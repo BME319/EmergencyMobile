@@ -1160,8 +1160,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
 //伤情、处置记录
 //生理参数采集
 ////---------------------伤情记录/处置，生理生化信息录入界面---------马志彬
-.controller('InjuryCtrl', ['$scope','$http','$ionicScrollDelegate','$ionicPlatform','bleService','$rootScope','Patients','$ionicPopup','$ionicHistory','VitalSignInfo','EmergencyInfo', '$state','Storage','PatientInfo','Evacation',
-  function ($scope,$http,$ionicScrollDelegate,$ionicPlatform,bleService,$rootScope,Patients,$ionicPopup,$ionicHistory,VitalSignInfo,EmergencyInfo, $state,Storage,PatientInfo,Evacation) {
+.controller('InjuryCtrl', ['$scope','$http','$ionicScrollDelegate','$ionicPlatform','bleService','$rootScope','Patients','$ionicPopup','$ionicHistory','VitalSignInfo','EmergencyInfo', '$state','Storage','PatientInfo',
+  function ($scope,$http,$ionicScrollDelegate,$ionicPlatform,bleService,$rootScope,Patients,$ionicPopup,$ionicHistory,VitalSignInfo,EmergencyInfo, $state,Storage,PatientInfo) {
   $scope.head = 'HEAD';
 
   //屏幕高度和宽度

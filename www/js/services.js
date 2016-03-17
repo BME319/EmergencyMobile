@@ -441,9 +441,9 @@ return{
       });
     return deferred.promise;
   };
-  self.UpdateTriage = function(PatientID, VisitNo, Status, TriageDateTime, TriageToDept){
+  self.UpdateTriage = function(TriageData){
     var deferred = $q.defer();
-    Data.PatientVisitInfo.UpdateTriage({PatientID:PatientID, VisitNo:VisitNo, Status:Status, TriageDateTime:TriageDateTime, TriageToDept:TriageToDept, UserID:'', TerminalName:'', TerminalIP:''}, function(data, headers){
+    Data.PatientVisitInfo.UpdateTriage(TriageData, function(data, headers){
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
@@ -464,7 +464,7 @@ return{
 
 
 
-//-------分流人员-列表、信息查看、分流-------- [张亚童]
+//-------分流人员-列表、信息查看、分流-------- [张桠童]
 .factory('VitalSignInfo', ['$q', '$http', 'Data', function( $q, $http, Data ){
   var self = this;
   // 获取某一病人体征信息（供分流使用）--张桠童
@@ -527,6 +527,70 @@ return{
     return deferred.promise;
   };
   return self;
+}])
+
+// 弹出分流框
+.factory('Popup', ['$state', '$ionicPopup', '$ionicLoading', 'MstDivision', 'PatientVisitInfo', 'Common', '$q', 'Storage', '$http', 'Data', function($state, $ionicPopup, $ionicLoading, MstDivision, PatientVisitInfo, Common, $q, Storage, $http, Data ){
+  return{
+    triagePopup: function(scope){
+      // 读入分诊去向字典表
+      var promise = MstDivision.GetDivisions();
+      promise.then(function(data){
+        scope.TriageDepts = data;
+      }, function(err){
+        // 无错误读入处理
+      });
+      scope.test = function(){
+        // console.log(scope.TriageData);
+      };
+      // 分流PID、VID、状态、时间、地点
+      scope.TriageData = {
+        "PatientID": Storage.get("PatientID"),
+        "VisitNo": Storage.get("VisitNo"),
+        "Status": "4",
+        "TriageDateTime": "",
+        "TriageToDept":"",
+        "UserID":"", 
+        "TerminalName":"", 
+        "TerminalIP":""
+      };
+      scope.TriageData.TriageDateTime = new Date(Common.DateTimeNow().fullTime);
+      temp_TriageData = [scope.TriageData];
+      // 弹出框
+      var Popup_triage = $ionicPopup.show({
+        templateUrl : 'templates/ambulance/triage.html',
+        scope : scope,
+        title : '分诊' ,
+        buttons : [
+          { text:'确定',
+            type:'button-assertive',
+            onTap: function(){
+              // 插入病人分诊信息
+              var promise = PatientVisitInfo.UpdateTriage(temp_TriageData);
+              promise.then(function(data){
+                if(data.result=="数据插入成功"){
+                  $ionicLoading.show({
+                    template: '分诊成功',
+                    duration:1000
+                  });
+                  $state.go('ambulance.list');
+                }
+              }, function(err){
+                // 无错误处理
+                  $ionicLoading.show({
+                    template: '分诊失败',
+                    duration:1000
+                  });
+              });
+            }
+          },
+          { text:'取消' ,
+            type:'button-positive'
+          }
+        ]
+      });
+    }
+  }
 }])
 //-------急救人员-伤情与处置-------- [马志彬]
 ////////////蓝牙(BLE)相关服务///马志彬-----------start

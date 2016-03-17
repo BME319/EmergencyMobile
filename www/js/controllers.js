@@ -333,14 +333,14 @@ angular.module('controllers', ['ionic','ngResource','services'])
   $scope.$on('$ionicView.enter', function() {
     $scope.refreshList();
   });
-
+  // 批量处理
   $scope.data = {
       showDelete: false
     };
   $scope.select = function(item) {
-    if(item.itemClass=="ion-ios-checkmark-outline") item.itemClass="ion-ios-checkmark";
-    else item.itemClass="ion-ios-checkmark-outline";
-  }
+    item.itemClass = !item.itemClass;
+  };
+
   //根据状态获取不同列表，并控制显示
   var GetPatientsbyStatus = function(Status)
   {
@@ -348,7 +348,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       promise.then(function(data)
       { 
          for(var i=0;i<data.length;i++){
-          data[i].itemClass="ion-ios-checkmark-outline";
+          data[i].itemClass=false;
          }
          $scope.PatientList = data;
          $scope.$broadcast('scroll.refreshComplete'); 
@@ -1113,9 +1113,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
 }])
 
 
-// --------分流人员-列表、信息查看、分流 [张亚童]----------------
+// --------分流人员-列表、信息查看、分流 [张桠童]----------------
 //信息查看
-.controller('ViewEmergencyCtrl', ['$scope', '$ionicHistory', '$http','$ionicPopup' ,'$ionicLoading','Storage','MstType', 'PatientInfo', 'VitalSignInfo', 'EmergencyInfo','PatientVisitInfo', 'Common', 'MstDivision',function ($scope, $ionicHistory,$http,$ionicPopup, $ionicLoading, Storage, MstType, PatientInfo, VitalSignInfo, EmergencyInfo, PatientVisitInfo, Common, MstDivision) {
+.controller('ViewEmergencyCtrl', ['$scope', '$ionicHistory', '$http','$ionicPopup' ,'$ionicLoading','Storage','MstType', 'PatientInfo', 'VitalSignInfo', 'EmergencyInfo','PatientVisitInfo', 'Common', 'MstDivision','Popup', function ($scope, $ionicHistory,$http,$ionicPopup, $ionicLoading, Storage, MstType, PatientInfo, VitalSignInfo, EmergencyInfo, PatientVisitInfo, Common, MstDivision, Popup) {
   
   $scope.goBack = function() {
     $ionicHistory.goBack();
@@ -1127,6 +1127,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
   var promise = PatientInfo.GetPsPatientInfo(Storage.get("PatientID"));
   promise.then(function(data){
     $scope.PatientInfos = data;
+        console.log($scope.PatientInfos);
   }, function(err){
     // 无错误读入处理
   });
@@ -1149,49 +1150,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
     // 无错误读入处理
   });
 
-  // 读入分诊去向字典表
-  var promise = MstDivision.GetDivisions();
-  promise.then(function(data){
-    $scope.TriageDepts = data;
-  }, function(err){
-    // 无错误读入处理
-  });
-
-  $scope.TriageDate = {"TriageDateTime":"", "TriageToDept":""};
-
-  //分诊popup的弹出
+  // 分诊按钮
   $scope.triagePopup = function(){
-    //分诊时间
-    $scope.TriageDate.TriageDateTime=new Date(Common.DateTimeNow().fullTime);
-
-    var Popup_triage = $ionicPopup.show({
-      templateUrl : 'triage.html',
-      scope : $scope,
-      title : '分诊' ,
-      buttons : [
-        { text:'确定',
-          type:'button-assertive',
-          onTap: function(){
-
-          // 插入病人分诊信息
-          var promise = PatientVisitInfo.UpdateTriage( Storage.get("PatientID"), Storage.get("VisitNo"), "4", $scope.TriageDate.TriageDateTime, '1|'+$scope.TriageDate.TriageToDept+'|0');
-          promise.then(function(data){
-            if(data.result=="数据插入成功"){
-              $ionicLoading.show({
-                template: '分诊成功',
-                duration:1000
-              });
-              // $state.go('Injurylist');
-            }
-          }, function(err){
-            // 无错误处理
-          });
-          }
-        },{ text:'取消' ,
-          type:'button-positive'
-        }
-      ]
-    });
+    Popup.triagePopup($scope);
   };
  
 }])

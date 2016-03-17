@@ -736,8 +736,8 @@ return{
 
     var openPop = function(){
       $ionicPopup.show({
-        title: '<center>发现NFC卡片</center>',
-        template: '卡片信息为空，新建患者？',
+        title: '<center>发现空的NFC卡片</center>',
+        template: '卡片无效，ID信息为空',
         //subTitle: '2',
         scope: $rootScope,
         buttons: [
@@ -745,11 +745,7 @@ return{
             text: '确定',
             type: 'button-assertive',
             onTap: function(e) {
-                $state.go('newPatient');
             }
-          },{ text: '取消',
-              type: 'button-calm',
-            onTap: function(e) {}
           }
         ]
       });      
@@ -760,9 +756,9 @@ return{
         function () {
             $rootScope.recordToWrite='';
             $rootScope.NFCmodefy=false;
+            $rootScope.isWritedToCard = true;
             $ionicLoading.hide();
             $ionicLoading.show({template:'NFC卡片写入成功',noBackdrop:true,duration:1000});
-            $state.go('injury');
         }, 
         function (reason) {
             $ionicLoading.hide();
@@ -803,15 +799,38 @@ return{
                   if(!$rootScope.NFCmodefy && (typeof(nfcEvent.tag.ndefMessage) === 'undefined' || nfcEvent.tag.ndefMessage[0].id=='')){
                     openPop();
                   }else if(!$rootScope.NFCmodefy){
-                    var temp= new Array();
-                    temp = nfc.bytesToString(nfcEvent.tag.ndefMessage[0].id).split("|");//取出相应数据
-                    //var pid=temp[0];
-                    //var visit=temp[1];
-                    Storage.set('PatientID',temp[0]);
-                    Storage.set('VisitNo',temp[1]);
-                    if(Storage.get('RoleCode') == 'EmergencyPersonnel') $state.go('visitInfo');
-                    else  $state.go('viewEmergency');
-                    
+                    var goToPatient = function(){
+                      var temp= new Array();
+                      temp = nfc.bytesToString(nfcEvent.tag.ndefMessage[0].id).split("|");//取出相应数据
+                      //var pid=temp[0];
+                      //var visit=temp[1];
+                      Storage.set('PatientID',temp[0]);
+                      Storage.set('VisitNo',temp[1]);
+                      if(Storage.get('RoleCode') == 'EmergencyPersonnel') $state.go('visitInfo');
+                      else  $state.go('viewEmergency');                      
+                    }                    
+                    if($state.current.name == 'newVisit' || $state.current.name == 'newPatient'){
+                      $ionicPopup.show({
+                        title: '<center>从NFC扫描到新患者</center>',
+                        template: '是否放弃当前新建操作，跳转到该患者信息页面？',
+                        //subTitle: '2',
+                        scope: $rootScope,
+                        buttons: [
+                          {
+                            text: '确定',
+                            type: 'button-assertive',
+                            onTap: function(e) {
+                                goToPatient();
+                            }
+                          },{ text: '取消',
+                              type: 'button-calm',
+                            onTap: function(e) {}
+                          }
+                        ]
+                      });                       
+                    }else{
+                      goToPatient();
+                    }
                   }
               });
               if($rootScope.NFCmodefy && $rootScope.recordToWrite!=undefined && $rootScope.recordToWrite!=''){

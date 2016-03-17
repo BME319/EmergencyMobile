@@ -20,6 +20,16 @@
         </a>  
       </div> 
 </ion-header-bar>
+<!-- <ion-footer-bar ng-if="data.showDelete">
+  <div class="row">
+    <div class="col buttons" ng-click="doSomething()">
+      <button class="button button-block button-assertive" style="height: 41.6px; margin-bottom: 0px; margin-top: 0px; bottom: 20px;">分诊</button>
+    </div>
+    <div class="col buttons" ng-click="data.showDelete = !data.showDelete;">
+      <button class="button button-block button-positive" style="height: 41.6px; margin-bottom: 0px; margin-top: 0px; bottom: 20px;">取消</button>
+    </div>
+  </div>
+</ion-footer-bar> -->
   <ion-content> 
     
     <ion-refresher pulling-text="下拉刷新" on-refresh="refreshList()"></ion-refresher>
@@ -31,7 +41,7 @@
             <input type="search" placeholder="ID/姓名" ng-model="query"> 
           </label>
       </div>
- <ion-list show-delete="data.showDelete">
+      <ion-list show-delete="data.showDelete">
         <ion-item ng-repeat="ct in PatientList| filter:query" class="item-avatar item-icon-right" ng-click ="setCurrent(ct)" on-hold="onHold(ct)">
           <img src="img/head_portrait.jpg">
           <span class="item-note" ng-if="tab2_checked || tab3_checked">伤情：{{ct.InjuryExtent}}</span>
@@ -39,9 +49,9 @@
           <p>ID号：{{ct.PatientID}}</p>
           <p>就诊号：{{ct.VisitNo}}</p>
           <i class="icon ion-chevron-right icon-accessory"></i>
-          <ion-delete-button class={{ct.itemClass}} ng-click="select(ct)"></ion-delete-button>
+          <ion-delete-button ng-class="{true:'ion-android-checkbox-outline',false:'ion-android-checkbox-outline-blank'}[ct.itemClass]" ng-click="select(ct)"></ion-delete-button>   
         </ion-item>   
-            </ion-list>  
+      </ion-list>  
     </div>
    
    <!-- <div ng-if="tab2_checked">

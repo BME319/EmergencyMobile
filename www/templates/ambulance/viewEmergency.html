@@ -99,38 +99,3 @@
 </ion-content>
 </ion-view>
 
-<script id="triage.html" type="text/ng-template">
-	 
-	<ion-item>
-		
-		<div>
-			<span class="input-label" style="width:100%"><h2>时间</h2></span> 
-		</div>  
-
-		<div style="width:100%">
-			<input type="datetime-local" class="item-input-wrapper" ng-model="TriageDate.TriageDateTime" style="width:100%; margin-top: 7px">
-		</div>
-
-		<div>
-			<span class="input-label" style="width:100%"><h2>去向</h2></span> 
-		</div> 
-
-		<div style="width:100%">
-			<select ng-model="TriageDate.TriageToDept" ng-options="TriageDept.Code as TriageDept.Name for TriageDept in TriageDepts" style="width:100%; margin-top: 7px">
-				<option value="">请选择分诊方向</option>
-			</select>
-		</div>
-		
-	</ion-item>
-
-	<style>
-		.popup-head {
-			padding-bottom : 0px;
-		}
-		.popup-title {
-			color : #4a87ee;
-			font-size : 180%;
-		}
-	</style>
-	
-</script>

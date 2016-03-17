@@ -266,15 +266,6 @@ angular.module('controllers', ['ionic','ngResource','services'])
       ]
     });    
   }
-  $scope.wirteToCard = function(){
-    $rootScope.NFCmodefy=true;
-    var type = "text/pg",
-        pid = "331972146|2016313",
-        payload = nfc.stringToBytes("test success"),
-        record = ndef.record(ndef.TNF_MIME_MEDIA, type, pid, payload);
-    $rootScope.recordToWrite=record;
-    $ionicLoading.show({template:'请将手机靠近NFC卡片'});
-  }
   $scope.eraseCard = function(){
     $rootScope.eraseCard=true;
     $ionicLoading.show({template:'请将手机靠近NFC卡片'});
@@ -688,26 +679,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
 .controller('NewVisitCtrl', ['$rootScope','$timeout','$scope', '$ionicHistory', '$http','$ionicPopup' ,'PatientVisitInfo', '$ionicLoading','MstType','Storage','PatientInfo', 'Common', 'MstEva','$state' ,'Evacation',function ($rootScope,$timeout,$scope, $ionicHistory,$http,$ionicPopup,PatientVisitInfo, $ionicLoading,MstType,Storage, PatientInfo, Common, MstEva, $state,Evacation) {
 
   //写入信息
+  $rootScope.isWritedToCard = false;
+  var VNo,PID;
   $scope.wirteToCard = function(){
-    if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')){
-      $rootScope.NFCmodefy=true;
-      var type = "text/pg",
-          id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
-          payload = "",//暂时用不到
-          // payload = nfc.stringToBytes("fdsf"),
-          record = ndef.record(ndef.TNF_MIME_MEDIA, type, id, payload);
-      $rootScope.recordToWrite=record;
-      $ionicLoading.show({template:'信息写入,请将设备靠近NFC卡片'});
-    }
-    else
-    {
-        $ionicLoading.show({
-           template: '请先保存就诊记录',
-           noBackdrop: false,
-           duration: 1000,
-           hideOnStateChange: true
-        });
-    }
+    $scope.saveVisitInfo(false);
   }
 
   $scope.goBack = function() {
@@ -715,6 +690,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
 
   $scope.goInjury = function() {
+    if(!$rootScope.isWritedToCard){
+      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+      return;
+    } 
     if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')){
        Storage.set("New", 1);
        $state.go('injury');
@@ -738,6 +717,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
      promise.then(function(data)
      { 
         $scope.NewVisitNo = data;
+        if(PID!=Storage.get("PatientID") || VNo!=$scope.NewVisitNo){
+          $rootScope.isWritedToCard = false;
+          PID=Storage.get("PatientID");VNo=$scope.NewVisitNo;
+        }
         },function(err) {   
      });      
   }
@@ -763,7 +746,12 @@ angular.module('controllers', ['ionic','ngResource','services'])
   $scope.visitInfo={"InjuryArea": "", "InjuryDateTime": new Date(Common.DateTimeNow().fullTime), "VisitDateTime": new Date(Common.DateTimeNow().fullTime)};
 
   //保存
-  $scope.saveVisitInfo = function() {
+  $scope.saveVisitInfo = function(Type) {
+    if(Type && !$rootScope.isWritedToCard){
+      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+      return;
+    }
+    $ionicLoading.show();
     var sendData = {
                   "PatientID": Storage.get("PatientID"),
                   "VisitNo":  $scope.NewVisitNo.VisitNo,
@@ -790,15 +778,22 @@ angular.module('controllers', ['ionic','ngResource','services'])
               //console.log(sendData);
               var promise =  PatientVisitInfo.SetPsPatientVisitInfo(sendData);
               promise.then(function(data){ 
+                  $ionicLoading.hide();
                   if(data.result=="数据插入成功"){
                       //Storage存入VisitNo
                       Storage.set("VisitNo",$scope.NewVisitNo.VisitNo); 
-                      $ionicLoading.show({
-                       template: "保存VisitNo成功",
-                       noBackdrop: true,
-                       duration: 700,
-                      });
-                      $timeout($scope.wirteToCard(),500);
+                      if(Type){
+                        $ionicLoading.show({template: "保存VisitNo成功", noBackdrop: true, duration: 700});
+                      }else{
+                        $rootScope.NFCmodefy=true;
+                        var type = "text/pg",
+                            id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
+                            payload = "",//暂时用不到
+                            // payload = nfc.stringToBytes("fdsf"),
+                            record = ndef.record(ndef.TNF_MIME_MEDIA, type, id, payload);
+                        $rootScope.recordToWrite=record;
+                        $ionicLoading.show({template:'信息写入,请将设备靠近NFC卡片'});              
+                      }
                   }
                 },function(err) {  
                    $ionicLoading.show({

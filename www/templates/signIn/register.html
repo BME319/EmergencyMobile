@@ -1,0 +1,71 @@
+<ion-view title="新用户注册">
+  <ion-nav-bar class="bar-calm nav-title-slide-ios7">
+<!--     <ion-nav-buttons side="left">
+      <button class="button button-icon icon ion-android-arrow-back" ng-click="onClickBackward()"></button>
+    </ion-nav-buttons>  -->  
+    <ion-nav-back-button class="button-icon ion-android-arrow-back">返回</ion-nav-back-button>    
+  </ion-nav-bar>
+  <div  style="position: absolute;top: 43px;z-index:100;display: block;height: 2.5px;background-color: #ef473a;{{barwidth}}" ></div>
+  <ion-content padding="true">
+    <div class="list" style="margin-bottom:0" >
+        <label class="item item-input">
+          <span class="input-label" style="width:80px">用户名</span>
+          <input type="text" ng-model="register.UserId" placeholder="设置登录帐号">
+        </label>
+        <label class="item item-input">
+          <span class="input-label" style="width:80px">密码</span>
+          <input type="password" ng-model="register.LoginPassword" placeholder="密码长度要求为6~20位">
+        </label>
+        <label class="item item-input">
+          <span class="input-label" style="width:80px">确认密码</span>
+          <input type=password ng-model="register.LoginPassword0" placeholder="请再次输入密码进行确认">
+        </label>
+        <!-- <label class="item item-input"> -->
+        <!-- </label>       -->
+        <label class="item item-input">
+          <span class="input-label" style="width:80px">姓名</span>
+          <input type="text" ng-model="register.UserName" placeholder="请填写真实姓名">
+        </label>
+        <label  class="item item-input item-select">
+        <div class="input-label">角色</div>
+        <select ng-model="register.role">
+          <option value="">请选择</option>
+          <option>急救人员</option>
+          <option>分流人员</option>
+          <option>分流组长</option>
+        </select>
+        </label>    
+        <div class="item" style="background-color: #EFEFD0;padding:6px 0 3px 0;font-style: italic;font-size:0.9em">以下项目非必填</div>
+<!--       <label  class="item item-input item-select">
+        <div class="input-label">性别</div>
+        <select ng-model="register.gender">
+          <option value="">请选择</option>
+          <option >女</option>
+          <option>男</option>
+        </select>
+      </label> -->      
+               
+ <!--      <a class="item">
+        <div>
+          <span>角色</span><span class="item-note">role{{role}}</span>
+        </div>
+      </a>  -->   
+      <label class="item item-input">
+        <span class="input-label" style="width:80px">专业</span>
+        <input type="text" ng-model="register.Occupation" placeholder="请填写您的职业">
+      </label>       
+      <label class="item item-input">
+        <span class="input-label" style="width:80px">职称</span>
+        <input type="text" ng-model="register.Position" placeholder="请填写您的职位">
+      </label>        
+      <label class="item item-input">
+        <span class="input-label" style="width:80px">机构</span>
+        <input type="text" ng-model="register.Affiliation" placeholder="请填写您的工作单位">
+      </label> 
+  
+      <span style="color:#c55e19">{{logStatus}}</span><span style="color:white">0</span>                
+    </div>        
+    <button  class="button button-block button-assertive" ng-click="Register(register)">注 册</button>          
+  </ion-content>
+  </div>
+</ion-view>

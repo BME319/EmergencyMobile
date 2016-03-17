@@ -1,0 +1,29 @@
+<ion-view title="提交位置信息">
+  <ion-nav-bar class="bar-dark nav-title-slide-ios7">
+    <ion-nav-buttons side="left">
+      <button class="button button-icon icon ion-android-arrow-back" ng-if="navFlag" ng-click="onClickBackward()"></button>
+    </ion-nav-buttons>    
+  </ion-nav-bar>
+  <ion-content >
+<!--     <a class="item " style="white-space:normal" ng-if="myLocation">当前选择： {{myLocation.text}}</a>
+    <div class="list">
+    <ion-radio ng-repeat="location in locationList"  ng-value="location.text" ng-model="myLocation.text">{{location.value}}</ion-radio>  
+    </div> 
+    <button padding="true" class="button button-block button-assertive" ng-click="setLocation()">提 交</button> -->
+
+    <ion-list>
+      <ion-item class="item-stable item-icon-right" ng-click="toggleList()" ng-class="{active: isGroupShown(group)}">
+        <!-- <i class="icon ion-chevron-down" ng-if="!isListShow"></i><i class="icon ion-chevron-up" ng-if="isListShow"></i> -->
+        <!-- <i class="icon" ng-class="{isListShown? 'ion-chevron-up':'ion-chevron-down'}"></i> -->
+        <i class="icon" ng-class="isIconShown() ?'ion-chevron-up':'ion-chevron-down'"></i>
+        当前选择： {{myLocation.Description}}
+      </ion-item>
+<!--       <ion-item ng-repeat="location in locationList" ng-show="isListShown">
+        {{location.value}}
+      </ion-item> -->
+      <ion-radio class="item-accordion" ng-repeat="location in locationList" ng-show="isListShown" ng-value="location.Description" ng-model="myLocation.Description">{{location.Description}}</ion-radio>  
+      <button class="item-accordion button button-block button-assertive" style="transition: 0.09s all linear" ng-show="isListShown" ng-click="setLocation()">提 交</button>
+    </ion-list>  
+  </ion-content>
+  </div>
+</ion-view>

@@ -1,0 +1,136 @@
+<ion-view view-title = "患者就诊信息">
+
+<ion-nav-bar class="bar-calm">
+	<ion-nav-buttons side="primary">
+      <button class="button button-icon icon ion-ios-home" ng-click="goBack()"></button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+       <a class="button button-icon icon ion-android-contact" href="#/patientInfo"></a>
+    </ion-nav-buttons>
+
+	<div class="bar bar-footer">
+		<button class="button button-block button-assertive" ng-click="triagePopup()" style="height: 41.6px; margin-bottom: 0px; margin-top: 0px;"><b><h4>分&nbsp;&nbsp;诊</h4></b></button>
+	</div>
+</ion-nav-bar>
+
+<ion-content>
+	<ion-list>
+		<div class = "list card">
+			<ion-item class = "item-calm">
+				<i class = "icon ion-android-arrow-dropdown"></i>&nbsp;&nbsp;伤员基本信息
+			</ion-item>
+			<ion-item class = "item item-avatar item-accordion" ng-show = "true">
+				<img ng-src="img/head_portrait.jpg" />
+				<div class = "row">
+					<div class = "col">
+						<span><b></b></b></span>{{PatientInfos.PatientID}}
+					</div>
+					<div class = "col">
+						<span><b></b></span>V001
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col">
+						<span><b>姓名：</b></span>{{PatientInfos.PatientName}}
+					</div>
+					<div class = "col">
+						<span><b>性别：</b></b></span>{{PatientInfos.Gender|sex}}
+					</div>
+				</div>
+				<div class = "row">
+					
+					<div class = "col">
+						<span><b>年龄：</b></span>{{PatientInfos.Age}}
+					</div>
+					<div class = "col">
+						<span><b>血型：</b></span>{{PatientInfos.BloodType}}
+					</div>
+				</div>
+				<!-- <div class = "row">
+					<div class = "col">
+						<span><b>出生日期：</b></b></span>{{PatientInfos.DOB}}
+					</div>
+					
+				</div>
+				<div class = "row">
+					<div class = "col">
+						<span><b>药敏：</b></b></span>{{PatientInfos.Allergy}}
+					</div>
+					<div class = "col">
+						<span><b>部别：</b></span>{{PatientInfos.TroopType}}
+					</div>
+				</div>
+				<div class = "row">
+					<div class = "col">
+						<span><b>职位：</b></b></span>{{PatientInfos.Job}}
+					</div>
+					<div class = "col">
+						<span><b>军衔：</b></span>{{PatientInfos.Rank}}
+					</div>
+				</div> -->
+			</ion-item>
+		</div>
+
+		<div class = "list card">
+			<ion-item class = "item-calm">
+				<i class = "icon ion-android-arrow-dropdown"></i>&nbsp;&nbsp;生理体征参数信息
+			</ion-item>
+			<ion-item  ng-show = "true">
+				<div class="row row-wrap">
+					<div class="col col-50" ng-repeat="VitalSignInfo in VitalSignInfos">
+						<span><b>{{VitalSignInfo.ItemName}}：</b></span>{{VitalSignInfo.ItemValue}}{{VitalSignInfo.ItemUnit}}
+					</div>
+				</div>
+			</ion-item>
+		</div>
+
+		<div class = "list card">
+			<ion-item class = "item-calm">
+				<i class = "icon ion-android-arrow-dropdown"></i>&nbsp;&nbsp;伤情与处置一览
+			</ion-item>
+			<ion-item class = "item-accordion" ng-show = "true">
+				<div ng-repeat="EmergencyInfo in EmergencyInfos">
+					<p><b>{{EmergencyInfo.CategoryName}}：</b></p><p style="white-space:pre-wrap;"><span ng-repeat="item in EmergencyInfo.Item" >{{item.ItemValue}}；</span></p>
+				</div>
+			</ion-item>
+		</div>
+	</ion-list>
+
+</ion-content>
+</ion-view>
+
+<script id="triage.html" type="text/ng-template">
+	 
+	<ion-item>
+		
+		<div>
+			<span class="input-label" style="width:100%"><h2>时间</h2></span> 
+		</div>  
+
+		<div style="width:100%">
+			<input type="datetime-local" class="item-input-wrapper" ng-model="TriageDate.TriageDateTime" style="width:100%; margin-top: 7px">
+		</div>
+
+		<div>
+			<span class="input-label" style="width:100%"><h2>去向</h2></span> 
+		</div> 
+
+		<div style="width:100%">
+			<select ng-model="TriageDate.TriageToDept" ng-options="TriageDept.Code as TriageDept.Name for TriageDept in TriageDepts" style="width:100%; margin-top: 7px">
+				<option value="">请选择分诊方向</option>
+			</select>
+		</div>
+		
+	</ion-item>
+
+	<style>
+		.popup-head {
+			padding-bottom : 0px;
+		}
+		.popup-title {
+			color : #4a87ee;
+			font-size : 180%;
+		}
+	</style>
+	
+</script>

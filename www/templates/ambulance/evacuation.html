@@ -1,0 +1,56 @@
+<div class="list">
+
+  <div class="row">
+    后送时间
+   </div> 
+    <div class="row">
+      <input type="datetime-local"  style="width:100%;background:#f4f4f4;" ng-model="evacuationInfo.EvaDateTime"> 
+  </div> 
+
+  <!-- <div class="row">
+    <div class="col" >后送时间</div>  
+    <div class="col-50">
+      <input type="datetime-local"  style="width:100%;background:#f4f4f4;" ng-model="evacuationInfo.EvaDateTime"> 
+    </div>
+  </div>   --> 
+  <div class="row">
+    <div class="col" >后送方式 </div>  
+    <div class="col-50">
+      <select ng-model="evacuationInfo.EvaTransportation" ng-options="EvaTransportation.Type as EvaTransportation.Description for EvaTransportation in EvaTransportations" ng-change="changeEVABatchNos(evacuationInfo.EvaTransportation)">
+      </select>
+    </div>
+  </div>     
+
+  <div class="row">
+    <div class="col" >后送批次 </div>  
+    <div class="col-50">
+      <select ng-model="evacuationInfo.EvaBatchNo" ng-options="EVABatchNo.EVANO as EVABatchNo.EVATransName for EVABatchNo in EVABatchNos" >
+      </select>
+    </div>
+  </div>     
+  <div class="row">
+    <div class="col">后送体位 </div>  
+    <div class="col-50">
+      <select ng-model="evacuationInfo.EvaPosition" ng-options="EvaPosition.Type as EvaPosition.Description for EvaPosition in EvaPositions" >
+      </select>
+    </div>
+  </div> 
+
+  <div class="row">
+    <div class="col">后送地点 </div>  
+    <div class="col-50">
+      <select ng-model="evacuationInfo.EvaDestination" ng-options="EvaDestination.Type as EvaDestination.Description for EvaDestination in EvaDestinations" >
+      </select>
+    </div>
+  </div> 
+  
+<style>
+.popup-title{
+   color: black;
+   font-size:28px;
+   font-weight:bold;
+  /* background-color: Red;*/
+ }
+</style>
+
+      

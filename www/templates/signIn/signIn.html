@@ -1,0 +1,33 @@
+<ion-view >
+  <div  style="position: absolute;top: 43px;z-index:100;display: block;height: 2.5px;background-color: #ef473a;{{barwidth}}" ></div>
+
+  <ion-content padding="true" style="padding-left:10%;padding-right:10%;background-image:url(img/signInBackground.png);">
+    <h2 style="text-align:center;color:#FFF;padding-top:40px;padding-bottom:60px">快速分流急救系统</h2>
+    <div class="list list-inset" style="margin-bottom:0">
+      <label class="item item-input" >
+        <span class="input" style="margin-right:16px"><i class="icon ion-person"></i></span>
+        <input type="text"  ng-model="account.UserID" placeholder="用户名" >
+      </label>
+      <label class="item item-input">
+        <span class="input" style="margin-right:16px"><i class="icon ion-locked"></i></span>
+        <input type="password" ng-model="account.password" placeholder="密 码" >
+      </label>
+    </div>
+    <div class="row">
+      
+    </div>
+    <!-- <p style="color:#B8B8B8">{{logStatus}}</p><span>0</span> -->
+<!--           <div class="row" style="padding:0" >
+          <div class="col col-75" style="padding-left:0;padding-right:0"><p style="color:#B8B8B8">{{logStatus}}</p></div>
+          <div class="col" style="padding-left:0;padding-right:0"><p style="color:#9999cc;text-align:right" ng-click="toReset()">忘记密码</p></div>
+        </div> -->
+          <div class="row" style="padding:0;min-height: 30px" >
+          <p style="color:#B8B8B8">{{logStatus}}</p>
+        </div>        
+    <button style="margin-top:0" class="button button-block button-assertive" ng-click="signIn(account)">登 录</button>          
+  </ion-content>
+          
+  <div  class="text-center hide-on-keyboard-open" style="position:absolute;bottom:0px;width:100%;min-height:10%">
+    <span style="color:#aaaadd">还没有帐号？</span><a style="color:#FFFFFF" ng-click="toRegister()">注册</a>
+  </div>
+</ion-view>

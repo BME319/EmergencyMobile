@@ -1,0 +1,122 @@
+<ion-view view-title="患者基本信息">
+  <ion-nav-bar class="bar-calm">
+    <ion-nav-buttons side="primary">
+      <button class="button button-clear" ng-click="goBack()">返回</button>
+    </ion-nav-buttons>
+  </ion-nav-bar>
+
+  <ion-content>
+    <ion-list >
+
+      <ion-item style="border:none; text-align:center;" >
+         <img ng-src="img/head_portrait.jpg"  style="border-radius:50%; height:20%; width:30%">
+      </ion-item>
+
+      <ion-item>
+        <div class="row">
+          <div class="col" style="width:100%">
+            <span class="input-label">患者ID</span> 
+          </div>  
+          <div class="col-67" >
+          <input type="text" ng-model="BasicInfo.PatientID" style="width:100%;background:#f4f4f4;height:34px;" readonly="readonly"> 
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <span class="input-label">患者姓名</span> 
+          </div>  
+          <div class=" col-67" >
+            <input type="text" ng-model="BasicInfo.PatientName" style="width:100%;background:#f4f4f4;height:34px;" >
+          </div>
+        </div>
+
+          <div class="row">
+          <div class="col" style="width:100%">
+            <span class="input-label">性别</span> 
+          </div>  
+          <div class="col col-67">
+            <select ng-model="BasicInfo.Gender" ng-options="Gender.Type as Gender.Description for Gender in Genders" style="width:100%">
+            </select>
+          </div>
+        </div>
+      
+       <form>
+        <div class="row">
+          <div class="col">
+            <span class="input-label" >患者年龄</span> 
+          </div>  
+          <div class=" col-67" >
+            <input  type="number"  required min='0' ng-model="BasicInfo.Age" style="width:100%;background:#f4f4f4;height:34px;" >
+          </div>
+        </div>
+        </form>
+
+        <div class="row">
+          <div class="col">
+            <span class="input-label">出生日期</span> 
+          </div>  
+          <div class=" col-67" >
+            <input type="text" ng-model="BasicInfo.DOB" style="width:100%;background:#f4f4f4;height:34px;" >
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <span class="input-label">血型</span> 
+          </div>  
+          <div class="col col-67" style="width:100%">
+            <select ng-model="BasicInfo.BloodType" ng-options="BloodType.Type as BloodType.Description for BloodType in BloodTypes" style="width:100%">
+              <!-- <option value="">-请选择-</option> -->
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col" style="width:100%">
+            <span class="input-label">药敏</span> 
+          </div>  
+          <div class="col-67" >
+          <input type="text" ng-model="BasicInfo.Allergy" style="width:100%;background:#f4f4f4;height:34px;" > 
+          </div>
+        </div>
+
+         <div class="row">
+          <div class="col" style="width:100%">
+            <span class="input-label">部别</span> 
+          </div>  
+          <div class="col col-67">
+            <select ng-model="BasicInfo.Troop" ng-options="Troop.Type as Troop.Description for Troop in Troops" style="width:100%">
+            </select>
+          </div>
+        </div>
+        
+
+        <div class="row">
+          <div class="col" style="width:100%">
+            <span class="input-label">职位</span> 
+          </div>  
+          <div class="col col-67">
+            <select ng-model="BasicInfo.JOB" ng-options="JOB.Type as JOB.Description for JOB in JOBs" style="width:100%">
+            </select>
+          </div>
+        </div>
+       
+         
+        <div class="row">
+          <div class="col" style="width:100%">
+            <span class="input-label">头衔</span> 
+          </div>  
+          <div class="col col-67">
+            <select ng-model="BasicInfo.Rank" ng-options="Rank.JOB as Rank.Description for Rank in Ranks" style="width:100%">
+            </select>
+          </div>
+        </div>
+      </ion-item>
+
+   </ion-list>
+  </ion-content>
+<ion-footer-bar>
+    <button ng-click='showConfirm()' class="button button-full button-assertive" style="height: 41.6px; margin-bottom: 0px; margin-top: 0px;">保存</button>
+</ion-footer-bar>
+</ion-view>

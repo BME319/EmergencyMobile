@@ -1,0 +1,66 @@
+
+<ion-view view-title="急救伤员列表">
+<ion-nav-buttons side="secondary">
+    <a class="button button-icon icon ion-android-person-add" href="#/newPatient" ng-if="newPatientIcon"></a>
+    <button class="button button-clear" ng-click="data.showDelete = !data.showDelete;" ng-if=false>批量操作</button><!-- (!newPatientIcon)&&(curtab=="tab3") -->
+</ion-nav-buttons>
+<ion-header-bar class="bar-calm">
+    <div class="tabs tabs-icon-top tabs-top"  >  
+        <a class="tab-item" ng-click="sel_tab('tab1')"    >  
+          <i class="icon ion-ios-heart"  ng-style="tab1_color"  ></i>  
+              <span  ng-style="tab1_color">已接收</span>  
+        </a>  
+        <a class="tab-item" ng-click="sel_tab('tab2')">  
+          <i class="icon ion-ios-star-half" ng-style="tab2_color" ></i>  
+              <span  ng-style="tab2_color">已后送</span>  
+        </a>                    
+        <a class="tab-item" ng-click="sel_tab('tab3')" >  
+          <i class="icon ion-ios-star" ng-style="tab3_color"></i>  
+          <span  ng-style="tab3_color">已送达</span>  
+        </a>  
+      </div> 
+</ion-header-bar>
+  <ion-content> 
+    
+    <ion-refresher pulling-text="下拉刷新" on-refresh="refreshList()"></ion-refresher>
+
+    <div>
+       <div class="bar item-input-inset" style="margin-top:50px;vertical-align:center;">
+          <label class="item-input-wrapper">
+            <i class="icon ion-search placeholder-icon"></i>
+            <input type="search" placeholder="ID/姓名" ng-model="query"> 
+          </label>
+      </div>
+ <ion-list show-delete="data.showDelete">
+        <ion-item ng-repeat="ct in PatientList| filter:query" class="item-avatar item-icon-right" ng-click ="setCurrent(ct)" on-hold="onHold(ct)">
+          <img src="img/head_portrait.jpg">
+          <span class="item-note" ng-if="tab2_checked || tab3_checked">伤情：{{ct.InjuryExtent}}</span>
+          <h2>姓名：{{ct.PatientName}}</h2>
+          <p>ID号：{{ct.PatientID}}</p>
+          <p>就诊号：{{ct.VisitNo}}</p>
+          <i class="icon ion-chevron-right icon-accessory"></i>
+          <ion-delete-button class={{ct.itemClass}} ng-click="select(ct)"></ion-delete-button>
+        </ion-item>   
+            </ion-list>  
+    </div>
+   
+   <!-- <div ng-if="tab2_checked">
+      <div class="bar item-input-inset" style="margin-top:50px;vertical-align:center;">
+        <label class="item-input-wrapper">
+          <i class="icon ion-search placeholder-icon"></i>
+          <input type="search" placeholder="ID/姓名" ng-model=""> 
+        </label>
+      </div>
+
+      <ion-item href='#/visitInfo' ng-repeat="Patient in PatientsList2" class="item-avatar item-icon-right" ng-click ="setCurrent(Patient)">
+        <img src="img/head_portrait.jpg">
+        <span class="item-note">{{Patient.InjuryExtent}}</span>
+        <h2>姓名：{{Patient.PatientName}}</h2>
+        <p>ID号：{{Patient.PatientID}}</p>
+        <p>就诊号：{{Patient.VisitNo}}</p>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+      </ion-item>     
+    </div> -->
+
+  </ion-content>
+</ion-view>

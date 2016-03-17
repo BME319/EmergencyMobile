@@ -1,0 +1,17 @@
+
+<ion-view view-title="主页" >
+    <ion-nav-bar class="bar-calm">
+    </ion-nav-bar>
+    <ion-tabs class="tabs-icon-top tabs-color-active-positive bar-footer {{$root.hideTabs}}">
+      <ion-tab title="急救" icon-off="ion-medkit" icon-on="ion-medkit" href="#/ambulance/list">
+        <ion-nav-view name="ambulance"></ion-nav-view>
+      </ion-tab>
+
+      <ion-tab title="我" icon-off="ion-person" icon-on="ion-person" href="#/ambulance/mine" >
+        <ion-nav-view name="mine"></ion-nav-view>
+      </ion-tab>
+
+    </ion-tabs>
+</ion-view>
+
+

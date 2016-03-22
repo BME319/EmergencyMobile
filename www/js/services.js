@@ -870,9 +870,7 @@ return{
         });
     }
 
-    return {
-      start,
-    };
+    return start;
 })
 
 

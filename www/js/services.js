@@ -870,11 +870,11 @@ return{
         });
     }
 
-    return {
-      start,
-    };
+    return start;
 })
 
+
+//后送
 .factory('Evacation', function ($rootScope, $ionicPlatform,$ionicPopup,$ionicLoading,$state,Storage,PatientVisitInfo,MstEva,Common,MstType) {
 
    function getPopup(scope) {

@@ -560,8 +560,11 @@ angular.module('controllers', ['ionic','ngResource','services'])
       var promise_CheckPatientID = PatientInfo.CheckPatientID( $scope.NewPatientID.PatientID);
       promise_CheckPatientID.then(function(data)
        { 
+           
           if(data.result=="病人Id不存在"){
              //showConfirm();
+             if($scope.BasicInfo.DOB) $scope.birthcheck='';
+             else $scope.birthcheck='required';
              setPatientInfo();
           }
           else{
@@ -575,7 +578,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       }); 
     } //else end
   }  
-   
+
    //将生日转化为年龄
     var  jsGetAge=function(strBirthday)
     {       
@@ -806,7 +809,11 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
      
   //后送选择框         
-      $scope.showreservePop = function() {
+    $scope.showreservePop = function() {
+      if(!$rootScope.isWritedToCard){
+        $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+        return;
+      }
      var myPopup = Evacation.getPopup($scope);
      myPopup.then(function(res) {
      console.log('haha',res);
@@ -933,6 +940,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
    //修改患者基本信息确认框
    $scope.showConfirm = function() {
+      
       $scope.confirmPopup = $ionicPopup.confirm({
          //title: '确认修改?',
          template: '<center>确定修改患者基本信息？</center>',
@@ -957,10 +965,14 @@ angular.module('controllers', ['ionic','ngResource','services'])
                 'TerminalName':"",
                 "TerminalIP": ""
               }
+             
             var promise =  PatientInfo.SetPatientInfo(sendData);
-            promise.then(function(data){ 
+            promise.then(function(data){
+
                   if(data.result=="数据插入成功"){
+                   
                     Storage.set("PatientName", $scope.BasicInfo.PatientName);
+                    
                     $ionicLoading.show({
                        template: "患者基本信息修改成功",
                        noBackdrop: true,
@@ -1155,8 +1167,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
 //伤情、处置记录
 //生理参数采集
 ////---------------------伤情记录/处置，生理生化信息录入界面---------马志彬
-.controller('InjuryCtrl', ['$scope','$http','$ionicScrollDelegate','$ionicPlatform','bleService','$rootScope','Patients','$ionicPopup','$ionicHistory','VitalSignInfo','EmergencyInfo', '$state','Storage','PatientInfo',
-  function ($scope,$http,$ionicScrollDelegate,$ionicPlatform,bleService,$rootScope,Patients,$ionicPopup,$ionicHistory,VitalSignInfo,EmergencyInfo, $state,Storage,PatientInfo) {
+.controller('InjuryCtrl', ['$scope','$http','$ionicScrollDelegate','$ionicPlatform','bleService','$rootScope','Patients','$ionicPopup','$ionicHistory','VitalSignInfo','EmergencyInfo', '$state','Storage','PatientInfo','Evacation',
+  function ($scope,$http,$ionicScrollDelegate,$ionicPlatform,bleService,$rootScope,Patients,$ionicPopup,$ionicHistory,VitalSignInfo,EmergencyInfo, $state,Storage,PatientInfo,Evacation) {
   $scope.head = 'HEAD';
 
   //屏幕高度和宽度

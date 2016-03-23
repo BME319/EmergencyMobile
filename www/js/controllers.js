@@ -1250,6 +1250,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
           {
             $scope.catalog[s[i].ItemCategory][s[i].ItemCode-1].value = s[i].ItemValue;
           }
+          scoring();
         },
         function(e){
           console.log(e);
@@ -1279,6 +1280,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
                   $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1].value = s[i1].Item[i2].ItemValue;
               }
             }
+            angular.forEach($scope.catalog.InjuryExtent,function(value,key){
+              value.status=false;
+            })
           },
           function(e){
             // console.log(e);
@@ -1432,7 +1436,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       };
       $scope.saveall = function(){
 
-        // console.log($scope.catalog);
+        console.log($scope.catalog);
         postEmergencydata.postdata = [];
         postVitalSigndata.postdata = [];
         angular.forEach($scope.catalog,function(value,key){
@@ -1478,10 +1482,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
           Patients.PostVitalSign(postVitalSigndata).then(
             function(s){
             // console.log(s.result);
-            window.plugins.toast.showShortBottom('生理/生化信息保存成功');
+            //window.plugins.toast.showShortBottom('生理/生化信息保存成功');
           },function(e){
             // console.log(e);
-            window.plugins.toast.showShortBottom('生理/生化信息保存失败');
+            //window.plugins.toast.showShortBottom('生理/生化信息保存失败');
           });
         }
         if(postEmergencydata.postdata.length>0)
@@ -1489,10 +1493,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
           Patients.PostEmergency(postEmergencydata).then(
             function(s){
             // console.log(s.result);
-            window.plugins.toast.showShortBottom('急救信息保存成功');
+           // window.plugins.toast.showShortBottom('急救信息保存成功');
           },function(e){
             // console.log(e);
-            window.plugins.toast.showShortBottom('急救信息保存失败');
+            //window.plugins.toast.showShortBottom('急救信息保存失败');
           });
         }
       }
@@ -1619,10 +1623,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
       // console.log(breathscoring);
       // console.log(bp_hscoring);
       // console.log(mindscoring);
+      $scope.showscoredetail = function()
+      {
+        if(ionic.Platform.platform()!='win32')
+          window.plugins.toast.showShortTop("战伤计分:"+$scope.scoring);
+        else 
+          console.log("战伤计分:"+$scope.scoring);
+      }
       $scope.scoring = breathscoring+bp_hscoring+mindscoring;
       if($scope.scoring>=6&&$scope.scoring<=9)
         {
-          $scope.scoring+=" 分 重伤-紧急处置";
+          $scope.scoring+="分 重伤-紧急处置";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":3,
@@ -1634,7 +1645,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
         }
       else if($scope.scoring>=10&&$scope.scoring<=11)
        { 
-        $scope.scoring+=" 分 中度伤-优先处置";
+        $scope.scoring+="分 中度伤-优先处置";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":2,
@@ -1646,7 +1657,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       }
       else if($scope.scoring==12)
         {
-          $scope.scoring+=" 分 轻伤-常规处置";
+          $scope.scoring+="分 轻伤-常规处置";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":1,
@@ -1658,7 +1669,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
         }
       else if($scope.scoring<=5)
         {
-          $scope.scoring+=" 分 危重伤-期待处置";
+          $scope.scoring+="分 危重伤-期待处置";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":4,

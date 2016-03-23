@@ -554,6 +554,7 @@ return{
         "TerminalName":"", 
         "TerminalIP":""
       };
+      scope.TriageData.TriageToDept = "Dept05";
       scope.TriageData.TriageDateTime = new Date(Common.DateTimeNow().fullTime);
       temp_TriageData = [scope.TriageData];
       // 弹出框

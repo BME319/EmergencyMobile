@@ -551,8 +551,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
     }); 
   }
     
-  GetDefault(); //加载页面默认参数     
-
+  GetDefault(); //加载页面默认参数  
+  //$scope.BasicInfo={DOB:Date()};
+  
   //检查新建的PID是否重复,不重复则弹出确认框
   $scope.SaveNewPatientID = function() {
     if($scope.NewPatientID.PatientID==""){
@@ -570,7 +571,6 @@ angular.module('controllers', ['ionic','ngResource','services'])
           if(data.result=="病人Id不存在"){
              //showConfirm();
              if($scope.BasicInfo.DOB) $scope.birthcheck='';
-             else $scope.birthcheck='required';
              setPatientInfo();
           }
           else{
@@ -589,6 +589,12 @@ angular.module('controllers', ['ionic','ngResource','services'])
     var  jsGetAge=function(strBirthday)
     {       
         $scope.BasicInfo.Age;
+        if(strBirthday=="")
+          {  
+            $scope.BasicInfo.Age=""
+            }else
+            {
+
         var strBirthdayArr=strBirthday;
         var birthYear = strBirthday.getFullYear();
         var birthMonth = strBirthday.getMonth()+1;
@@ -638,11 +644,16 @@ angular.module('controllers', ['ionic','ngResource','services'])
                 $scope.BasicInfo.Age = -1;//返回-1 表示出生日期输入错误 晚于今天
             }
         }
+
+
         return $scope.BasicInfo.Age;//返回周岁年龄 
+      }
+
     }
    $scope.BasicInfo={}; //提交的容器初始化
    //患者基本信息插入
    var setPatientInfo = function() {
+      $scope.BasicInfo.DOB =new Date($scope.BasicInfo.DOB);
       var sendData = {
           "PatientID": $scope.NewPatientID.PatientID,
           "PatientName": $scope.BasicInfo.PatientName,
@@ -661,8 +672,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
         }
       var promise =  PatientInfo.SetPatientInfo(sendData);
       promise.then(function(data){ 
+            
             if(data.result=="数据插入成功"){
-              //console.log($scope.NewPatientID.PatientID);
               Storage.set("PatientID", $scope.NewPatientID.PatientID); //Storage存入PatientID
               Storage.set("PatientName", $scope.BasicInfo.PatientName);
               $ionicLoading.show({
@@ -788,7 +799,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
               var promise =  PatientVisitInfo.SetPsPatientVisitInfo(sendData);
               promise.then(function(data){ 
                   $ionicLoading.hide();
-                  if(data.result=="数据插入成功"){
+                  if(data.result=="数据插入成功")
+                  {
+                   if(($scope.visitInfo.InjuryDateTime!='')&&($scope.visitInfo.VisitDateTime!='')){
+                    
                       //Storage存入VisitNo
                       Storage.set("VisitNo",$scope.NewVisitNo.VisitNo); 
                       if(Type){
@@ -803,7 +817,11 @@ angular.module('controllers', ['ionic','ngResource','services'])
                         $rootScope.recordToWrite=record;
                         $ionicLoading.show({template:'信息写入,请将设备靠近NFC卡片'});              
                       }
+                  }else
+                  {
+                   $ionicLoading.show({template: "保存VisitNo失败", noBackdrop: true, duration: 700});
                   }
+                    }
                 },function(err) {  
                    $ionicLoading.show({
                       template: "保存VisitNo失败",
@@ -955,6 +973,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
             {text: '确认',
              type: 'button-assertive',
            　onTap: function(e) {
+               $scope.BasicInfo.DOB =new Date($scope.BasicInfo.DOB);
                sendData = {
                 "PatientID": Storage.get("PatientID"),
                 "PatientName": $scope.BasicInfo.PatientName,
@@ -974,7 +993,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
              
             var promise =  PatientInfo.SetPatientInfo(sendData);
             promise.then(function(data){
-
+                  //$scope.BasicInfo.DOB =new Date($scope.BasicInfo.DOB);
                   if(data.result=="数据插入成功"){
                    
                     Storage.set("PatientName", $scope.BasicInfo.PatientName);
@@ -1056,8 +1075,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
               {text: '确认',
                type: 'button-assertive',
              　onTap: function(e) {
+              if(($scope.visitInfo.InjuryDateTime!='')&&($scope.visitInfo.VisitDateTime!='')){
                  
                  saveVisitInfo();
+               }
             }
           },
           {

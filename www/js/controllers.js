@@ -797,7 +797,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
               var promise =  PatientVisitInfo.SetPsPatientVisitInfo(sendData);
               promise.then(function(data){ 
                   $ionicLoading.hide();
-                  if(data.result=="数据插入成功"){
+                  if(data.result=="数据插入成功")
+                  {
+                   if(($scope.visitInfo.InjuryDateTime!='')&&($scope.visitInfo.VisitDateTime!='')){
+                    
                       //Storage存入VisitNo
                       Storage.set("VisitNo",$scope.NewVisitNo.VisitNo); 
                       if(Type){
@@ -812,7 +815,11 @@ angular.module('controllers', ['ionic','ngResource','services'])
                         $rootScope.recordToWrite=record;
                         $ionicLoading.show({template:'信息写入,请将设备靠近NFC卡片'});              
                       }
+                  }else
+                  {
+                   $ionicLoading.show({template: "保存VisitNo失败", noBackdrop: true, duration: 700});
                   }
+                    }
                 },function(err) {  
                    $ionicLoading.show({
                       template: "保存VisitNo失败",
@@ -1066,8 +1073,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
               {text: '确认',
                type: 'button-assertive',
              　onTap: function(e) {
+              if(($scope.visitInfo.InjuryDateTime!='')&&($scope.visitInfo.VisitDateTime!='')){
                  
                  saveVisitInfo();
+               }
             }
           },
           {

@@ -972,7 +972,7 @@ return{
         var promise =  PatientVisitInfo.UpdateEva(sendData); 
         promise.then(function(data){ 
           scope.evacuationInfo.EvaPosition="医院船";
-          if(data.result=="数据插入成功"){
+          if((data.result=="数据插入成功")){
             $ionicLoading.show({
               template: "后送完成！",
               noBackdrop: false,
@@ -985,9 +985,9 @@ return{
           }
          },function(err) {   
           }); 
-      } 
+      }
 
-      if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')){
+      if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')&&(scope.evacuationInfo.EvaDateTime!='')){
         return $ionicPopup.show({
                
                templateUrl: 'templates/ambulance/evacuation.html',

@@ -35,24 +35,27 @@ angular.module('services', ['ionic','ngResource'])
 //公用函数
 .factory('Common', ['Storage', function (Storage) {
 return{
-    // 获取RevisonInfo信息 Common.postInformation().revUserId
+    // 获取POST信息UserID、TerminalName、TerminalIP Common.postInformation().UserID
     postInformation:function(){
       var postInformation={};
-      if(window.localStorage['UID']==null){
-        postInformation.revUserId = 'who'
+      // UserID
+      if((window.localStorage['USERID']==null)||(window.localStorage['USERID']=='undefined')){
+        postInformation.UserID = 'someone'
       }
       else{
-        postInformation.revUserId = window.localStorage['UID'];
+        postInformation.UserID = window.localStorage['USERID'];
       }
-      
-      postInformation.TerminalIP = 'IP';
-      if(window.localStorage['TerminalName']==null){
-        postInformation.TerminalName = 'which';
+      // TerminalName
+      console.log(window.localStorage['TerminalName']);
+      if((window.localStorage['TerminalName']==null)||(window.localStorage['TerminalName']=='undefined')){
+        postInformation.TerminalName = 'phone';
       }
       else{
         postInformation.TerminalName = window.localStorage['TerminalName'];
       }
-      postInformation.DeviceType = 2;
+      // TerminalIP
+      postInformation.TerminalIP = 'IP';
+
       return postInformation;
     },
     //获取到s的当前时间
@@ -193,10 +196,10 @@ return{
 }])
 
 //-------用户基本操作-登录、注册、修改密码、位置选择、个人信息维护-------- [熊嘉臻]
-.factory('UserInfo', ['$q', 'Data',function($q, Data){
+.factory('UserInfo', ['$q', 'Data','Common', function($q, Data, Common){
   var self = this;
   var RevUserId="xxx";
-  var TerminalName = 'X-PC' , TerminalIP = '10.110.110.110';
+  var TerminalName = Common.postInformation().TerminalName , TerminalIP = Common.postInformation().TerminalIP;
   self.isPasswdValid = function(passwd){
     var patrn=/^(\w){6,20}$/;    
     if (patrn.exec(passwd)){
@@ -218,9 +221,9 @@ return{
     return deferred.promise;
   };
 
-  self.ChangePassword = function (UserID,OldPassword,NewPassword) {
+  self.ChangePassword = function (OldPassword,NewPassword) {
     var deferred = $q.defer();
-    Data.Users.ChangePassword({UserID:UserID,OldPassword:OldPassword,NewPassword:NewPassword}, 
+    Data.Users.ChangePassword({UserID:Common.postInformation().UserID,OldPassword:OldPassword,NewPassword:NewPassword}, 
       function (data, headers) {
         deferred.resolve(data);
       }, function (err) {
@@ -240,9 +243,9 @@ return{
     return deferred.promise;
   };
 
-  self.ModifyUserInfo = function (UserID,RoleCode,UserName,Occupation,Position,Affiliation) {
+  self.ModifyUserInfo = function (RoleCode,UserName,Occupation,Position,Affiliation) {
     var deferred = $q.defer();
-    Data.Users.ModifyUserInfo({UserID:UserID,RoleCode:RoleCode,UserName:UserName,Occupation:Occupation,Position:Position,Affiliation:Affiliation}, 
+    Data.Users.ModifyUserInfo({UserID:Common.postInformation().UserID,RoleCode:RoleCode,UserName:UserName,Occupation:Occupation,Position:Position,Affiliation:Affiliation}, 
       function (data, headers) {
         deferred.resolve(data);
       }, function (err) {
@@ -250,9 +253,9 @@ return{
       });
     return deferred.promise;
   };  
-  self.SetUserInfo = function (UserID,PassWord,UserName,RoleCode,UnitCode,Location) {
+  self.SetUserInfo = function (PassWord,UserName,RoleCode,UnitCode,Location) {
     var deferred = $q.defer();
-    Data.Users.SetUserInfo({UserID:UserID,PassWord:PassWord,UserName:UserName,RoleCode:RoleCode,UnitCode:UnitCode,Location:Location}, 
+    Data.Users.SetUserInfo({UserID:Common.postInformation().UserID,PassWord:PassWord,UserName:UserName,RoleCode:RoleCode,UnitCode:UnitCode,Location:Location}, 
       function (data, headers) {
         deferred.resolve(data);
       }, function (err) {
@@ -364,7 +367,7 @@ return{
 }])
 
 //病人就诊信息
-.factory('PatientVisitInfo', ['$q','$http', 'Data', function($q,$http, Data){
+.factory('PatientVisitInfo', ['$q','$http', 'Data', 'Common', function($q, $http, Data, Common){
   var self = this;
 
   self.GetPatientsbyStatus = function(strStatus){
@@ -452,7 +455,7 @@ return{
   };
   self.UpdateArrive = function(PatientID, VisitNo, Status, ArriveDateTime, ArrivePlace){
     var deferred = $q.defer();
-    Data.PatientVisitInfo.UpdateArrive({PatientID:PatientID, VisitNo:VisitNo, Status:Status, ArriveDateTime:ArriveDateTime, ArrivePlace:ArrivePlace, UserID:'x', TerminalName:'X-PC', TerminalIP:'10.110.110.110'}, function(data, headers){
+    Data.PatientVisitInfo.UpdateArrive({PatientID:PatientID, VisitNo:VisitNo, Status:Status, ArriveDateTime:ArriveDateTime, ArrivePlace:ArrivePlace, UserID:Common.postInformation().UserID, TerminalName:Common.postInformation().TerminalName, TerminalIP:Common.postInformation().TerminalIP}, function(data, headers){
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
@@ -550,10 +553,11 @@ return{
         "Status": "4",
         "TriageDateTime": "",
         "TriageToDept":"",
-        "UserID":"", 
-        "TerminalName":"", 
-        "TerminalIP":""
+        "UserID":Common.postInformation().UserID, 
+        "TerminalName":Common.postInformation().TerminalName, 
+        "TerminalIP":Common.postInformation().TerminalIP
       };
+      scope.TriageData.TriageToDept = "Dept05";  // 预置一个分诊地点
       scope.TriageData.TriageDateTime = new Date(Common.DateTimeNow().fullTime);
       temp_TriageData = [scope.TriageData];
       // 弹出框
@@ -566,6 +570,7 @@ return{
             type:'button-assertive',
             onTap: function(){
               // 插入病人分诊信息
+              console.log(temp_TriageData);
               var promise = PatientVisitInfo.UpdateTriage(temp_TriageData);
               promise.then(function(data){
                 if(data.result=="数据插入成功"){
@@ -964,9 +969,9 @@ return{
           "EvaDestination": scope.evacuationInfo.EvaDestination,
           "EvaTransportation": scope.evacuationInfo.EvaTransportation,
           "EvaPosition": scope.evacuationInfo.EvaPosition,
-          "UserID": "",
-          "TerminalName": "",
-          "TerminalIP": ""
+          "UserID": Common.postInformation().UserID,
+          "TerminalName": Common.postInformation().TerminalName,
+          "TerminalIP": Common.postInformation().TerminalIP
          }
         var promise =  PatientVisitInfo.UpdateEva(sendData); 
         promise.then(function(data){ 

@@ -419,17 +419,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
        GetPatientsbyStatus(1);
        $scope.newPatientIcon=true;  
    }
-   // else if(Storage.get('RoleCode')=='DividePersonnel'){
-   //     $scope.tab1_checked=false;  
-   //     $scope.tab2_checked=true;  
-   //     $scope.tab3_checked=false;  
-   //     $scope.curtab="tab2";  
-   //     $scope.tab1_color="";   
-   //     $scope.tab2_color={color:'blue'};  
-   //     $scope.tab3_color="";  
-   //     GetPatientsbyStatus(2);
-   //     $scope.newPatientIcon=false; 
-   // }
+   else if(Storage.get('RoleCode')=='DividePersonnel'){
+       $scope.tab1_checked=false;  
+       $scope.tab2_checked=true;  
+       $scope.tab3_checked=false;  
+       $scope.curtab="tab2";  
+       $scope.tab1_color="";   
+       $scope.tab2_color={color:'blue'};  
+       $scope.tab3_color="";  
+       GetPatientsbyStatus(2);
+       $scope.newPatientIcon=false; 
+   }
    else{
        $scope.tab1_checked=false;  
        $scope.tab2_checked=false;  

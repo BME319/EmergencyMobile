@@ -205,10 +205,10 @@ return{
     return false;
   }
   self.UserRegister = function(form){
-    var deferred = $q.defer();
     form.RevUserId = RevUserId; 
     form.TerminalName = TerminalName; 
     form.TerminalIP = TerminalIP;
+    var deferred = $q.defer();
     Data.Users.UserRegister(form,
       function(s){
         deferred.resolve(s);
@@ -452,7 +452,7 @@ return{
   };
   self.UpdateArrive = function(PatientID, VisitNo, Status, ArriveDateTime, ArrivePlace){
     var deferred = $q.defer();
-    Data.PatientVisitInfo.UpdateArrive({PatientID:PatientID, VisitNo:VisitNo, Status:Status, ArriveDateTime:ArriveDateTime, ArrivePlace:ArrivePlace, UserID:'', TerminalName:'', TerminalIP:''}, function(data, headers){
+    Data.PatientVisitInfo.UpdateArrive({PatientID:PatientID, VisitNo:VisitNo, Status:Status, ArriveDateTime:ArriveDateTime, ArrivePlace:ArrivePlace, UserID:'x', TerminalName:'X-PC', TerminalIP:'10.110.110.110'}, function(data, headers){
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
@@ -733,7 +733,7 @@ return{
 
 
 //NFC XJZ
-.factory('nfcService', function ($rootScope, $ionicPlatform,$ionicPopup,$ionicLoading,$state,Storage) {
+.factory('nfcService', function ($rootScope, $ionicPlatform,$ionicPopup,$ionicLoading,$state,Storage,PatientVisitInfo,Common) {
 
     var openPop = function(){
       $ionicPopup.show({
@@ -786,13 +786,15 @@ return{
         nfc.addNdefListener(function (nfcEvent) {
             if(Storage.get('MY_LOCATION') == undefined){
               $ionicLoading.show({template:'请先登录，并提交位置',noBackdrop:true,duration:2000});
-            }else if($rootScope.eraseCard == true){
-              nfc.erase(function(){
-                $ionicLoading.hide();
-                $ionicLoading.show({template:'NFC卡片擦除成功',noBackdrop:true,duration:2000});
-                $rootScope.eraseCard=false;
-              },function(){});
-            }else{
+            }
+            // else if($rootScope.eraseCard == true){
+            //   nfc.erase(function(){
+            //     $ionicLoading.hide();
+            //     $ionicLoading.show({template:'NFC卡片擦除成功',noBackdrop:true,duration:2000});
+            //     $rootScope.eraseCard=false;
+            //   },function(){});
+            // }
+            else{
               console.log(JSON.stringify(nfcEvent, null, 4));
               console.log(nfcEvent);
               $rootScope.$apply(function(){
@@ -805,10 +807,34 @@ return{
                       temp = nfc.bytesToString(nfcEvent.tag.ndefMessage[0].id).split("|");//取出相应数据
                       //var pid=temp[0];
                       //var visit=temp[1];
-                      Storage.set('PatientID',temp[0]);
-                      Storage.set('VisitNo',temp[1]);
-                      if(Storage.get('RoleCode') == 'EmergencyPersonnel') $state.go('visitInfo');
-                      else  $state.go('viewEmergency');                      
+                      PatientVisitInfo.GetPatientVisitInfo(temp[0],temp[1])
+                      .then(function(data){
+                        var s=data.Status;
+                        if(Storage.get('RoleCode') == 'EmergencyPersonnel'){
+                          if(s=="1"){
+                            Storage.set('PatientID',temp[0]);
+                            Storage.set('VisitNo',temp[1]);
+                            $state.go('visitInfo');
+                          }else{
+                            $ionicLoading.show({template:'没有操作权限：该患者已后送',noBackdrop:true,duration:2000});
+                          } 
+                        }else{
+                          if(s=="1") $ionicLoading.show({template:'没有操作权限：该患者还未后送',noBackdrop:true,duration:2000});
+                          else if(s!="4"){
+                            if(s=="2"){
+                              var ArriveDateTime = Common.DateTimeNow().fullTime;
+                              PatientVisitInfo.UpdateArrive(temp[0],temp[1], "3",new Date(ArriveDateTime), Storage.get('MY_LOCATION_CODE'));
+                            }
+                            Storage.set('PatientID',temp[0]);
+                            Storage.set('VisitNo',temp[1]);
+                            $state.go('viewEmergency');
+                          }else{
+                            $ionicLoading.show({template:'没有操作权限：该患者已分诊',noBackdrop:true,duration:2000});
+                          } 
+                        }
+                      },function(err){
+
+                      });
                     }                    
                     if($state.current.name == 'newVisit' || $state.current.name == 'newPatient'){
                       $ionicPopup.show({
@@ -871,7 +897,7 @@ return{
         });
     }
 
-    return start;
+    return {start:start};
 })
 
 

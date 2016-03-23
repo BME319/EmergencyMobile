@@ -2,11 +2,11 @@
 <ion-view view-title="{{lastchooseitem | itemname}}">
 <ion-nav-bar class="bar-positive">
 	<ion-nav-buttons side="left">
-      <button class="button button-icon ion-ios-arrow-left" ng-click="onClickBackward()">返回</button>
+      <button class="button button-icon ion-ios-arrow-left hide-on-keyboard-open" ng-click="onClickBackward()">返回</button>
 
     </ion-nav-buttons>
     <ion-nav-buttons side="right">
-       <a class="button button-icon icon ion-ios-list-outline" href="#/patientInfo"></a>
+       <a class="button button-icon icon ion-ios-list-outline hide-on-keyboard-open" href="#/patientInfo"></a>
     </ion-nav-buttons>
 </ion-nav-bar>
     <div class="textarea2" ng-style="mytext2height">
@@ -81,17 +81,19 @@
 						</a>
 					</ion-item>
 					<label class="item item-input" ng-repeat="item in itemdetail">
-						<span class="input-label">{{item.ItemName}}</span>
+						<span class="input-label">{{item.ItemName}}<span ng-if=(item.ItemName!="神志")>({{item.ItemUnit}})</span>:</span>
 							<input type="text" ng-model="item.value" ng-focus="OnFocus($index)"></input>
 					</label>
-					<div class="item item-button-right" style="font-size: 15px;">
+					<div class="item" style="font-size: 15px;" ng-click="showscoredetail()">
 						战伤计分:&nbsp{{scoring}}
-						<button class="button button-positive" ng-click="showdescribe()">
+						<!-- <button class="button button-positive" ng-click="showdescribe()">
 							说明
-						</button>
+						</button> -->
 					</div>
 					<ion-item style="word-break:break-all;white-space:normal">
-						神志昏迷等级，按一下3项判定得分之和进行区分：<br/>
+						<b>战伤总积分：</b><br/>
+						呼吸计分+收缩压计分+神志计分的总和。<br/>
+						<b>神志昏迷等级</b>，按以下3项判定得分之和进行区分：<br/>
 						(1).睁眼动作：自动睁眼4分，呼唤睁眼3分，刺痛睁眼2分，不睁眼1分。<br/>
 						(2).语言反应：回答切题5分，回答不切题4分，答非所问3分，只能发音2分，不能言语1分。<br/>
 						(3).运动反应：按吩咐动作6分，刺痛能定位5分，刺痛能躲避4分，刺痛后肢体能屈曲3分，刺痛后肢体能过度伸展2分，不能活动1分。

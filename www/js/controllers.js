@@ -384,7 +384,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               type:'button-assertive',
               onTap: function(){
               // 插入病人送达信息
-              var promise = PatientVisitInfo.UpdateArrive(item.PatientID, item.VisitNo, "3", new Date(ArriveDateTime), Storage.get('MY_LOCATION'));
+              var promise = PatientVisitInfo.UpdateArrive(item.PatientID, item.VisitNo, "3", new Date(ArriveDateTime), Storage.get('MY_LOCATION_CODE'));
               promise.then(function(data){
                 if(data.result=="数据插入成功"){
                   GetPatientsbyStatus(2);

@@ -456,15 +456,15 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.tab2_color="";  
           $scope.tab3_color="";                   
    }
-   // else if (vtab=="tab2"){  
-   //        $scope.tab1_checked=false;  
-   //        $scope.tab2_checked=true;  
-   //        $scope.tab3_checked=false;  
-   //        $scope.curtab="tab2";  
-   //        $scope.tab1_color="";  
-   //        $scope.tab2_color={color:'blue'};  
-   //        $scope.tab3_color="";                 
-   // }
+   else if (vtab=="tab2"){  
+          $scope.tab1_checked=false;  
+          $scope.tab2_checked=true;  
+          $scope.tab3_checked=false;  
+          $scope.curtab="tab2";  
+          $scope.tab1_color="";  
+          $scope.tab2_color={color:'blue'};  
+          $scope.tab3_color="";                 
+   }
    else if (vtab=="tab3"){  
           $scope.tab1_checked=false;  
           $scope.tab2_checked=false;  
@@ -480,7 +480,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
   //下拉刷新
    $scope.refreshList = function() { 
      if($scope.curtab=="tab1")  GetPatientsbyStatus(1);
-     // else if($scope.curtab=="tab2")  GetPatientsbyStatus(2);
+     else if($scope.curtab=="tab2")  GetPatientsbyStatus(2);
      else  GetPatientsbyStatus(3);
    };
 

@@ -46,10 +46,14 @@ angular.module('controllers', ['ionic','ngResource','services'])
 //注册 
 .controller('RegisterCtrl',['$ionicLoading','$state','$scope','$rootScope','$ionicHistory','UserInfo','Storage',function($ionicLoading,$state,$scope,$rootScope,$ionicHistory,UserInfo,Storage){
   var DictRoles=JSON.parse(Storage.get('DictRoleMatch'));//DictRoleMatch在signinCtrl初始化
-  $scope.register={UserId:'',LoginPassword:'' ,LoginPassword0:'',UserName:"",role:"", Occupation: "", Position: "",Affiliaation: ""};
+  $scope.register={UserId:'',LoginPassword:'' ,LoginPassword0:'',UserName:"",role:"", Occupation: "", Position: "",Affiliation: ""};
   $scope.Register = function(form){
     $scope.logStatus="";
-    if(form.UserId!='' && form.LoginPassword!='' && form.LoginPassword0!='' && form.UserName!=''){
+    console.log(form)
+    if(form.UserId!='' && form.LoginPassword!='' && form.LoginPassword0!='' && form.UserName!='' && form.role!=''){
+      if(form.Occupation=='')form.Occupation=' ';
+      if(form.Position=='')form.Position=' ';
+      if(form.Affiliation=='')form.Affiliation=' ';
       if(form.LoginPassword!=form.LoginPassword0){
         $scope.logStatus="两次密码的输入不一致";
         return;
@@ -205,6 +209,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     UserInfo.SetMobileDevice({DeviceID:Storage.get('UUID'),Location:t,UserId:Storage.get('USERID'),DeviceFlag:1})
     .then(function(data){
       Storage.set('MY_LOCATION',$scope.myLocation.Description);
+      Storage.set('MY_LOCATION_CODE',t);
       $scope.isListShown=false;
       $ionicLoading.hide();
       $ionicLoading.show({template:'位置已更新',noBackdrop:true,duration:1500});
@@ -221,11 +226,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
   }
 
   $scope.onClickBackward = function(){
-    // $scope.$apply(function(){
       $scope.isListShown=false;
       $scope.myLocation.Description=MY_LOCATION;
-    // })
-    console.log($rootScope.MY_LOCATION);
       $state.go('ambulance.mine');
   }
 }])
@@ -266,10 +268,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
       ]
     });    
   }
-  $scope.eraseCard = function(){
-    $rootScope.eraseCard=true;
-    $ionicLoading.show({template:'请将手机靠近NFC卡片'});
-  }  
+  // $scope.eraseCard = function(){
+  //   $rootScope.eraseCard=true;
+  //   $ionicLoading.show({template:'请将手机靠近NFC卡片'});
+  // }  
 }])
 
 //个人信息维护
@@ -309,6 +311,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
         data.role=value;
       }
     })
+    if(data.Occupation==' ')data.Occupation='';
+    if(data.Position==' ')data.Position='';
+    if(data.Affiliation==' ')data.Affiliation='';
     delete data['RoleCode'];
     // temp = data;
     $scope.profile = data;
@@ -320,7 +325,6 @@ angular.module('controllers', ['ionic','ngResource','services'])
 // --------急救人员-列表、新建、后送 [赵艳霞]----------------
 //病人列表(已接收、已后送、已送达)
 .controller('AmbulanceListCtrl',['$state','$scope','$ionicLoading','UserInfo','Storage','PatientVisitInfo', '$state','Common', '$ionicPopup', '$stateParams', function($state,$scope,$ionicLoading,UserInfo,Storage, PatientVisitInfo, $state, Common, $ionicPopup, $stateParams){
-   
   $scope.$on('$ionicView.enter', function() {
     $scope.refreshList();
   });
@@ -380,7 +384,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               type:'button-assertive',
               onTap: function(){
               // 插入病人送达信息
-              var promise = PatientVisitInfo.UpdateArrive(item.PatientID, item.VisitNo, "3", new Date(ArriveDateTime), Storage.get('MY_LOCATION'));
+              var promise = PatientVisitInfo.UpdateArrive(item.PatientID, item.VisitNo, "3", new Date(ArriveDateTime), Storage.get('MY_LOCATION_CODE'));
               promise.then(function(data){
                 if(data.result=="数据插入成功"){
                   GetPatientsbyStatus(2);

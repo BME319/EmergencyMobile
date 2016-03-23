@@ -55,7 +55,7 @@ angular.module('EmergencyMobile', ['ionic', 'services', 'controllers', 'ngCordov
     $rootScope.$on('$cordovaNetwork:offline', function(event, networkState){
         alert('掉线啦');
     })
-    $rootScope.eraseCard=false;
+    // $rootScope.eraseCard=false;
     $rootScope.NFCmodefy=false;
     Storage.set('UUID',ionic.Platform.device().uuid);
     nfcService.start();  

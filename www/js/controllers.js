@@ -710,10 +710,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
 
   $scope.goInjury = function() {
-    if(!$rootScope.isWritedToCard){
-      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-      return;
-    } 
+    // if(!$rootScope.isWritedToCard){
+    //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+    //   return;
+    // } 
     if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')){
        Storage.set("New", 1);
        $state.go('injury');
@@ -767,10 +767,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
   //保存
   $scope.saveVisitInfo = function(Type) {
-    if(Type && !$rootScope.isWritedToCard){
-      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-      return;
-    }
+    // if(Type && !$rootScope.isWritedToCard){
+    //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+    //   return;
+    // }
     $ionicLoading.show();
     var sendData = {
                   "PatientID": Storage.get("PatientID"),
@@ -834,10 +834,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
      
   //后送选择框         
     $scope.showreservePop = function() {
-      if(!$rootScope.isWritedToCard){
-        $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-        return;
-      }
+      // if(!$rootScope.isWritedToCard){
+      //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+      //   return;
+      // }
      var myPopup = Evacation.getPopup($scope);
      myPopup.then(function(res) {
      console.log('haha',res);

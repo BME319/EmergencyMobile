@@ -89,78 +89,78 @@ return{
 
   var Users = function(){
     return $resource(CONFIG.baseUrl + ':path/:route',{path:'UserInfo',},{
-      LogOn:{method:'POST', params:{route: 'LogOn',UserID:'@UserID',LoginPassword:'@LoginPassword'}, timeout: 10000},
-      UserRegister:{method:'POST', params:{route: 'UserRegister'}, timeout: 10000},
-      ChangePassword:{method:'POST',params:{route:'ChangePassword',UserID:'@UserID',OldPassword:'@OldPassword',NewPassword:'@NewPassword'},timeout: 10000},
-      UID:{method:'GET',params:{route:'UID',Type:'@Type',Name:'@Name'},timeout:10000},
-      ModifyUserInfo:{method:'POST',params:{route:'ModifyUserInfo',UserID:'@UserID',RoleCode:'@RoleCode',UserName:'@UserName',Occupation:"@Occupation",Position:'@Position',Affiliation:'@Affiliation'},timeout:10000},
-      SetUserInfo:{method:'POST',params:{route:'SetUserInfo'},timeout:10000},
-      GetModifyUserInfo:{method:'GET',params:{route:'GetModifyUserInfo',UserID:'@UserID'},timeout:10000},
+      LogOn:{method:'POST', params:{route: 'LogOn',UserID:'@UserID',LoginPassword:'@LoginPassword'}, timeout: 100000},
+      UserRegister:{method:'POST', params:{route: 'UserRegister'}, timeout: 100000},
+      ChangePassword:{method:'POST',params:{route:'ChangePassword',UserID:'@UserID',OldPassword:'@OldPassword',NewPassword:'@NewPassword'},timeout: 100000},
+      UID:{method:'GET',params:{route:'UID',Type:'@Type',Name:'@Name'},timeout:100000},
+      ModifyUserInfo:{method:'POST',params:{route:'ModifyUserInfo',UserID:'@UserID',RoleCode:'@RoleCode',UserName:'@UserName',Occupation:"@Occupation",Position:'@Position',Affiliation:'@Affiliation'},timeout:100000},
+      SetUserInfo:{method:'POST',params:{route:'SetUserInfo'},timeout:100000},
+      GetModifyUserInfo:{method:'GET',params:{route:'GetModifyUserInfo',UserID:'@UserID'},timeout:100000},
     });
   };
   var MstType = function(){
     return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstType',},{
-      GetMstType:{method:'GET',isArray:true, params:{route: 'GetMstType',Category:'@Category'}, timeout: 10000}
+      GetMstType:{method:'GET',isArray:true, params:{route: 'GetMstType',Category:'@Category'}, timeout: 100000}
     });
   }; 
   var MobileDevice = function(){
     return $resource(CONFIG.baseUrl + ':path/:route',{path:'MobileDevice',},{
-      SetMobileDevice:{method:'POST', params:{route: 'SetMobileDevice'}, timeout: 10000}
+      SetMobileDevice:{method:'POST', params:{route: 'SetMobileDevice'}, timeout: 100000}
     });
   };  
   var PatientInfo = function () {
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'PatientInfo'},
       {
-        SetPatientInfo: {method:'POST',params:{route: 'SetPatientInfo'}, timeout:10000},
-        GetNewPatientID: {method:'GET',params:{route: 'GetNewPatientID'}, timeout:10000},
-        GetPsPatientInfo: {method:'GET',params:{route: 'GetPsPatientInfo',strPatientID:'@strPatientID'}, timeout:10000},
-        CheckPatientID: {method:'POST',params:{route: 'CheckPatientID',PatientID:'@PatientID'}, timeout:10000},
+        SetPatientInfo: {method:'POST',params:{route: 'SetPatientInfo'}, timeout:100000},
+        GetNewPatientID: {method:'GET',params:{route: 'GetNewPatientID'}, timeout:100000},
+        GetPsPatientInfo: {method:'GET',params:{route: 'GetPsPatientInfo',strPatientID:'@strPatientID'}, timeout:100000},
+        CheckPatientID: {method:'POST',params:{route: 'CheckPatientID',PatientID:'@PatientID'}, timeout:100000},
       });
   };
   var PatientVisitInfo = function () {
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'PatientVisitInfo'},
       {
         GetPatientsbyStatus: {method:'GET',isArray: true,params:{route: 'GetPatientsbyStatus', strStatus:'@strStatus'}, timeout:100000},
-        GetPatientbyPID: {method:'GET',params:{route: 'GetPatientbyPID', strPatientID:'@strPatientID'}, timeout:10000},
-        GetNewVisitNo: {method:'GET',params:{route: 'GetNewVisitNo', patientID:'@patientID'}, timeout:10000},
-        UpdateInjury: {method:'POST',params:{route: 'UpdateInjury'}, timeout:10000},
-        UpdateEva: {method:'POST',params:{route: 'UpdateEva'}, timeout:10000},
-        GetPatientVisitInfo: {method:'GET',params:{route: 'GetPatientVisitInfo', strPatientID:'@strPatientID',strVisitNo:'@strVisitNo'}, timeout:10000},
-        SetPsPatientVisitInfo: {method:'POST',params:{route: 'SetPsPatientVisitInfo'}, timeout:10000},
-        UpdateTriage: {method:'POST', params:{route:'UpdateTriage'}, timeout:10000},
-        UpdateArrive: {method:'POST', params:{route:'UpdateArrive'}, timeout:10000},
+        GetPatientbyPID: {method:'GET',params:{route: 'GetPatientbyPID', strPatientID:'@strPatientID'}, timeout:100000},
+        GetNewVisitNo: {method:'GET',params:{route: 'GetNewVisitNo', patientID:'@patientID'}, timeout:100000},
+        UpdateInjury: {method:'POST',params:{route: 'UpdateInjury'}, timeout:100000},
+        UpdateEva: {method:'POST',params:{route: 'UpdateEva'}, timeout:100000},
+        GetPatientVisitInfo: {method:'GET',params:{route: 'GetPatientVisitInfo', strPatientID:'@strPatientID',strVisitNo:'@strVisitNo'}, timeout:100000},
+        SetPsPatientVisitInfo: {method:'POST',params:{route: 'SetPsPatientVisitInfo'}, timeout:100000},
+        UpdateTriage: {method:'POST', params:{route:'UpdateTriage'}, timeout:100000},
+        UpdateArrive: {method:'POST', params:{route:'UpdateArrive'}, timeout:100000},
       });
   };
   var VitalSignInfo = function(){
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'VitalSignInfo'}, {
-      GetVitalSignInfos: {method:'GET', params:{route:'GetVitalSignInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:10000},
-      POSTVitalSign:{method:'POST', params:{route: 'SetVitalSign',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 10000}
+      GetVitalSignInfos: {method:'GET', params:{route:'GetVitalSignInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:100000},
+      POSTVitalSign:{method:'POST', params:{route: 'SetVitalSign',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 100000}
     });
   };
   var MstVitalSignDict = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstVitalSignDict'},{
-          GETVitalSignDictItems:{method:'GET',isArray:true, params:{route: 'GetAllVitalSignDictItems'}, timeout: 10000}
+          GETVitalSignDictItems:{method:'GET',isArray:true, params:{route: 'GetAllVitalSignDictItems'}, timeout: 100000}
       });
   };
   var EmergencyInfo = function(){
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'EmergencyInfo'}, {
-      GetEmergencyInfos: {method:'GET', params:{route:'GetEmergencyInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:10000},
-      POSTEmergency:{method:'POST', params:{route: 'SetEmergency',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 10000}
+      GetEmergencyInfos: {method:'GET', params:{route:'GetEmergencyInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:100000},
+      POSTEmergency:{method:'POST', params:{route: 'SetEmergency',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 100000}
     });
   };
   var MstEmergencyItemDict = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstEmergencyItemDict'},{
-          GETEmergencyDictItems:{method:'GET',isArray:true, params:{route: 'GetAllMstEmergencyItemDict'}, timeout: 10000}
+          GETEmergencyDictItems:{method:'GET',isArray:true, params:{route: 'GetAllMstEmergencyItemDict'}, timeout: 100000}
       });
   };
   var MstDivision = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstDivision'},{
-          GetDivisions:{method:'GET',isArray:true, params:{route: 'GetDivisions'}, timeout: 10000}
+          GetDivisions:{method:'GET',isArray:true, params:{route: 'GetDivisions'}, timeout: 100000}
       });
   };
   var MstEva = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstEva'},{
-          GetDataByEVATransportation:{method:'GET',isArray:true, params:{route: 'GetDataByEVATransportation'}, timeout: 10000}
+          GetDataByEVATransportation:{method:'GET',isArray:true, params:{route: 'GetDataByEVATransportation'}, timeout: 100000}
       });
   };
   serve.abort = function ($scope) {
@@ -555,6 +555,7 @@ return{
         "TerminalName":Common.postInformation().TerminalName, 
         "TerminalIP":Common.postInformation().TerminalIP
       };
+      // console.log(scope.TriageData);
       // scope.TriageData.TriageToDept = "Dept05";  // 预置一个分诊地点
       // scope.TriageData.TriageDateTime = new Date(Common.DateTimeNow().fullTime);
       // 弹出框

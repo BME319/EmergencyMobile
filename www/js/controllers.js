@@ -808,6 +808,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
                       if(Type){
                         $ionicLoading.show({template: "保存VisitNo成功", noBackdrop: true, duration: 700});
                       }else{
+                        //写入NFC卡
                         $rootScope.NFCmodefy=true;
                         var type = "text/pg",
                             id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
@@ -1024,7 +1025,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 }])
 
 //查看或编辑病人就诊记录
-.controller('VisitInfoCtrl', ['$scope', '$ionicHistory', '$http','$ionicPopup' ,'PatientVisitInfo', '$ionicLoading','MstType','Storage','PatientInfo','Common', '$state', 'MstEva','Evacation' ,function ($scope, $ionicHistory,$http,$ionicPopup,PatientVisitInfo, $ionicLoading,MstType,Storage, PatientInfo, Common, $state, MstEva,Evacation) {
+.controller('VisitInfoCtrl', ['$rootScope','$scope', '$ionicHistory', '$http','$ionicPopup' ,'PatientVisitInfo', '$ionicLoading','MstType','Storage','PatientInfo','Common', '$state', 'MstEva','Evacation' ,function ($rootScope,$scope, $ionicHistory,$http,$ionicPopup,PatientVisitInfo, $ionicLoading,MstType,Storage, PatientInfo, Common, $state, MstEva,Evacation) {
 
   $scope.goBack = function() {
     $ionicHistory.goBack();
@@ -1035,6 +1036,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
      Storage.set("New", 0);
   };
 
+  //写卡
+  $scope.wirteToCard = function(){
+    $rootScope.NFCmodefy=true;
+    var type = "text/pg",
+        id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
+        payload = "",//暂时用不到
+        // payload = nfc.stringToBytes("fdsf"),
+        record = ndef.record(ndef.TNF_MIME_MEDIA, type, id, payload);
+    $rootScope.recordToWrite=record;
+    $ionicLoading.show({template:'信息写入,请将设备靠近NFC卡片'});    
+  }
   //获取病人基本信息
   var GetPatientbyPID= function(strPatientID)
   {

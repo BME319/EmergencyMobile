@@ -779,8 +779,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
                   "DeviceID": "",  //暂时留空
                   "InjuryArea": $scope.visitInfo.InjuryArea, 
                   "InjuryAreaGPS": "",
-                  "InjuryDateTime": $scope.visitInfo.InjuryDateTime, //"9999-12-31 23:59:59"
-                  "VisitDateTime": $scope.visitInfo.VisitDateTime, //"2016-03-07 19:07:19"
+                  "InjuryDateTime":$Common.DateTimeNow($scope.visitInfo.InjuryDateTime).fullTime, //"9999-12-31 23:59:59"
+                  "VisitDateTime": $Common.DateTimeNow($scope.visitInfo.VisitDateTime).fullTime, //"2016-03-07 19:07:19"
                   "EvaDateTime": new Date("9999-12-31 23:59:59"),
                   "EvaBatchNo": "",
                   "EvaDestination": "",
@@ -1110,8 +1110,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
                   "DeviceID": "",  //暂时留空
                   "InjuryArea": $scope.visitInfo.InjuryArea, 
                   "InjuryAreaGPS": "",
-                  "InjuryDateTime": $scope.visitInfo.InjuryDateTime, //"9999-12-31 23:59:59"
-                  "VisitDateTime": $scope.visitInfo.VisitDateTime, //"2016-03-07 19:07:19"
+                  "InjuryDateTime": Common.DateTimeNow($scope.visitInfo.InjuryDateTime).fullTime, //"9999-12-31 23:59:59"
+                  "VisitDateTime": Common.DateTimeNow($scope.visitInfo.VisitDateTime).fullTime, //"2016-03-07 19:07:19"
                   "EvaDateTime": new Date("9999-12-31 23:59:59"),
                   "EvaBatchNo": "",
                   "EvaDestination": "",

@@ -977,7 +977,7 @@ return{
           "PatientID": Storage.get("PatientID"),
           "VisitNo": Storage.get("VisitNo"),
           "Status": "2",
-          "EvaDateTime": scope.evacuationInfo.EvaDateTime,
+          "EvaDateTime": Common.DateTimeNow(scope.evacuationInfo.EvaDateTime).fullTime,
           "EvaBatchNo": scope.evacuationInfo.EvaBatchNo,
           "EvaDestination": scope.evacuationInfo.EvaDestination,
           "EvaTransportation": scope.evacuationInfo.EvaTransportation,

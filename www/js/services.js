@@ -46,7 +46,6 @@ return{
         postInformation.UserID = window.localStorage['USERID'];
       }
       // TerminalName
-      console.log(window.localStorage['TerminalName']);
       if((window.localStorage['TerminalName']==null)||(window.localStorage['TerminalName']=='undefined')){
         postInformation.TerminalName = 'phone';
       }
@@ -543,23 +542,23 @@ return{
       }, function(err){
         // 无错误读入处理
       });
+      // 供测试用
       scope.test = function(){
-        // console.log(scope.TriageData);
+        // console.log(scope.TriageData.TriageToDept);
       };
-      // 分流PID、VID、状态、时间、地点
+      // 初始化  分流PID、VID、状态、时间、地点  
       scope.TriageData = {
         "PatientID": Storage.get("PatientID"),
         "VisitNo": Storage.get("VisitNo"),
         "Status": "4",
-        "TriageDateTime": "",
-        "TriageToDept":"",
+        "TriageDateTime": new Date(Common.DateTimeNow().fullTime),
+        "TriageToDept":"Dept05",
         "UserID":Common.postInformation().UserID, 
         "TerminalName":Common.postInformation().TerminalName, 
         "TerminalIP":Common.postInformation().TerminalIP
       };
-      scope.TriageData.TriageToDept = "Dept05";  // 预置一个分诊地点
-      scope.TriageData.TriageDateTime = new Date(Common.DateTimeNow().fullTime);
-      temp_TriageData = [scope.TriageData];
+      // scope.TriageData.TriageToDept = "Dept05";  // 预置一个分诊地点
+      // scope.TriageData.TriageDateTime = new Date(Common.DateTimeNow().fullTime);
       // 弹出框
       var Popup_triage = $ionicPopup.show({
         templateUrl : 'templates/ambulance/triage.html',
@@ -570,7 +569,18 @@ return{
             type:'button-assertive',
             onTap: function(){
               // 插入病人分诊信息
-              console.log(temp_TriageData);
+              // 考虑时序的问题，必须要在按键的时候才给变量赋值
+              var temp_TriageData = [{
+                "PatientID": scope.TriageData.PatientID,
+                "VisitNo": scope.TriageData.VisitNo,
+                "Status": scope.TriageData.Status,
+                "TriageDateTime": scope.TriageData.TriageDateTime,
+                "TriageToDept": "1|"+scope.TriageData.TriageToDept+"|0",
+                "UserID": scope.TriageData.UserID, 
+                "TerminalName": scope.TriageData.TerminalName, 
+                "TerminalIP": scope.TriageData.TerminalIP
+              }];
+              // console.log(temp_TriageData);
               var promise = PatientVisitInfo.UpdateTriage(temp_TriageData);
               promise.then(function(data){
                 if(data.result=="数据插入成功"){

@@ -58,8 +58,8 @@ return{
       return postInformation;
     },
     //获取到s的当前时间
-    DateTimeNow:function(){
-      var date = new Date();
+    DateTimeNow:function(date){
+      if(date==null) date = new Date();
       var dt={};
       dt.year=date.getFullYear().toString();
       dt.year.length==1?dt.year='0'+dt.year:dt.year=dt.year;
@@ -120,7 +120,7 @@ return{
   var PatientVisitInfo = function () {
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'PatientVisitInfo'},
       {
-        GetPatientsbyStatus: {method:'GET',isArray: true,params:{route: 'GetPatientsbyStatus', strStatus:'@strStatus'}, timeout:10000},
+        GetPatientsbyStatus: {method:'GET',isArray: true,params:{route: 'GetPatientsbyStatus', strStatus:'@strStatus'}, timeout:100000},
         GetPatientbyPID: {method:'GET',params:{route: 'GetPatientbyPID', strPatientID:'@strPatientID'}, timeout:10000},
         GetNewVisitNo: {method:'GET',params:{route: 'GetNewVisitNo', patientID:'@patientID'}, timeout:10000},
         UpdateInjury: {method:'POST',params:{route: 'UpdateInjury'}, timeout:10000},
@@ -464,8 +464,6 @@ return{
   return self;
 }])
 
-
-
 //-------分流人员-列表、信息查看、分流-------- [张桠童]
 .factory('VitalSignInfo', ['$q', '$http', 'Data', function( $q, $http, Data ){
   var self = this;
@@ -574,7 +572,7 @@ return{
                 "PatientID": scope.TriageData.PatientID,
                 "VisitNo": scope.TriageData.VisitNo,
                 "Status": scope.TriageData.Status,
-                "TriageDateTime": scope.TriageData.TriageDateTime,
+                "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime,
                 "TriageToDept": "1|"+scope.TriageData.TriageToDept+"|0",
                 "UserID": scope.TriageData.UserID, 
                 "TerminalName": scope.TriageData.TerminalName, 

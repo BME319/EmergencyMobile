@@ -374,6 +374,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
      if( (Storage.get('RoleCode')!='EmergencyPersonnel')  && ($scope.curtab=="tab2") ) {
         //送达
         var ArriveDateTime = Common.DateTimeNow().fullTime;
+        console.log(ArriveDateTime);
 
         var Popup_Arrive = $ionicPopup.show({
           template : '伤员 '+item.PatientID+' 于 '+ArriveDateTime+' 送达 '+Storage.get('MY_LOCATION'),
@@ -384,7 +385,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               type:'button-assertive',
               onTap: function(){
               // 插入病人送达信息
-              var promise = PatientVisitInfo.UpdateArrive(item.PatientID, item.VisitNo, "3", new Date(ArriveDateTime), Storage.get('MY_LOCATION_CODE'));
+              var promise = PatientVisitInfo.UpdateArrive(item.PatientID, item.VisitNo, "3", ArriveDateTime, Storage.get('MY_LOCATION_CODE'));
               promise.then(function(data){
                 if(data.result=="数据插入成功"){
                   GetPatientsbyStatus(2);

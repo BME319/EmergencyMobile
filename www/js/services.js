@@ -574,7 +574,7 @@ return{
                 "VisitNo": scope.TriageData.VisitNo,
                 "Status": scope.TriageData.Status,
                 "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime,
-                "TriageToDept": "1|"+scope.TriageData.TriageToDept+"|0",
+                "TriageToDept": scope.TriageData.TriageToDept,
                 "UserID": scope.TriageData.UserID, 
                 "TerminalName": scope.TriageData.TerminalName, 
                 "TerminalIP": scope.TriageData.TerminalIP

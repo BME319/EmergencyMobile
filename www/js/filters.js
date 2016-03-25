@@ -28,8 +28,18 @@ angular.module('filters', [])
   		case '1':return '男';break;
   		case '2':return '女';break;
   		case '0':return '其他';break;
-
   	}
+  };
+})
+.filter('BloodType', function() {
+  return function(input) {
+    switch(input)
+    {
+      case '1':return 'A型';break;
+      case '2':return 'B型';break;
+      case '3':return 'O型';break;
+      case '4':return 'AB型';break;
+    }
   };
 })
   .filter('itemname', function() {

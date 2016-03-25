@@ -58,8 +58,8 @@ return{
       return postInformation;
     },
     //获取到s的当前时间
-    DateTimeNow:function(){
-      var date = new Date();
+    DateTimeNow:function(date){
+      if(date==null) date = new Date();
       var dt={};
       dt.year=date.getFullYear().toString();
       dt.year.length==1?dt.year='0'+dt.year:dt.year=dt.year;
@@ -120,7 +120,7 @@ return{
   var PatientVisitInfo = function () {
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'PatientVisitInfo'},
       {
-        GetPatientsbyStatus: {method:'GET',isArray: true,params:{route: 'GetPatientsbyStatus', strStatus:'@strStatus'}, timeout:10000},
+        GetPatientsbyStatus: {method:'GET',isArray: true,params:{route: 'GetPatientsbyStatus', strStatus:'@strStatus'}, timeout:100000},
         GetPatientbyPID: {method:'GET',params:{route: 'GetPatientbyPID', strPatientID:'@strPatientID'}, timeout:10000},
         GetNewVisitNo: {method:'GET',params:{route: 'GetNewVisitNo', patientID:'@patientID'}, timeout:10000},
         UpdateInjury: {method:'POST',params:{route: 'UpdateInjury'}, timeout:10000},
@@ -464,8 +464,6 @@ return{
   return self;
 }])
 
-
-
 //-------分流人员-列表、信息查看、分流-------- [张桠童]
 .factory('VitalSignInfo', ['$q', '$http', 'Data', function( $q, $http, Data ){
   var self = this;
@@ -574,7 +572,7 @@ return{
                 "PatientID": scope.TriageData.PatientID,
                 "VisitNo": scope.TriageData.VisitNo,
                 "Status": scope.TriageData.Status,
-                "TriageDateTime": scope.TriageData.TriageDateTime,
+                "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime,
                 "TriageToDept": "1|"+scope.TriageData.TriageToDept+"|0",
                 "UserID": scope.TriageData.UserID, 
                 "TerminalName": scope.TriageData.TerminalName, 
@@ -926,6 +924,7 @@ return{
      promise_EvaTransportation.then(function(data)
      { 
         scope.EvaTransportations = data;
+        scope.EvaTransportations.selectedOption=data[0];
         },function(err) {   
      });      
 
@@ -953,6 +952,7 @@ return{
       promise_EvaPosition.then(function(data)
       { 
         scope.EvaPositions = data;
+        scope.EvaPositions.selectedOption=data[0];
       },function(err) {   
         });      
 
@@ -961,13 +961,14 @@ return{
     promise.then(function(data)
     { 
      scope.EvaDestinations = data;
-     scope.EvaDestinations.Description=data[0].Description;
+     scope.EvaDestinations.selectedOption=data[0];
+     console.log(scope.EvaDestinations.selectedOption);
       },function(err) {   
     }); 
    
      //后送操作
      var visitNo = window.localStorage['VisitNo'];
-     scope.evacuationInfo={"EvaDateTime": new Date(Common.DateTimeNow().fullTime), "EvaBatchNo":"33", "EvaDestination":"",  "EvaTransportation":"",  "EvaPosition":""};
+     scope.evacuationInfo={"EvaDateTime": new Date(Common.DateTimeNow().fullTime), "EvaBatchNo":"33", "EvaDestination":"",  "EvaTransportation":"",  "EvaPosition":"医院船"};
      var Evacuation= function(scope)
      {
         
@@ -986,7 +987,7 @@ return{
          }
         var promise =  PatientVisitInfo.UpdateEva(sendData); 
         promise.then(function(data){ 
-          scope.evacuationInfo.EvaPosition="医院船";
+          //scope.evacuationInfo.EvaPosition="医院船";
           if((data.result=="数据插入成功")){
             $ionicLoading.show({
               template: "后送完成！",

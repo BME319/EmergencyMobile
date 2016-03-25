@@ -459,7 +459,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.tab1_color={color:'blue'};  
           $scope.tab2_color="";  
           $scope.tab3_color="";                   
-   }else if (vtab=="tab2"){  
+   }
+   else if (vtab=="tab2"){  
           $scope.tab1_checked=false;  
           $scope.tab2_checked=true;  
           $scope.tab3_checked=false;  
@@ -467,7 +468,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.tab1_color="";  
           $scope.tab2_color={color:'blue'};  
           $scope.tab3_color="";                 
-   }else if (vtab=="tab3"){  
+   }
+   else if (vtab=="tab3"){  
           $scope.tab1_checked=false;  
           $scope.tab2_checked=false;  
           $scope.tab3_checked=true;  
@@ -549,8 +551,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
     }); 
   }
     
-  GetDefault(); //加载页面默认参数     
-
+  GetDefault(); //加载页面默认参数  
+  //$scope.BasicInfo={DOB:Date()};
+  
   //检查新建的PID是否重复,不重复则弹出确认框
   $scope.SaveNewPatientID = function() {
     if($scope.NewPatientID.PatientID==""){
@@ -568,7 +571,6 @@ angular.module('controllers', ['ionic','ngResource','services'])
           if(data.result=="病人Id不存在"){
              //showConfirm();
              if($scope.BasicInfo.DOB) $scope.birthcheck='';
-             else $scope.birthcheck='required';
              setPatientInfo();
           }
           else{
@@ -587,6 +589,12 @@ angular.module('controllers', ['ionic','ngResource','services'])
     var  jsGetAge=function(strBirthday)
     {       
         $scope.BasicInfo.Age;
+        if(strBirthday=="")
+          {  
+            $scope.BasicInfo.Age=""
+            }else
+            {
+
         var strBirthdayArr=strBirthday;
         var birthYear = strBirthday.getFullYear();
         var birthMonth = strBirthday.getMonth()+1;
@@ -636,11 +644,16 @@ angular.module('controllers', ['ionic','ngResource','services'])
                 $scope.BasicInfo.Age = -1;//返回-1 表示出生日期输入错误 晚于今天
             }
         }
+
+
         return $scope.BasicInfo.Age;//返回周岁年龄 
+      }
+
     }
    $scope.BasicInfo={}; //提交的容器初始化
    //患者基本信息插入
    var setPatientInfo = function() {
+      $scope.BasicInfo.DOB =new Date($scope.BasicInfo.DOB);
       var sendData = {
           "PatientID": $scope.NewPatientID.PatientID,
           "PatientName": $scope.BasicInfo.PatientName,
@@ -659,8 +672,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
         }
       var promise =  PatientInfo.SetPatientInfo(sendData);
       promise.then(function(data){ 
+            
             if(data.result=="数据插入成功"){
-              //console.log($scope.NewPatientID.PatientID);
               Storage.set("PatientID", $scope.NewPatientID.PatientID); //Storage存入PatientID
               Storage.set("PatientName", $scope.BasicInfo.PatientName);
               $ionicLoading.show({
@@ -697,10 +710,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
 
   $scope.goInjury = function() {
-    if(!$rootScope.isWritedToCard){
-      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-      return;
-    } 
+    // if(!$rootScope.isWritedToCard){
+    //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+    //   return;
+    // } 
     if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')){
        Storage.set("New", 1);
        $state.go('injury');
@@ -754,10 +767,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
   //保存
   $scope.saveVisitInfo = function(Type) {
-    if(Type && !$rootScope.isWritedToCard){
-      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-      return;
-    }
+    // if(Type && !$rootScope.isWritedToCard){
+    //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+    //   return;
+    // }
     $ionicLoading.show();
     var sendData = {
                   "PatientID": Storage.get("PatientID"),
@@ -786,12 +799,16 @@ angular.module('controllers', ['ionic','ngResource','services'])
               var promise =  PatientVisitInfo.SetPsPatientVisitInfo(sendData);
               promise.then(function(data){ 
                   $ionicLoading.hide();
-                  if(data.result=="数据插入成功"){
+                  if(data.result=="数据插入成功")
+                  {
+                   if(($scope.visitInfo.InjuryDateTime!='')&&($scope.visitInfo.VisitDateTime!='')){
+                    
                       //Storage存入VisitNo
                       Storage.set("VisitNo",$scope.NewVisitNo.VisitNo); 
                       if(Type){
                         $ionicLoading.show({template: "保存VisitNo成功", noBackdrop: true, duration: 700});
                       }else{
+                        //写入NFC卡
                         $rootScope.NFCmodefy=true;
                         var type = "text/pg",
                             id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
@@ -801,7 +818,11 @@ angular.module('controllers', ['ionic','ngResource','services'])
                         $rootScope.recordToWrite=record;
                         $ionicLoading.show({template:'信息写入,请将设备靠近NFC卡片'});              
                       }
+                  }else
+                  {
+                   $ionicLoading.show({template: "保存VisitNo失败", noBackdrop: true, duration: 700});
                   }
+                    }
                 },function(err) {  
                    $ionicLoading.show({
                       template: "保存VisitNo失败",
@@ -814,10 +835,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
      
   //后送选择框         
     $scope.showreservePop = function() {
-      if(!$rootScope.isWritedToCard){
-        $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-        return;
-      }
+      // if(!$rootScope.isWritedToCard){
+      //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+      //   return;
+      // }
      var myPopup = Evacation.getPopup($scope);
      myPopup.then(function(res) {
      console.log('haha',res);
@@ -953,6 +974,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
             {text: '确认',
              type: 'button-assertive',
            　onTap: function(e) {
+               $scope.BasicInfo.DOB =new Date($scope.BasicInfo.DOB);
                sendData = {
                 "PatientID": Storage.get("PatientID"),
                 "PatientName": $scope.BasicInfo.PatientName,
@@ -972,7 +994,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
              
             var promise =  PatientInfo.SetPatientInfo(sendData);
             promise.then(function(data){
-
+                  //$scope.BasicInfo.DOB =new Date($scope.BasicInfo.DOB);
                   if(data.result=="数据插入成功"){
                    
                     Storage.set("PatientName", $scope.BasicInfo.PatientName);
@@ -1003,7 +1025,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 }])
 
 //查看或编辑病人就诊记录
-.controller('VisitInfoCtrl', ['$scope', '$ionicHistory', '$http','$ionicPopup' ,'PatientVisitInfo', '$ionicLoading','MstType','Storage','PatientInfo','Common', '$state', 'MstEva','Evacation' ,function ($scope, $ionicHistory,$http,$ionicPopup,PatientVisitInfo, $ionicLoading,MstType,Storage, PatientInfo, Common, $state, MstEva,Evacation) {
+.controller('VisitInfoCtrl', ['$rootScope','$scope', '$ionicHistory', '$http','$ionicPopup' ,'PatientVisitInfo', '$ionicLoading','MstType','Storage','PatientInfo','Common', '$state', 'MstEva','Evacation' ,function ($rootScope,$scope, $ionicHistory,$http,$ionicPopup,PatientVisitInfo, $ionicLoading,MstType,Storage, PatientInfo, Common, $state, MstEva,Evacation) {
 
   $scope.goBack = function() {
     $ionicHistory.goBack();
@@ -1014,6 +1036,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
      Storage.set("New", 0);
   };
 
+  //写卡
+  $scope.wirteToCard = function(){
+    $rootScope.NFCmodefy=true;
+    var type = "text/pg",
+        id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
+        payload = "",//暂时用不到
+        // payload = nfc.stringToBytes("fdsf"),
+        record = ndef.record(ndef.TNF_MIME_MEDIA, type, id, payload);
+    $rootScope.recordToWrite=record;
+    $ionicLoading.show({template:'信息写入,请将设备靠近NFC卡片'});    
+  }
   //获取病人基本信息
   var GetPatientbyPID= function(strPatientID)
   {
@@ -1054,8 +1087,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
               {text: '确认',
                type: 'button-assertive',
              　onTap: function(e) {
+              if(($scope.visitInfo.InjuryDateTime!='')&&($scope.visitInfo.VisitDateTime!='')){
                  
                  saveVisitInfo();
+               }
             }
           },
           {
@@ -1138,7 +1173,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
   var promise = PatientInfo.GetPsPatientInfo(Storage.get("PatientID"));
   promise.then(function(data){
     $scope.PatientInfos = data;
-        console.log($scope.PatientInfos);
+        // console.log($scope.PatientInfos);
   }, function(err){
     // 无错误读入处理
   });

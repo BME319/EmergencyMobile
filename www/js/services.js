@@ -2,7 +2,7 @@ angular.module('services', ['ionic','ngResource'])
 
 // 客户端配置
 .constant('CONFIG', {
-  baseUrl: 'http://121.43.107.106:8055/Api/v1/',
+  baseUrl: 'http://10.12.43.32:8055/Api/v1/',
   //revUserId: "",
   //TerminalName: "",
   //TerminalIP: "",
@@ -35,29 +35,31 @@ angular.module('services', ['ionic','ngResource'])
 //公用函数
 .factory('Common', ['Storage', function (Storage) {
 return{
-    // 获取RevisonInfo信息 Common.postInformation().revUserId
+    // 获取POST信息UserID、TerminalName、TerminalIP Common.postInformation().UserID
     postInformation:function(){
       var postInformation={};
-      if(window.localStorage['UID']==null){
-        postInformation.revUserId = 'who'
+      // UserID
+      if((window.localStorage['USERID']==null)||(window.localStorage['USERID']=='undefined')){
+        postInformation.UserID = 'someone'
       }
       else{
-        postInformation.revUserId = window.localStorage['UID'];
+        postInformation.UserID = window.localStorage['USERID'];
       }
-      
-      postInformation.TerminalIP = 'IP';
-      if(window.localStorage['TerminalName']==null){
-        postInformation.TerminalName = 'which';
+      // TerminalName
+      if((window.localStorage['TerminalName']==null)||(window.localStorage['TerminalName']=='undefined')){
+        postInformation.TerminalName = 'phone';
       }
       else{
         postInformation.TerminalName = window.localStorage['TerminalName'];
       }
-      postInformation.DeviceType = 2;
+      // TerminalIP
+      postInformation.TerminalIP = 'IP';
+
       return postInformation;
     },
     //获取到s的当前时间
-    DateTimeNow:function(){
-      var date = new Date();
+    DateTimeNow:function(date){
+      if(date==null) date = new Date();
       var dt={};
       dt.year=date.getFullYear().toString();
       dt.year.length==1?dt.year='0'+dt.year:dt.year=dt.year;
@@ -118,7 +120,7 @@ return{
   var PatientVisitInfo = function () {
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'PatientVisitInfo'},
       {
-        GetPatientsbyStatus: {method:'GET',isArray: true,params:{route: 'GetPatientsbyStatus', strStatus:'@strStatus'}, timeout:10000},
+        GetPatientsbyStatus: {method:'GET',isArray: true,params:{route: 'GetPatientsbyStatus', strStatus:'@strStatus'}, timeout:100000},
         GetPatientbyPID: {method:'GET',params:{route: 'GetPatientbyPID', strPatientID:'@strPatientID'}, timeout:10000},
         GetNewVisitNo: {method:'GET',params:{route: 'GetNewVisitNo', patientID:'@patientID'}, timeout:10000},
         UpdateInjury: {method:'POST',params:{route: 'UpdateInjury'}, timeout:10000},
@@ -193,10 +195,10 @@ return{
 }])
 
 //-------用户基本操作-登录、注册、修改密码、位置选择、个人信息维护-------- [熊嘉臻]
-.factory('UserInfo', ['$q', 'Data',function($q, Data){
+.factory('UserInfo', ['$q', 'Data','Common', function($q, Data, Common){
   var self = this;
   var RevUserId="xxx";
-  var TerminalName = 'X-PC' , TerminalIP = '10.110.110.110';
+  var TerminalName = Common.postInformation().TerminalName , TerminalIP = Common.postInformation().TerminalIP;
   self.isPasswdValid = function(passwd){
     var patrn=/^(\w){6,20}$/;    
     if (patrn.exec(passwd)){
@@ -218,9 +220,9 @@ return{
     return deferred.promise;
   };
 
-  self.ChangePassword = function (UserID,OldPassword,NewPassword) {
+  self.ChangePassword = function (OldPassword,NewPassword) {
     var deferred = $q.defer();
-    Data.Users.ChangePassword({UserID:UserID,OldPassword:OldPassword,NewPassword:NewPassword}, 
+    Data.Users.ChangePassword({UserID:Common.postInformation().UserID,OldPassword:OldPassword,NewPassword:NewPassword}, 
       function (data, headers) {
         deferred.resolve(data);
       }, function (err) {
@@ -240,9 +242,9 @@ return{
     return deferred.promise;
   };
 
-  self.ModifyUserInfo = function (UserID,RoleCode,UserName,Occupation,Position,Affiliation) {
+  self.ModifyUserInfo = function (RoleCode,UserName,Occupation,Position,Affiliation) {
     var deferred = $q.defer();
-    Data.Users.ModifyUserInfo({UserID:UserID,RoleCode:RoleCode,UserName:UserName,Occupation:Occupation,Position:Position,Affiliation:Affiliation}, 
+    Data.Users.ModifyUserInfo({UserID:Common.postInformation().UserID,RoleCode:RoleCode,UserName:UserName,Occupation:Occupation,Position:Position,Affiliation:Affiliation}, 
       function (data, headers) {
         deferred.resolve(data);
       }, function (err) {
@@ -250,9 +252,9 @@ return{
       });
     return deferred.promise;
   };  
-  self.SetUserInfo = function (UserID,PassWord,UserName,RoleCode,UnitCode,Location) {
+  self.SetUserInfo = function (PassWord,UserName,RoleCode,UnitCode,Location) {
     var deferred = $q.defer();
-    Data.Users.SetUserInfo({UserID:UserID,PassWord:PassWord,UserName:UserName,RoleCode:RoleCode,UnitCode:UnitCode,Location:Location}, 
+    Data.Users.SetUserInfo({UserID:Common.postInformation().UserID,PassWord:PassWord,UserName:UserName,RoleCode:RoleCode,UnitCode:UnitCode,Location:Location}, 
       function (data, headers) {
         deferred.resolve(data);
       }, function (err) {
@@ -364,7 +366,7 @@ return{
 }])
 
 //病人就诊信息
-.factory('PatientVisitInfo', ['$q','$http', 'Data', function($q,$http, Data){
+.factory('PatientVisitInfo', ['$q','$http', 'Data', 'Common', function($q, $http, Data, Common){
   var self = this;
 
   self.GetPatientsbyStatus = function(strStatus){
@@ -452,7 +454,7 @@ return{
   };
   self.UpdateArrive = function(PatientID, VisitNo, Status, ArriveDateTime, ArrivePlace){
     var deferred = $q.defer();
-    Data.PatientVisitInfo.UpdateArrive({PatientID:PatientID, VisitNo:VisitNo, Status:Status, ArriveDateTime:ArriveDateTime, ArrivePlace:ArrivePlace, UserID:'x', TerminalName:'X-PC', TerminalIP:'10.110.110.110'}, function(data, headers){
+    Data.PatientVisitInfo.UpdateArrive({PatientID:PatientID, VisitNo:VisitNo, Status:Status, ArriveDateTime:ArriveDateTime, ArrivePlace:ArrivePlace, UserID:Common.postInformation().UserID, TerminalName:Common.postInformation().TerminalName, TerminalIP:Common.postInformation().TerminalIP}, function(data, headers){
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
@@ -461,8 +463,6 @@ return{
   };
   return self;
 }])
-
-
 
 //-------分流人员-列表、信息查看、分流-------- [张桠童]
 .factory('VitalSignInfo', ['$q', '$http', 'Data', function( $q, $http, Data ){
@@ -540,22 +540,23 @@ return{
       }, function(err){
         // 无错误读入处理
       });
+      // 供测试用
       scope.test = function(){
-        // console.log(scope.TriageData);
+        // console.log(scope.TriageData.TriageToDept);
       };
-      // 分流PID、VID、状态、时间、地点
+      // 初始化  分流PID、VID、状态、时间、地点  
       scope.TriageData = {
         "PatientID": Storage.get("PatientID"),
         "VisitNo": Storage.get("VisitNo"),
         "Status": "4",
-        "TriageDateTime": "",
-        "TriageToDept":"",
-        "UserID":"", 
-        "TerminalName":"", 
-        "TerminalIP":""
+        "TriageDateTime": new Date(Common.DateTimeNow().fullTime),
+        "TriageToDept":"Dept05",
+        "UserID":Common.postInformation().UserID, 
+        "TerminalName":Common.postInformation().TerminalName, 
+        "TerminalIP":Common.postInformation().TerminalIP
       };
-      scope.TriageData.TriageDateTime = new Date(Common.DateTimeNow().fullTime);
-      temp_TriageData = [scope.TriageData];
+      // scope.TriageData.TriageToDept = "Dept05";  // 预置一个分诊地点
+      // scope.TriageData.TriageDateTime = new Date(Common.DateTimeNow().fullTime);
       // 弹出框
       var Popup_triage = $ionicPopup.show({
         templateUrl : 'templates/ambulance/triage.html',
@@ -566,6 +567,18 @@ return{
             type:'button-assertive',
             onTap: function(){
               // 插入病人分诊信息
+              // 考虑时序的问题，必须要在按键的时候才给变量赋值
+              var temp_TriageData = [{
+                "PatientID": scope.TriageData.PatientID,
+                "VisitNo": scope.TriageData.VisitNo,
+                "Status": scope.TriageData.Status,
+                "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime,
+                "TriageToDept": "1|"+scope.TriageData.TriageToDept+"|0",
+                "UserID": scope.TriageData.UserID, 
+                "TerminalName": scope.TriageData.TerminalName, 
+                "TerminalIP": scope.TriageData.TerminalIP
+              }];
+              // console.log(temp_TriageData);
               var promise = PatientVisitInfo.UpdateTriage(temp_TriageData);
               promise.then(function(data){
                 if(data.result=="数据插入成功"){
@@ -911,6 +924,7 @@ return{
      promise_EvaTransportation.then(function(data)
      { 
         scope.EvaTransportations = data;
+        scope.EvaTransportations.selectedOption=data[0];
         },function(err) {   
      });      
 
@@ -938,6 +952,7 @@ return{
       promise_EvaPosition.then(function(data)
       { 
         scope.EvaPositions = data;
+        scope.EvaPositions.selectedOption=data[0];
       },function(err) {   
         });      
 
@@ -946,12 +961,14 @@ return{
     promise.then(function(data)
     { 
      scope.EvaDestinations = data;
+     scope.EvaDestinations.selectedOption=data[0];
+     console.log(scope.EvaDestinations.selectedOption);
       },function(err) {   
     }); 
-     
+   
      //后送操作
      var visitNo = window.localStorage['VisitNo'];
-     scope.evacuationInfo={"EvaDateTime": new Date(Common.DateTimeNow().fullTime), "EvaBatchNo":"33", "EvaDestination":"",  "EvaTransportation":"",  "EvaPosition":""};
+     scope.evacuationInfo={"EvaDateTime": new Date(Common.DateTimeNow().fullTime), "EvaBatchNo":"33", "EvaDestination":"",  "EvaTransportation":"",  "EvaPosition":"医院船"};
      var Evacuation= function(scope)
      {
         
@@ -964,13 +981,14 @@ return{
           "EvaDestination": scope.evacuationInfo.EvaDestination,
           "EvaTransportation": scope.evacuationInfo.EvaTransportation,
           "EvaPosition": scope.evacuationInfo.EvaPosition,
-          "UserID": "",
-          "TerminalName": "",
-          "TerminalIP": ""
+          "UserID": Common.postInformation().UserID,
+          "TerminalName": Common.postInformation().TerminalName,
+          "TerminalIP": Common.postInformation().TerminalIP
          }
         var promise =  PatientVisitInfo.UpdateEva(sendData); 
         promise.then(function(data){ 
-          if(data.result=="数据插入成功"){
+          //scope.evacuationInfo.EvaPosition="医院船";
+          if((data.result=="数据插入成功")){
             $ionicLoading.show({
               template: "后送完成！",
               noBackdrop: false,
@@ -983,9 +1001,9 @@ return{
           }
          },function(err) {   
           }); 
-      } 
+      }
 
-      if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')){
+      if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')&&(scope.evacuationInfo.EvaDateTime!='')){
         return $ionicPopup.show({
                
                templateUrl: 'templates/ambulance/evacuation.html',

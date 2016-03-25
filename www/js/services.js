@@ -926,6 +926,7 @@ return{
      promise_EvaTransportation.then(function(data)
      { 
         scope.EvaTransportations = data;
+        scope.EvaTransportations.selectedOption=data[0];
         },function(err) {   
      });      
 
@@ -953,6 +954,7 @@ return{
       promise_EvaPosition.then(function(data)
       { 
         scope.EvaPositions = data;
+        scope.EvaPositions.selectedOption=data[0];
       },function(err) {   
         });      
 
@@ -961,13 +963,14 @@ return{
     promise.then(function(data)
     { 
      scope.EvaDestinations = data;
-     scope.EvaDestinations.Description=data[0].Description;
+     scope.EvaDestinations.selectedOption=data[0];
+     console.log(scope.EvaDestinations.selectedOption);
       },function(err) {   
     }); 
    
      //后送操作
      var visitNo = window.localStorage['VisitNo'];
-     scope.evacuationInfo={"EvaDateTime": new Date(Common.DateTimeNow().fullTime), "EvaBatchNo":"33", "EvaDestination":"",  "EvaTransportation":"",  "EvaPosition":""};
+     scope.evacuationInfo={"EvaDateTime": new Date(Common.DateTimeNow().fullTime), "EvaBatchNo":"33", "EvaDestination":"",  "EvaTransportation":"",  "EvaPosition":"医院船"};
      var Evacuation= function(scope)
      {
         
@@ -986,7 +989,7 @@ return{
          }
         var promise =  PatientVisitInfo.UpdateEva(sendData); 
         promise.then(function(data){ 
-          scope.evacuationInfo.EvaPosition="医院船";
+          //scope.evacuationInfo.EvaPosition="医院船";
           if((data.result=="数据插入成功")){
             $ionicLoading.show({
               template: "后送完成！",

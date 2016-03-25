@@ -9,6 +9,10 @@ angular.module('EmergencyMobile', ['ionic', 'services', 'controllers', 'ngCordov
   $ionicPlatform.ready(function() {
     console.log(window.localStorage);
     Storage.rm('MY_LOCATION');
+    
+    //获取移动平台信息
+    window.localStorage['TerminalName']=ionic.Platform.device().model; //获取手机型号 iPhone、三星
+    
     //自动登录
     var userid=Storage.get('USERID');
     var passwd=Storage.get('PASSWD');

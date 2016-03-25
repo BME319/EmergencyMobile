@@ -363,7 +363,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       else {} //$state.go('viewEmergency'); 
     }
     else {
-      if($scope.curtab!="tab1"){
+      if($scope.curtab=="tab3"){
         $state.go('viewEmergency'); 
       }
     }

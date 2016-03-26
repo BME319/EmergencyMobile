@@ -642,7 +642,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
             }
             else
             {
-                $scope.BasicInfo.Age = -1;//返回-1 表示出生日期输入错误 晚于今天
+                $scope.BasicInfo.Age = '';//返回-1 表示出生日期输入错误 晚于今天
             }
         }
 

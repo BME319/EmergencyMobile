@@ -374,6 +374,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
      if( (Storage.get('RoleCode')!='EmergencyPersonnel')  && ($scope.curtab=="tab2") ) {
         //送达
         var ArriveDateTime = Common.DateTimeNow().fullTime;
+        console.log(ArriveDateTime);
 
         var Popup_Arrive = $ionicPopup.show({
           template : '伤员 '+item.PatientID+' 于 '+ArriveDateTime+' 送达 '+Storage.get('MY_LOCATION'),
@@ -384,7 +385,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               type:'button-assertive',
               onTap: function(){
               // 插入病人送达信息
-              var promise = PatientVisitInfo.UpdateArrive(item.PatientID, item.VisitNo, "3", new Date(ArriveDateTime), Storage.get('MY_LOCATION_CODE'));
+              var promise = PatientVisitInfo.UpdateArrive(item.PatientID, item.VisitNo, "3", ArriveDateTime, Storage.get('MY_LOCATION_CODE'));
               promise.then(function(data){
                 if(data.result=="数据插入成功"){
                   GetPatientsbyStatus(2);
@@ -779,8 +780,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
                   "DeviceID": "",  //暂时留空
                   "InjuryArea": $scope.visitInfo.InjuryArea, 
                   "InjuryAreaGPS": "",
-                  "InjuryDateTime":$Common.DateTimeNow($scope.visitInfo.InjuryDateTime).fullTime, //"9999-12-31 23:59:59"
-                  "VisitDateTime": $Common.DateTimeNow($scope.visitInfo.VisitDateTime).fullTime, //"2016-03-07 19:07:19"
+                  "InjuryDateTime":Common.DateTimeNow($scope.visitInfo.InjuryDateTime).fullTime, //"9999-12-31 23:59:59"
+                  "VisitDateTime": Common.DateTimeNow($scope.visitInfo.VisitDateTime).fullTime, //"2016-03-07 19:07:19"
                   "EvaDateTime": new Date("9999-12-31 23:59:59"),
                   "EvaBatchNo": "",
                   "EvaDestination": "",
@@ -1335,15 +1336,15 @@ angular.module('controllers', ['ionic','ngResource','services'])
       else $ionicHistory.goBack();
     } 
       $scope.firstdirs = [//左侧目录的数据
-      [   "InjuryPart",//伤情记录
-          "InjuryClass",
-          "InjuryType",
-          "InjuryComplication"
+      [   "Site",//伤情记录
+          "Class",
+          "Type",
+          "Complications"
       ],
       [
-          "EmergencySurgery",//伤情处理
-          "TreatmentOutLine",
-          "AntiInfection",
+          "Emergency",//伤情处理
+          "Treatment",
+          "AntiInfect",
           "AntiShock"
       ],
       [
@@ -1352,17 +1353,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
       ]
       ];
     $scope.items = {//左侧目录详细数据，filters.js文件中有过滤信息
-      "InjuryPart":{Style:{}},
-        "InjuryClass":{Style:{}},
-        "InjuryType":{Style:{}},
-        "InjuryComplication":{Style:{}},
+      "Site":{Style:{}},
+        "Class":{Style:{}},
+        "Type":{Style:{}},
+        "Complications":{Style:{}},
         "InjuryExtent":{Style:{}},
-        "EmergencySurgery":{Style:{}},
-        "InjuryOutLine":{Style:{}},
+        "Emergency":{Style:{}},
+        "Treatment":{Style:{}},
         "WarWound":{Style:{}},
         "CarePathway":{Style:{}},
         "TreatmentOutLine":{Style:{}},
-        "AntiInfection":{Style:{}},
+        "AntiInfect":{Style:{}},
         "AntiShock":{Style:{}},
         "Physical":{Style:{'background-color':'#BEDBD7'}},
         "Biochemical":{Style:{}}
@@ -1676,7 +1677,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":3,
-            "ItemValue":'重伤-紧急处置',
+            "ItemValue":'重伤',
             "UserId":Userid,
             "TerminalName":"sampleTerminalName",
             "TerminalIP":"sampleTerminalIP"
@@ -1688,7 +1689,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":2,
-            "ItemValue":'中度伤-优先处置',
+            "ItemValue":'中度伤',
             "UserId":Userid,
             "TerminalName":"sampleTerminalName",
             "TerminalIP":"sampleTerminalIP"
@@ -1700,7 +1701,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":1,
-            "ItemValue":'轻伤-常规处置',
+            "ItemValue":'轻伤',
             "UserId":Userid,
             "TerminalName":"sampleTerminalName",
             "TerminalIP":"sampleTerminalIP"
@@ -1712,7 +1713,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":4,
-            "ItemValue":'危重伤-期待处置',
+            "ItemValue":'危重伤',
             "UserId":Userid,
             "TerminalName":"sampleTerminalName",
             "TerminalIP":"sampleTerminalIP"

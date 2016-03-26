@@ -574,7 +574,7 @@ return{
                 "VisitNo": scope.TriageData.VisitNo,
                 "Status": scope.TriageData.Status,
                 "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime,
-                "TriageToDept": "1|"+scope.TriageData.TriageToDept+"|0",
+                "TriageToDept": scope.TriageData.TriageToDept,
                 "UserID": scope.TriageData.UserID, 
                 "TerminalName": scope.TriageData.TerminalName, 
                 "TerminalIP": scope.TriageData.TerminalIP
@@ -835,8 +835,7 @@ return{
                           if(s=="1") $ionicLoading.show({template:'没有操作权限：该患者还未后送',noBackdrop:true,duration:2000});
                           else if(s!="4"){
                             if(s=="2"){
-                              var ArriveDateTime = Common.DateTimeNow().fullTime;
-                              PatientVisitInfo.UpdateArrive(temp[0],temp[1], "3",new Date(ArriveDateTime), Storage.get('MY_LOCATION_CODE'));
+                              PatientVisitInfo.UpdateArrive(temp[0],temp[1], "3",Common.DateTimeNow().fullTime, Storage.get('MY_LOCATION_CODE'));
                             }
                             Storage.set('PatientID',temp[0]);
                             Storage.set('VisitNo',temp[1]);

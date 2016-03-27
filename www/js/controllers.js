@@ -1521,10 +1521,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
           Patients.PostVitalSign(postVitalSigndata).then(
             function(s){
             // console.log(s.result);
-            //window.plugins.toast.showShortBottom('生理/生化信息保存成功');
+            window.plugins.toast.showShortBottom('生理/生化信息保存成功');
           },function(e){
             // console.log(e);
-            //window.plugins.toast.showShortBottom('生理/生化信息保存失败');
+            window.plugins.toast.showShortBottom('生理/生化信息保存失败');
           });
         }
         if(postEmergencydata.postdata.length>0)
@@ -1532,10 +1532,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
           Patients.PostEmergency(postEmergencydata).then(
             function(s){
             // console.log(s.result);
-           // window.plugins.toast.showShortBottom('急救信息保存成功');
+           window.plugins.toast.showShortBottom('急救信息保存成功');
           },function(e){
             // console.log(e);
-            //window.plugins.toast.showShortBottom('急救信息保存失败');
+            window.plugins.toast.showShortBottom('急救信息保存失败');
           });
         }
       }

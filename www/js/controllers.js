@@ -1262,7 +1262,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     var Userid = window.localStorage['USERID'];
     var patientID = window.localStorage['PatientID'];
     //获取病人基本信息
-    $scope.testdata={"PatientID":patientID, "VisitNo":visitNo, "PatientName":""}
+    // $scope.testdata={"PatientID":patientID, "VisitNo":visitNo, "PatientName":""}
     // var promise_PatientInfo = PatientInfo.GetPsPatientInfo(Storage.get("PatientID")); 
     // promise_PatientInfo.then(function(data)
     // { 
@@ -1297,7 +1297,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
         });
 
       $scope.itemdetail = $scope.catalog.Physical;
-      // console.log($scope.catalog);
+      console.log($scope.catalog);
     },function(e){
       // console.log(e);
     })
@@ -1573,13 +1573,18 @@ angular.module('controllers', ['ionic','ngResource','services'])
       // console.log($scope.blescanlist);
     }
     $scope.showbluetoothConfirm = function() {//弹出生理设备选择提示框
-      $scope.bluetoothscanlist = [];
+      $scope.bluetoothscanlist = [
+        
+      ];
       if(ionic.Platform.platform()!='win32')
       {
+        console.log('startbluetooth');
         bluetoothSerial.discoverUnpaired();
         bluetoothSerial.setDeviceDiscoveredListener(function(device) {
+          $rootScope.$apply(function(){
             $scope.bluetoothscanlist.push(device);
-            console.log($scope.bluetoothscanlist);
+          });
+          console.log($scope.bluetoothscanlist);
         });
       }
       var confirmPopup = $ionicPopup.confirm({
@@ -1606,6 +1611,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       })
     }
     $scope.receivevdata = function(){//从生理设备获取数据
+      $scope.testdata = [];
       if(ionic.Platform.platform()!='win32')
       {
         var bluetoothdevice = angular.fromJson(window.localStorage['bluetoothdevice']);
@@ -1614,7 +1620,45 @@ angular.module('controllers', ['ionic','ngResource','services'])
             bluetoothSerial.subscribeRawData(
               function(sd){
                 var bytes = new Uint8Array(sd);
-                console.log(bytes);
+                // console.log(sd);
+                $rootScope.$apply(function(){
+                  if($scope.testdata.length<55)
+                  {
+                    // $scope.testdata.concat(bytes);
+                    angular.forEach(bytes,function(value,key){
+                      console.log(value);
+                      $scope.testdata.push(value);
+                      console.log($scope.testdata);
+                    })
+                  }
+                  else{
+                    console.log("save 55 bytes!");
+                    bluetoothSerial.unsubscribeRawData(function(s){console.log(s)},function(e){console.log(e)});
+                    bluetoothSerial.disconnect(function(s){console.log(s);},function(e){console.log(e);});
+                    for(var i=0;i<55;i++){
+                      if($scope.testdata[i] == 170 && (i+26)<55)
+                        if($scope.testdata[i+1]==170)
+                          if($scope.testdata[i+2]==1)
+                            if($scope.testdata[i+3]==49)
+                            {
+                              $scope.testdata2= [];
+                              for(var ii=0;ii<26;ii++)
+                              {
+                                 $scope.testdata2.push($scope.testdata[i+ii]);
+                              }
+                              console.log($scope.testdata2);
+                              $scope.catalog.Physical[6].value = $scope.testdata2[6];//心率
+                              $scope.catalog.Physical[5].value = $scope.testdata2[7];//血氧值
+                              $scope.catalog.Physical[1].value = $scope.testdata2[8];//脉率
+                              $scope.catalog.Physical[2].value = $scope.testdata2[9];//呼吸率
+                              $scope.catalog.Physical[3].value = $scope.testdata2[10];//收缩压
+                              $scope.catalog.Physical[4].value = $scope.testdata2[11];//舒张压
+                              console.log($scope.catalog);
+                            }
+                    }
+                  }
+                });
+                console.log($scope.testdata);
               },function(ed){
 
               });
@@ -1954,5 +1998,15 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
 /////////////////////////ble-endv
 
+// var mytest = [];
+// var mytest2 = new Uint8Array(2);
+// mytest2[0]=1;
+// mytest2[1]=2;
+// // angular.forEach(mytest2,function(value,key){
+// //   console.log(value);
+// //   mytest.push(value);
+// // })
+// mytest.concat(mytest2);
+// console.log(mytest);
 }])
 ;

@@ -1,6 +1,6 @@
 <ion-view view-title="创建就诊记录">
 
-  <ion-header-bar class="bar-calm">
+  <ion-header-bar class="bar-positive">
     <!-- <button class="button button-clear" ng-click="goBack()">返回</button> -->
     <a class="button button-icon icon ion-ios-home" href="#/ambulance/list" ></a>
     <h1 class="title">创建就诊记录</h1>
@@ -25,7 +25,7 @@
           <span class="input-label" >伤员就诊编号:</span> 
         </div>  
         <div >
-        <input type="text" ng-model="NewVisitNo.VisitNo" style="width:100%;background:#f4f4f4;" readonly="readonly"> 
+        <input type="text" ng-model="NewVisitNo.VisitNo" style="width:100%;background:#FF8040;" readonly="readonly"> 
         </div>
 
         <div style="width:100%">
@@ -50,7 +50,7 @@
         </div>
 
         <div class="item tabs tabs-secondary tabs-icon-left "style="vertical-align:center;">
-          <a class="tab-item" ng-click="saveVisitInfo()" style="font-size:16px;color:blue">
+          <a class="tab-item" ng-click="saveVisitInfo(true)" style="font-size:16px;color:blue">
             <i class="ion-android-upload" style="font-size:30px;"></i>
             保存
           </a>

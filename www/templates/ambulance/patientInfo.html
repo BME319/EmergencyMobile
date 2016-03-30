@@ -8,7 +8,7 @@
   <ion-content>
     <ion-list >
 
-      <ion-item style="border:none; text-align:center;" >
+      <ion-item style="margin-top:50px;border:none; text-align:center;" >
          <img ng-src="img/head_portrait.jpg"  style="border-radius:50%; height:20%; width:30%">
       </ion-item>
 
@@ -41,7 +41,7 @@
           </div>
         </div>
       
-       <form>
+      <!--  <form>
         <div class="row">
           <div class="col">
             <span class="input-label" >患者年龄</span> 
@@ -50,14 +50,15 @@
             <input  type="number"  required min='0' ng-model="BasicInfo.Age" style="width:100%;background:#f4f4f4;height:34px;" >
           </div>
         </div>
-        </form>
+        </form> -->
 
-        <div class="row">
+         <div class="row">
           <div class="col">
-            <span class="input-label">出生日期</span> 
+            <!-- <span class="input-label" ng-show=birthcheck=='required' style="color:red">*必填</span>出生日期&nbsp;  -->
+            出生日期
           </div>  
           <div class=" col-67" >
-            <input type="text" ng-model="BasicInfo.DOB" style="width:100%;background:#f4f4f4;height:34px;" >
+            <input type="date" ng-model="BasicInfo.DOB" style="width:100%;background:#f4f4f4;height:34px;" >
           </div>
         </div>
 

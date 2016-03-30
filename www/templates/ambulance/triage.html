@@ -1,0 +1,31 @@
+<ion-item>
+	
+	<div>
+		<span class="input-label" style="width:100%"><h2>时间</h2></span> 
+	</div>  
+
+	<div style="width:100%">
+		<input type="datetime-local" class="item-input-wrapper" ng-model="TriageData.TriageDateTime" style="width:100%; margin-top: 7px">
+	</div>
+
+	<div>
+		<span class="input-label" style="width:100%"><h2>去向</h2></span> 
+	</div> 
+
+	<div style="width:100%">
+		<select ng-model="TriageData.TriageToDept" ng-options="TriageDept.Code as TriageDept.Name for TriageDept in TriageDepts" style="width:100%; margin-top: 7px" ng-change="test()">
+			<option value=""></option>
+		</select>
+	</div>
+	
+</ion-item>
+
+<style>
+	.popup-head {
+		padding-bottom : 0px;
+	}
+	.popup-title {
+		color : #4a87ee;
+		font-size : 180%;
+	}
+</style>

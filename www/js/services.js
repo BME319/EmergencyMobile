@@ -2,7 +2,7 @@ angular.module('services', ['ionic','ngResource'])
 
 // 客户端配置
 .constant('CONFIG', {
-  baseUrl: 'http://121.43.107.106:8055/Api/v1/',
+  baseUrl: 'http://10.12.43.32:8055/Api/v1/',
   //revUserId: "",
   //TerminalName: "",
   //TerminalIP: "",
@@ -35,29 +35,31 @@ angular.module('services', ['ionic','ngResource'])
 //公用函数
 .factory('Common', ['Storage', function (Storage) {
 return{
-    // 获取RevisonInfo信息 Common.postInformation().revUserId
+    // 获取POST信息UserID、TerminalName、TerminalIP Common.postInformation().UserID
     postInformation:function(){
       var postInformation={};
-      if(window.localStorage['UID']==null){
-        postInformation.revUserId = 'who'
+      // UserID
+      if((window.localStorage['USERID']==null)||(window.localStorage['USERID']=='undefined')){
+        postInformation.UserID = 'someone'
       }
       else{
-        postInformation.revUserId = window.localStorage['UID'];
+        postInformation.UserID = window.localStorage['USERID'];
       }
-      
-      postInformation.TerminalIP = 'IP';
-      if(window.localStorage['TerminalName']==null){
-        postInformation.TerminalName = 'which';
+      // TerminalName
+      if((window.localStorage['TerminalName']==null)||(window.localStorage['TerminalName']=='undefined')){
+        postInformation.TerminalName = 'phone';
       }
       else{
         postInformation.TerminalName = window.localStorage['TerminalName'];
       }
-      postInformation.DeviceType = 2;
+      // TerminalIP
+      postInformation.TerminalIP = 'IP';
+
       return postInformation;
     },
     //获取到s的当前时间
-    DateTimeNow:function(){
-      var date = new Date();
+    DateTimeNow:function(date){
+      if(date==null) date = new Date();
       var dt={};
       dt.year=date.getFullYear().toString();
       dt.year.length==1?dt.year='0'+dt.year:dt.year=dt.year;
@@ -87,78 +89,78 @@ return{
 
   var Users = function(){
     return $resource(CONFIG.baseUrl + ':path/:route',{path:'UserInfo',},{
-      LogOn:{method:'POST', params:{route: 'LogOn',UserID:'@UserID',LoginPassword:'@LoginPassword'}, timeout: 10000},
-      UserRegister:{method:'POST', params:{route: 'UserRegister'}, timeout: 10000},
-      ChangePassword:{method:'POST',params:{route:'ChangePassword',UserID:'@UserID',OldPassword:'@OldPassword',NewPassword:'@NewPassword'},timeout: 10000},
-      UID:{method:'GET',params:{route:'UID',Type:'@Type',Name:'@Name'},timeout:10000},
-      ModifyUserInfo:{method:'POST',params:{route:'ModifyUserInfo',UserID:'@UserID',RoleCode:'@RoleCode',UserName:'@UserName',Occupation:"@Occupation",Position:'@Position',Affiliation:'@Affiliation'},timeout:10000},
-      SetUserInfo:{method:'POST',params:{route:'SetUserInfo'},timeout:10000},
-      GetModifyUserInfo:{method:'GET',params:{route:'GetModifyUserInfo',UserID:'@UserID'},timeout:10000},
+      LogOn:{method:'POST', params:{route: 'LogOn',UserID:'@UserID',LoginPassword:'@LoginPassword'}, timeout: 100000},
+      UserRegister:{method:'POST', params:{route: 'UserRegister'}, timeout: 100000},
+      ChangePassword:{method:'POST',params:{route:'ChangePassword',UserID:'@UserID',OldPassword:'@OldPassword',NewPassword:'@NewPassword'},timeout: 100000},
+      UID:{method:'GET',params:{route:'UID',Type:'@Type',Name:'@Name'},timeout:100000},
+      ModifyUserInfo:{method:'POST',params:{route:'ModifyUserInfo',UserID:'@UserID',RoleCode:'@RoleCode',UserName:'@UserName',Occupation:"@Occupation",Position:'@Position',Affiliation:'@Affiliation'},timeout:100000},
+      SetUserInfo:{method:'POST',params:{route:'SetUserInfo'},timeout:100000},
+      GetModifyUserInfo:{method:'GET',params:{route:'GetModifyUserInfo',UserID:'@UserID'},timeout:100000},
     });
   };
   var MstType = function(){
     return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstType',},{
-      GetMstType:{method:'GET',isArray:true, params:{route: 'GetMstType',Category:'@Category'}, timeout: 10000}
+      GetMstType:{method:'GET',isArray:true, params:{route: 'GetMstType',Category:'@Category'}, timeout: 100000}
     });
   }; 
   var MobileDevice = function(){
     return $resource(CONFIG.baseUrl + ':path/:route',{path:'MobileDevice',},{
-      SetMobileDevice:{method:'POST', params:{route: 'SetMobileDevice'}, timeout: 10000}
+      SetMobileDevice:{method:'POST', params:{route: 'SetMobileDevice'}, timeout: 100000}
     });
   };  
   var PatientInfo = function () {
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'PatientInfo'},
       {
-        SetPatientInfo: {method:'POST',params:{route: 'SetPatientInfo'}, timeout:10000},
-        GetNewPatientID: {method:'GET',params:{route: 'GetNewPatientID'}, timeout:10000},
-        GetPsPatientInfo: {method:'GET',params:{route: 'GetPsPatientInfo',strPatientID:'@strPatientID'}, timeout:10000},
-        CheckPatientID: {method:'POST',params:{route: 'CheckPatientID',PatientID:'@PatientID'}, timeout:10000},
+        SetPatientInfo: {method:'POST',params:{route: 'SetPatientInfo'}, timeout:100000},
+        GetNewPatientID: {method:'GET',params:{route: 'GetNewPatientID'}, timeout:100000},
+        GetPsPatientInfo: {method:'GET',params:{route: 'GetPsPatientInfo',strPatientID:'@strPatientID'}, timeout:100000},
+        CheckPatientID: {method:'POST',params:{route: 'CheckPatientID',PatientID:'@PatientID'}, timeout:100000},
       });
   };
   var PatientVisitInfo = function () {
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'PatientVisitInfo'},
       {
-        GetPatientsbyStatus: {method:'GET',isArray: true,params:{route: 'GetPatientsbyStatus', strStatus:'@strStatus'}, timeout:10000},
-        GetPatientbyPID: {method:'GET',params:{route: 'GetPatientbyPID', strPatientID:'@strPatientID'}, timeout:10000},
-        GetNewVisitNo: {method:'GET',params:{route: 'GetNewVisitNo', patientID:'@patientID'}, timeout:10000},
-        UpdateInjury: {method:'POST',params:{route: 'UpdateInjury'}, timeout:10000},
-        UpdateEva: {method:'POST',params:{route: 'UpdateEva'}, timeout:10000},
-        GetPatientVisitInfo: {method:'GET',params:{route: 'GetPatientVisitInfo', strPatientID:'@strPatientID',strVisitNo:'@strVisitNo'}, timeout:10000},
-        SetPsPatientVisitInfo: {method:'POST',params:{route: 'SetPsPatientVisitInfo'}, timeout:10000},
-        UpdateTriage: {method:'POST', params:{route:'UpdateTriage'}, timeout:10000},
-        UpdateArrive: {method:'POST', params:{route:'UpdateArrive'}, timeout:10000},
+        GetPatientsbyStatus: {method:'GET',isArray: true,params:{route: 'GetPatientsbyStatus', strStatus:'@strStatus'}, timeout:100000},
+        GetPatientbyPID: {method:'GET',params:{route: 'GetPatientbyPID', strPatientID:'@strPatientID'}, timeout:100000},
+        GetNewVisitNo: {method:'GET',params:{route: 'GetNewVisitNo', patientID:'@patientID'}, timeout:100000},
+        UpdateInjury: {method:'POST',params:{route: 'UpdateInjury'}, timeout:100000},
+        UpdateEva: {method:'POST',params:{route: 'UpdateEva'}, timeout:100000},
+        GetPatientVisitInfo: {method:'GET',params:{route: 'GetPatientVisitInfo', strPatientID:'@strPatientID',strVisitNo:'@strVisitNo'}, timeout:100000},
+        SetPsPatientVisitInfo: {method:'POST',params:{route: 'SetPsPatientVisitInfo'}, timeout:100000},
+        UpdateTriage: {method:'POST', params:{route:'UpdateTriage'}, timeout:100000},
+        UpdateArrive: {method:'POST', params:{route:'UpdateArrive'}, timeout:100000},
       });
   };
   var VitalSignInfo = function(){
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'VitalSignInfo'}, {
-      GetVitalSignInfos: {method:'GET', params:{route:'GetVitalSignInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:10000},
-      POSTVitalSign:{method:'POST', params:{route: 'SetVitalSign',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 10000}
+      GetVitalSignInfos: {method:'GET', params:{route:'GetVitalSignInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:100000},
+      POSTVitalSign:{method:'POST', params:{route: 'SetVitalSign',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 100000}
     });
   };
   var MstVitalSignDict = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstVitalSignDict'},{
-          GETVitalSignDictItems:{method:'GET',isArray:true, params:{route: 'GetAllVitalSignDictItems'}, timeout: 10000}
+          GETVitalSignDictItems:{method:'GET',isArray:true, params:{route: 'GetAllVitalSignDictItems'}, timeout: 100000}
       });
   };
   var EmergencyInfo = function(){
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'EmergencyInfo'}, {
-      GetEmergencyInfos: {method:'GET', params:{route:'GetEmergencyInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:10000},
-      POSTEmergency:{method:'POST', params:{route: 'SetEmergency',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 10000}
+      GetEmergencyInfos: {method:'GET', params:{route:'GetEmergencyInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:100000},
+      POSTEmergency:{method:'POST', params:{route: 'SetEmergency',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 100000}
     });
   };
   var MstEmergencyItemDict = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstEmergencyItemDict'},{
-          GETEmergencyDictItems:{method:'GET',isArray:true, params:{route: 'GetAllMstEmergencyItemDict'}, timeout: 10000}
+          GETEmergencyDictItems:{method:'GET',isArray:true, params:{route: 'GetAllMstEmergencyItemDict'}, timeout: 100000}
       });
   };
   var MstDivision = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstDivision'},{
-          GetDivisions:{method:'GET',isArray:true, params:{route: 'GetDivisions'}, timeout: 10000}
+          GetDivisions:{method:'GET',isArray:true, params:{route: 'GetDivisions'}, timeout: 100000}
       });
   };
   var MstEva = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstEva'},{
-          GetDataByEVATransportation:{method:'GET',isArray:true, params:{route: 'GetDataByEVATransportation'}, timeout: 10000}
+          GetDataByEVATransportation:{method:'GET',isArray:true, params:{route: 'GetDataByEVATransportation'}, timeout: 100000}
       });
   };
   serve.abort = function ($scope) {
@@ -193,10 +195,10 @@ return{
 }])
 
 //-------用户基本操作-登录、注册、修改密码、位置选择、个人信息维护-------- [熊嘉臻]
-.factory('UserInfo', ['$q', 'Data',function($q, Data){
+.factory('UserInfo', ['$q', 'Data','Common', function($q, Data, Common){
   var self = this;
   var RevUserId="xxx";
-  var TerminalName = 'X-PC' , TerminalIP = '10.110.110.110';
+  var TerminalName = Common.postInformation().TerminalName , TerminalIP = Common.postInformation().TerminalIP;
   self.isPasswdValid = function(passwd){
     var patrn=/^(\w){6,20}$/;    
     if (patrn.exec(passwd)){
@@ -205,10 +207,10 @@ return{
     return false;
   }
   self.UserRegister = function(form){
-    var deferred = $q.defer();
     form.RevUserId = RevUserId; 
     form.TerminalName = TerminalName; 
     form.TerminalIP = TerminalIP;
+    var deferred = $q.defer();
     Data.Users.UserRegister(form,
       function(s){
         deferred.resolve(s);
@@ -218,9 +220,9 @@ return{
     return deferred.promise;
   };
 
-  self.ChangePassword = function (UserID,OldPassword,NewPassword) {
+  self.ChangePassword = function (OldPassword,NewPassword) {
     var deferred = $q.defer();
-    Data.Users.ChangePassword({UserID:UserID,OldPassword:OldPassword,NewPassword:NewPassword}, 
+    Data.Users.ChangePassword({UserID:Common.postInformation().UserID,OldPassword:OldPassword,NewPassword:NewPassword}, 
       function (data, headers) {
         deferred.resolve(data);
       }, function (err) {
@@ -240,9 +242,9 @@ return{
     return deferred.promise;
   };
 
-  self.ModifyUserInfo = function (UserID,RoleCode,UserName,Occupation,Position,Affiliation) {
+  self.ModifyUserInfo = function (RoleCode,UserName,Occupation,Position,Affiliation) {
     var deferred = $q.defer();
-    Data.Users.ModifyUserInfo({UserID:UserID,RoleCode:RoleCode,UserName:UserName,Occupation:Occupation,Position:Position,Affiliation:Affiliation}, 
+    Data.Users.ModifyUserInfo({UserID:Common.postInformation().UserID,RoleCode:RoleCode,UserName:UserName,Occupation:Occupation,Position:Position,Affiliation:Affiliation}, 
       function (data, headers) {
         deferred.resolve(data);
       }, function (err) {
@@ -250,9 +252,9 @@ return{
       });
     return deferred.promise;
   };  
-  self.SetUserInfo = function (UserID,PassWord,UserName,RoleCode,UnitCode,Location) {
+  self.SetUserInfo = function (PassWord,UserName,RoleCode,UnitCode,Location) {
     var deferred = $q.defer();
-    Data.Users.SetUserInfo({UserID:UserID,PassWord:PassWord,UserName:UserName,RoleCode:RoleCode,UnitCode:UnitCode,Location:Location}, 
+    Data.Users.SetUserInfo({UserID:Common.postInformation().UserID,PassWord:PassWord,UserName:UserName,RoleCode:RoleCode,UnitCode:UnitCode,Location:Location}, 
       function (data, headers) {
         deferred.resolve(data);
       }, function (err) {
@@ -364,7 +366,7 @@ return{
 }])
 
 //病人就诊信息
-.factory('PatientVisitInfo', ['$q','$http', 'Data', function($q,$http, Data){
+.factory('PatientVisitInfo', ['$q','$http', 'Data', 'Common', function($q, $http, Data, Common){
   var self = this;
 
   self.GetPatientsbyStatus = function(strStatus){
@@ -441,9 +443,9 @@ return{
       });
     return deferred.promise;
   };
-  self.UpdateTriage = function(PatientID, VisitNo, Status, TriageDateTime, TriageToDept){
+  self.UpdateTriage = function(TriageData){
     var deferred = $q.defer();
-    Data.PatientVisitInfo.UpdateTriage({PatientID:PatientID, VisitNo:VisitNo, Status:Status, TriageDateTime:TriageDateTime, TriageToDept:TriageToDept, UserID:'', TerminalName:'', TerminalIP:''}, function(data, headers){
+    Data.PatientVisitInfo.UpdateTriage(TriageData, function(data, headers){
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
@@ -452,7 +454,7 @@ return{
   };
   self.UpdateArrive = function(PatientID, VisitNo, Status, ArriveDateTime, ArrivePlace){
     var deferred = $q.defer();
-    Data.PatientVisitInfo.UpdateArrive({PatientID:PatientID, VisitNo:VisitNo, Status:Status, ArriveDateTime:ArriveDateTime, ArrivePlace:ArrivePlace, UserID:'', TerminalName:'', TerminalIP:''}, function(data, headers){
+    Data.PatientVisitInfo.UpdateArrive({PatientID:PatientID, VisitNo:VisitNo, Status:Status, ArriveDateTime:ArriveDateTime, ArrivePlace:ArrivePlace, UserID:Common.postInformation().UserID, TerminalName:Common.postInformation().TerminalName, TerminalIP:Common.postInformation().TerminalIP}, function(data, headers){
       deferred.resolve(data);
     }, function(err){
       deferred.reject(err);
@@ -462,9 +464,7 @@ return{
   return self;
 }])
 
-
-
-//-------分流人员-列表、信息查看、分流-------- [张亚童]
+//-------分流人员-列表、信息查看、分流-------- [张桠童]
 .factory('VitalSignInfo', ['$q', '$http', 'Data', function( $q, $http, Data ){
   var self = this;
   // 获取某一病人体征信息（供分流使用）--张桠童
@@ -527,6 +527,84 @@ return{
     return deferred.promise;
   };
   return self;
+}])
+
+// 弹出分流框
+.factory('Popup', ['$state', '$ionicPopup', '$ionicLoading', 'MstDivision', 'PatientVisitInfo', 'Common', '$q', 'Storage', '$http', 'Data', function($state, $ionicPopup, $ionicLoading, MstDivision, PatientVisitInfo, Common, $q, Storage, $http, Data ){
+  return{
+    triagePopup: function(scope){
+      // 读入分诊去向字典表
+      var promise = MstDivision.GetDivisions();
+      promise.then(function(data){
+        scope.TriageDepts = data;
+      }, function(err){
+        // 无错误读入处理
+      });
+      // 供测试用
+      scope.test = function(){
+        // console.log(scope.TriageData.TriageToDept);
+      };
+      // 初始化  分流PID、VID、状态、时间、地点  
+      scope.TriageData = {
+        "PatientID": Storage.get("PatientID"),
+        "VisitNo": Storage.get("VisitNo"),
+        "Status": "4",
+        "TriageDateTime": new Date(Common.DateTimeNow().fullTime),
+        "TriageToDept":"Dept05",
+        "UserID":Common.postInformation().UserID, 
+        "TerminalName":Common.postInformation().TerminalName, 
+        "TerminalIP":Common.postInformation().TerminalIP
+      };
+      // console.log(scope.TriageData);
+      // scope.TriageData.TriageToDept = "Dept05";  // 预置一个分诊地点
+      // scope.TriageData.TriageDateTime = new Date(Common.DateTimeNow().fullTime);
+      // 弹出框
+      var Popup_triage = $ionicPopup.show({
+        templateUrl : 'templates/ambulance/triage.html',
+        scope : scope,
+        title : '分诊' ,
+        buttons : [
+          { text:'确定',
+            type:'button-assertive',
+            onTap: function(){
+              // 插入病人分诊信息
+              // 考虑时序的问题，必须要在按键的时候才给变量赋值
+              var temp_TriageData = [{
+                "PatientID": scope.TriageData.PatientID,
+                "VisitNo": scope.TriageData.VisitNo,
+                "Status": scope.TriageData.Status,
+                "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime,
+                "TriageToDept": scope.TriageData.TriageToDept,
+                "UserID": scope.TriageData.UserID, 
+                "TerminalName": scope.TriageData.TerminalName, 
+                "TerminalIP": scope.TriageData.TerminalIP
+              }];
+              // console.log(temp_TriageData);
+              var promise = PatientVisitInfo.UpdateTriage(temp_TriageData);
+              promise.then(function(data){
+                if(data.result=="数据插入成功"){
+                  $ionicLoading.show({
+                    template: '分诊成功',
+                    duration:1000
+                  });
+                  $state.go('ambulance.list');
+                }
+              }, function(err){
+                // 无错误处理
+                  $ionicLoading.show({
+                    template: '分诊失败',
+                    duration:1000
+                  });
+              });
+            }
+          },
+          { text:'取消' ,
+            type:'button-positive'
+          }
+        ]
+      });
+    }
+  }
 }])
 //-------急救人员-伤情与处置-------- [马志彬]
 ////////////蓝牙(BLE)相关服务///马志彬-----------start
@@ -668,12 +746,12 @@ return{
 
 
 //NFC XJZ
-.factory('nfcService', function ($rootScope, $ionicPlatform,$ionicPopup,$ionicLoading,$state,Storage) {
+.factory('nfcService', function ($rootScope, $ionicPlatform,$ionicPopup,$ionicLoading,$state,Storage,PatientVisitInfo,Common) {
 
     var openPop = function(){
       $ionicPopup.show({
-        title: '<center>发现NFC卡片</center>',
-        template: '卡片信息为空，新建患者？',
+        title: '<center>发现空的NFC卡片</center>',
+        template: '卡片无效，ID信息为空',
         //subTitle: '2',
         scope: $rootScope,
         buttons: [
@@ -681,11 +759,7 @@ return{
             text: '确定',
             type: 'button-assertive',
             onTap: function(e) {
-                $state.go('newPatient');
             }
-          },{ text: '取消',
-              type: 'button-calm',
-            onTap: function(e) {}
           }
         ]
       });      
@@ -696,9 +770,9 @@ return{
         function () {
             $rootScope.recordToWrite='';
             $rootScope.NFCmodefy=false;
+            $rootScope.isWritedToCard = true;
             $ionicLoading.hide();
             $ionicLoading.show({template:'NFC卡片写入成功',noBackdrop:true,duration:1000});
-            $state.go('injury');
         }, 
         function (reason) {
             $ionicLoading.hide();
@@ -725,13 +799,15 @@ return{
         nfc.addNdefListener(function (nfcEvent) {
             if(Storage.get('MY_LOCATION') == undefined){
               $ionicLoading.show({template:'请先登录，并提交位置',noBackdrop:true,duration:2000});
-            }else if($rootScope.eraseCard == true){
-              nfc.erase(function(){
-                $ionicLoading.hide();
-                $ionicLoading.show({template:'NFC卡片擦除成功',noBackdrop:true,duration:2000});
-                $rootScope.eraseCard=false;
-              },function(){});
-            }else{
+            }
+            // else if($rootScope.eraseCard == true){
+            //   nfc.erase(function(){
+            //     $ionicLoading.hide();
+            //     $ionicLoading.show({template:'NFC卡片擦除成功',noBackdrop:true,duration:2000});
+            //     $rootScope.eraseCard=false;
+            //   },function(){});
+            // }
+            else{
               console.log(JSON.stringify(nfcEvent, null, 4));
               console.log(nfcEvent);
               $rootScope.$apply(function(){
@@ -739,15 +815,61 @@ return{
                   if(!$rootScope.NFCmodefy && (typeof(nfcEvent.tag.ndefMessage) === 'undefined' || nfcEvent.tag.ndefMessage[0].id=='')){
                     openPop();
                   }else if(!$rootScope.NFCmodefy){
-                    var temp= new Array();
-                    temp = nfc.bytesToString(nfcEvent.tag.ndefMessage[0].id).split("|");//取出相应数据
-                    //var pid=temp[0];
-                    //var visit=temp[1];
-                    Storage.set('PatientID',temp[0]);
-                    Storage.set('VisitNo',temp[1]);
-                    if(Storage.get('RoleCode') == 'EmergencyPersonnel') $state.go('visitInfo');
-                    else  $state.go('viewEmergency');
-                    
+                    var goToPatient = function(){
+                      var temp= new Array();
+                      temp = nfc.bytesToString(nfcEvent.tag.ndefMessage[0].id).split("|");//取出相应数据
+                      //var pid=temp[0];
+                      //var visit=temp[1];
+                      PatientVisitInfo.GetPatientVisitInfo(temp[0],temp[1])
+                      .then(function(data){
+                        var s=data.Status;
+                        if(Storage.get('RoleCode') == 'EmergencyPersonnel'){
+                          if(s=="1"){
+                            Storage.set('PatientID',temp[0]);
+                            Storage.set('VisitNo',temp[1]);
+                            $state.go('visitInfo');
+                          }else{
+                            $ionicLoading.show({template:'没有操作权限：该患者已后送',noBackdrop:true,duration:2000});
+                          } 
+                        }else{
+                          if(s=="1") $ionicLoading.show({template:'没有操作权限：该患者还未后送',noBackdrop:true,duration:2000});
+                          else if(s!="4"){
+                            if(s=="2"){
+                              PatientVisitInfo.UpdateArrive(temp[0],temp[1], "3",Common.DateTimeNow().fullTime, Storage.get('MY_LOCATION_CODE'));
+                            }
+                            Storage.set('PatientID',temp[0]);
+                            Storage.set('VisitNo',temp[1]);
+                            $state.go('viewEmergency');
+                          }else{
+                            $ionicLoading.show({template:'没有操作权限：该患者已分诊',noBackdrop:true,duration:2000});
+                          } 
+                        }
+                      },function(err){
+
+                      });
+                    }                    
+                    if($state.current.name == 'newVisit' || $state.current.name == 'newPatient'){
+                      $ionicPopup.show({
+                        title: '<center>从NFC扫描到新患者</center>',
+                        template: '是否放弃当前新建操作，跳转到该患者信息页面？',
+                        //subTitle: '2',
+                        scope: $rootScope,
+                        buttons: [
+                          {
+                            text: '确定',
+                            type: 'button-assertive',
+                            onTap: function(e) {
+                                goToPatient();
+                            }
+                          },{ text: '取消',
+                              type: 'button-calm',
+                            onTap: function(e) {}
+                          }
+                        ]
+                      });                       
+                    }else{
+                      goToPatient();
+                    }
                   }
               });
               if($rootScope.NFCmodefy && $rootScope.recordToWrite!=undefined && $rootScope.recordToWrite!=''){
@@ -787,14 +909,132 @@ return{
         });
     }
 
-    return {
-      start,
-    };
+    return {start:start};
 })
 
+
 //后送
-.factory('Evacation', function ($rootScope, $ionicPlatform,$ionicPopup,$ionicLoading,$state,Storage) {
+.factory('Evacation', function ($rootScope, $ionicPlatform,$ionicPopup,$ionicLoading,$state,Storage,PatientVisitInfo,MstEva,Common,MstType) {
+
+   function getPopup(scope) {
+ 
+     //后送选项加载
+     //后送方式
+     var promise_EvaTransportation= MstType.GetMstType('EvaTransportation');
+     promise_EvaTransportation.then(function(data)
+     { 
+        scope.EvaTransportations = data;
+        scope.EvaTransportations.selectedOption=data[0];
+        },function(err) {   
+     });      
+
+      //默认后送批次
+      var promise_EVABatchNos = MstEva.GetDataByEVATransportation('1');
+      promise_EVABatchNos.then(function(data)
+       { 
+         scope.EVABatchNos = data;
+         //$scope.evacuationInfo.EvaBatchNo="B01";
+        },function(err) {   
+     }); 
   
+      scope.changeEVABatchNos=function(item){
+        var promise_EVABatchNos = MstEva.GetDataByEVATransportation(item);
+        promise_EVABatchNos.then(function(data)
+         { 
+          scope.EVABatchNos = data;
+          scope.evacuationInfo.EvaBatchNo=data[0].EVANO;
+          },function(err) {   
+        }); 
+      }      
+
+      //后送体位
+     var promise_EvaPosition = MstType.GetMstType('EvaPosition');
+      promise_EvaPosition.then(function(data)
+      { 
+        scope.EvaPositions = data;
+        scope.EvaPositions.selectedOption=data[0];
+      },function(err) {   
+        });      
+
+      //后送地点 必须
+    var promise = MstType.GetMstType('EvaDestination');
+    promise.then(function(data)
+    { 
+     scope.EvaDestinations = data;
+     scope.EvaDestinations.selectedOption=data[0];
+     console.log(scope.EvaDestinations.selectedOption);
+      },function(err) {   
+    }); 
+   
+     //后送操作
+     var visitNo = window.localStorage['VisitNo'];
+     scope.evacuationInfo={"EvaDateTime": new Date(Common.DateTimeNow().fullTime), "EvaBatchNo":"33", "EvaDestination":"",  "EvaTransportation":"",  "EvaPosition":"医院船"};
+     var Evacuation= function(scope)
+     {
+        
+        var sendData={
+          "PatientID": Storage.get("PatientID"),
+          "VisitNo": Storage.get("VisitNo"),
+          "Status": "2",
+          "EvaDateTime": Common.DateTimeNow(scope.evacuationInfo.EvaDateTime).fullTime,
+          "EvaBatchNo": scope.evacuationInfo.EvaBatchNo,
+          "EvaDestination": scope.evacuationInfo.EvaDestination,
+          "EvaTransportation": scope.evacuationInfo.EvaTransportation,
+          "EvaPosition": scope.evacuationInfo.EvaPosition,
+          "UserID": Common.postInformation().UserID,
+          "TerminalName": Common.postInformation().TerminalName,
+          "TerminalIP": Common.postInformation().TerminalIP
+         }
+        var promise =  PatientVisitInfo.UpdateEva(sendData); 
+        promise.then(function(data){ 
+          //scope.evacuationInfo.EvaPosition="医院船";
+          if((data.result=="数据插入成功")){
+            $ionicLoading.show({
+              template: "后送完成！",
+              noBackdrop: false,
+              duration: 1000,
+              hideOnStateChange: true
+            });
+            setTimeout(function(){
+              $state.go('ambulance.list'); //回主页
+            },600);
+          }
+         },function(err) {   
+          }); 
+      }
+
+      if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')&&(scope.evacuationInfo.EvaDateTime!='')){
+        return $ionicPopup.show({
+               
+               templateUrl: 'templates/ambulance/evacuation.html',
+               title: '后送操作',
+               scope: scope,
+               buttons: [
+                  {text: '确定',
+                   type: 'button-assertive',
+                 　onTap: function(e) {
+                    Evacuation(scope);
+        　　　　    }
+                   },{
+                   text: '取消',
+                   type: 'button-positive',
+               }]
+           });     
+        }
+        else
+            {
+              return $ionicLoading.show({
+                 template: '请先保存就诊记录',
+                 noBackdrop: false,
+                 duration: 1000,
+                 hideOnStateChange: true
+            });
+          }
+      }
+      
+   return {
+       getPopup: getPopup
+   };    
 })
 //分诊
 ;

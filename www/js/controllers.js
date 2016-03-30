@@ -1510,12 +1510,12 @@ angular.module('controllers', ['ionic','ngResource','services'])
             }
           }
         })
-        console.log($scope.emergencylevel);
+        // console.log($scope.emergencylevel);
         if($scope.emergencylevel!=undefined)
         {
           postEmergencydata.postdata.push($scope.emergencylevel);
         }
-        // console.log(postVitalSigndata);
+        console.log(postVitalSigndata);
         console.log(postEmergencydata);
         if(postVitalSigndata.postdata.length>0)
         {
@@ -1572,20 +1572,38 @@ angular.module('controllers', ['ionic','ngResource','services'])
       $scope.blescanlist[index].showconnecticon = true;
       // console.log($scope.blescanlist);
     }
-    $scope.showbluetoothConfirm = function() {//弹出生理设备选择提示框
+    $scope.showbluetoothConfirm = function(i) {//弹出生理设备选择提示框
       $scope.bluetoothscanlist = [
         
       ];
+      $scope.Pbluttoothdevice = i;
       if(ionic.Platform.platform()!='win32')
       {
-        console.log('startbluetooth');
-        bluetoothSerial.discoverUnpaired();
-        bluetoothSerial.setDeviceDiscoveredListener(function(device) {
-          $rootScope.$apply(function(){
-            $scope.bluetoothscanlist.push(device);
+        if(i==0)
+        {
+          console.log('startbluetooth');
+          bluetoothSerial.discoverUnpaired();
+          bluetoothSerial.setDeviceDiscoveredListener(function(device) {
+            $rootScope.$apply(function(){
+              $scope.bluetoothscanlist.push(device);
+            });
+            console.log($scope.bluetoothscanlist);
+          }); 
+        }else{
+          console.log("s");
+          ble.startScan([], function(device) {
+              console.log(JSON.stringify(device));
+              $rootScope.$apply(function(){
+                $scope.bluetoothscanlist.push(device);
+              });
+          }, function(e){
+            console.log(e);
           });
-          console.log($scope.bluetoothscanlist);
-        });
+        }
+      }
+      $scope.Pbluttoothdevicefun = function(i){
+        // $scope.Pbluttoothdevice = i;
+        console.log($scope.Pbluttoothdevice);
       }
       var confirmPopup = $ionicPopup.confirm({
         title: '选择设备',
@@ -1594,9 +1612,14 @@ angular.module('controllers', ['ionic','ngResource','services'])
       }).then(function(res) {
         if(res) {
           $scope.bluetoothscanlist.forEach(function(value,key){
-            if(value.showconnecticon == true)
-              window.localStorage['bluetoothdevice'] = angular.toJson(value);//存储生理设备mac(相当于绑定设备)
-          })
+              if(value.showconnecticon == true)
+              {
+                if(i==0)
+                  window.localStorage['bluetoothdevice'] = angular.toJson(value);//存储生理设备mac(相当于绑定设备)
+                else
+                  window.localStorage['bluetoothdeviceP'] = angular.toJson(value);//存储生理设备mac(相当于绑定设备)
+              }
+            })
         } else {
           // console.log('You are not sure');
         }
@@ -1614,57 +1637,115 @@ angular.module('controllers', ['ionic','ngResource','services'])
       $scope.testdata = [];
       if(ionic.Platform.platform()!='win32')
       {
-        var bluetoothdevice = angular.fromJson(window.localStorage['bluetoothdevice']);
-        bluetoothSerial.connect(bluetoothdevice.id,
-          function(s){
-            bluetoothSerial.subscribeRawData(
-              function(sd){
-                var bytes = new Uint8Array(sd);
-                // console.log(sd);
-                $rootScope.$apply(function(){
-                  if($scope.testdata.length<55)
-                  {
-                    // $scope.testdata.concat(bytes);
-                    angular.forEach(bytes,function(value,key){
-                      console.log(value);
-                      $scope.testdata.push(value);
-                      console.log($scope.testdata);
-                    })
-                  }
-                  else{
-                    console.log("save 55 bytes!");
-                    bluetoothSerial.unsubscribeRawData(function(s){console.log(s)},function(e){console.log(e)});
-                    bluetoothSerial.disconnect(function(s){console.log(s);},function(e){console.log(e);});
-                    for(var i=0;i<55;i++){
-                      if($scope.testdata[i] == 170 && (i+26)<55)
-                        if($scope.testdata[i+1]==170)
-                          if($scope.testdata[i+2]==1)
-                            if($scope.testdata[i+3]==49)
-                            {
-                              $scope.testdata2= [];
-                              for(var ii=0;ii<26;ii++)
-                              {
-                                 $scope.testdata2.push($scope.testdata[i+ii]);
-                              }
-                              console.log($scope.testdata2);
-                              $scope.catalog.Physical[6].value = $scope.testdata2[6];//心率
-                              $scope.catalog.Physical[5].value = $scope.testdata2[7];//血氧值
-                              $scope.catalog.Physical[1].value = $scope.testdata2[8];//脉率
-                              $scope.catalog.Physical[2].value = $scope.testdata2[9];//呼吸率
-                              $scope.catalog.Physical[3].value = $scope.testdata2[10];//收缩压
-                              $scope.catalog.Physical[4].value = $scope.testdata2[11];//舒张压
-                              console.log($scope.catalog);
-                            }
+        if($scope.Pbluttoothdevice==0)
+        {
+          var bluetoothdevice = angular.fromJson(window.localStorage['bluetoothdevice']);
+          bluetoothSerial.connect(bluetoothdevice.id,
+            function(s){
+              bluetoothSerial.subscribeRawData(
+                function(sd){
+                  var bytes = new Uint8Array(sd);
+                  // console.log(sd);
+                  $rootScope.$apply(function(){
+                    if($scope.testdata.length<55)
+                    {
+                      // $scope.testdata.concat(bytes);
+                      angular.forEach(bytes,function(value,key){
+                        // console.log(value);
+                        $scope.testdata.push(value);
+                        // console.log($scope.testdata);
+                      })
                     }
-                  }
+                    else{
+                      // console.log("save 55 bytes!");
+                      bluetoothSerial.unsubscribeRawData(function(s){/*console.log(s)*/},function(e){/*console.log(e)*/});
+                      bluetoothSerial.disconnect(function(s){/*console.log(s);*/},function(e){/*console.log(e);*/});
+                      for(var i=0;i<55;i++){
+                        if($scope.testdata[i] == 170 && (i+26)<55)
+                          if($scope.testdata[i+1]==170)
+                            if($scope.testdata[i+2]==1)
+                              if($scope.testdata[i+3]==49)
+                              {
+                                $scope.testdata2= [];
+                                for(var ii=0;ii<26;ii++)
+                                {
+                                   $scope.testdata2.push($scope.testdata[i+ii]);
+                                }
+                                // console.log($scope.testdata2);
+                                $scope.catalog.Physical[6].value = $scope.testdata2[6];//心率
+                                $scope.catalog.Physical[5].value = $scope.testdata2[7];//血氧值
+                                $scope.catalog.Physical[1].value = $scope.testdata2[8];//脉率
+                                $scope.catalog.Physical[2].value = $scope.testdata2[9];//呼吸率
+                                $scope.catalog.Physical[3].value = $scope.testdata2[10];//收缩压
+                                $scope.catalog.Physical[4].value = $scope.testdata2[11];//舒张压
+                                // console.log($scope.catalog);
+                              }
+                      }
+                    }
+                  });
+                  // console.log($scope.testdata);
+                },function(ed){
+
                 });
-                console.log($scope.testdata);
-              },function(ed){
+            }, function(e){
 
+            });
+          }else{
+            var bluetoothdevice = angular.fromJson(window.localStorage['bluetoothdeviceP']);
+            ble.connect(bluetoothdevice.id,
+              function(s)
+              {
+                console.log(s);
+                // console.log(s.id+" "+s.services[2]+" "+s.characteristics[6].characteristic);
+                ble.read(s.id, s.services[2], s.characteristics[6].characteristic,
+                  function(buff){
+                    console.log(buff);
+                    console.log('buff');
+                    var data = new Uint8Array(buff);
+                    ///////////获取成功进行存储，此处数据格式尚待确定
+
+                    $scope.catalog.Physical[6].value = $scope.testdata2[6];//心率
+                    $scope.catalog.Physical[5].value = $scope.testdata2[7];//血氧值
+                    $scope.catalog.Physical[1].value = $scope.testdata2[8];//脉率
+                    $scope.catalog.Physical[2].value = $scope.testdata2[9];//呼吸率
+                    $scope.catalog.Physical[3].value = $scope.testdata2[10];//收缩压
+                    $scope.catalog.Physical[4].value = $scope.testdata2[11];//舒张压
+
+
+                    console.log(data);
+                    ///断开连接
+                    ble.disconnect(s.id,
+                      function(dcsuccess){
+                        console.log(dcsuccess)
+                      },
+                      function(dce){
+                        console.log(dce);
+                      });
+                  },function(e){
+                    console.log(e);
+                     ///断开连接
+                    ble.disconnect(s.id,
+                      function(dcsuccess){
+                        console.log(dcsuccess)
+                      },
+                      function(dce){
+                        console.log(dce);
+                      });
+                  });
+              },function(e)
+              {
+                console.log(e);
+                 ///断开连接
+                    ble.disconnect(s.id,
+                      function(dcsuccess){
+                        console.log(dcsuccess)
+                      },
+                      function(dce){
+                        console.log(dce);
+                      });
               });
-          }, function(e){
-
-          });
+            console.log(bluetoothdevice);
+          }
       }
     }
     $scope.scoring = 0;
@@ -1717,7 +1798,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       $scope.scoring = breathscoring+bp_hscoring+mindscoring;
       if($scope.scoring>=6&&$scope.scoring<=9)
         {
-          $scope.scoring+="分 重伤-紧急处置";
+          $scope.scoring+="分 重伤";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":3,
@@ -1729,7 +1810,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
         }
       else if($scope.scoring>=10&&$scope.scoring<=11)
        { 
-        $scope.scoring+="分 中度伤-优先处置";
+        $scope.scoring+="分 中度伤";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":2,
@@ -1741,7 +1822,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       }
       else if($scope.scoring==12)
         {
-          $scope.scoring+="分 轻伤-常规处置";
+          $scope.scoring+="分 轻伤";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":1,
@@ -1753,7 +1834,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
         }
       else if($scope.scoring<=5)
         {
-          $scope.scoring+="分 危重伤-期待处置";
+          $scope.scoring+="分 危重伤";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":4,
@@ -1890,7 +1971,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     ble.startNotification(bledevice.id, bledevice.services[2], bledevice.characteristics[6].characteristic,function(buffer){
         // console.log('readsuccess');
         var data = new Uint8Array(buffer);
-        // console.log(data);
+        console.log(data);
         // console.log(data.length);
 
 

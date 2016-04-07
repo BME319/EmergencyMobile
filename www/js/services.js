@@ -2,7 +2,7 @@ angular.module('services', ['ionic','ngResource'])
 
 // 客户端配置
 .constant('CONFIG', {
-  baseUrl: 'http://10.12.43.32:8055/Api/v1/',
+  baseUrl: 'http://192.168.10.32:8055/Api/v1/',
   //revUserId: "",
   //TerminalName: "",
   //TerminalIP: "",
@@ -880,7 +880,7 @@ return{
         }, function () {
             console.log("Listening for any tag type.");
         }, function (reason) {
-            alert("Error adding NFC Listener " + reason);
+            //alert("Error adding NFC Listener " + reason);
         });
         
         nfc.addTagDiscoveredListener(function (nfcEvent) {
@@ -905,7 +905,7 @@ return{
         }, function () {
             console.log("Listening for any tag type.");
         }, function (reason) {
-            alert("Error adding NFC Listener " + reason);
+            //alert("Error adding NFC Listener " + reason);
         });
     }
 

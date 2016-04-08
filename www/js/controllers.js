@@ -1272,8 +1272,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
     $scope.selectResult=[];//伤情记录/处置选择结果
     $scope.inputResult=[];//生理生化信息输入结果
-    $scope.bindble = '--';//生理ble绑定结果
 
+    var blem = angular.fromJson(window.localStorage['blemac']);
+    blem==undefined?$scope.bindble = '--':$scope.bindble = blem.name;//生化ble绑定结果blemac
+
+    var btd = angular.fromJson(window.localStorage['bluetoothdevice']);
+    btd==undefined?$scope.bindBle = '--':$scope.bindBle = btd.name;//生理手持ble绑定结果
+
+    var btdp = angular.fromJson(window.localStorage['bluetoothdeviceP']);
+    btdp==undefined?$scope.bindBleP = '--':$scope.bindBleP = btdp.name;//生理腕表ble绑定结果
+
+    console.log($scope.bindBleP);
     $scope.catalog = {};//获取目录
 
     Patients.GetVitalSignDictItems().then(
@@ -1615,9 +1624,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
               if(value.showconnecticon == true)
               {
                 if(i==0)
+                {
                   window.localStorage['bluetoothdevice'] = angular.toJson(value);//存储生理设备mac(相当于绑定设备)
+                  $scope.bindBle = value.name;
+                  window.plugins.toast.showShortBottom('绑定手持设备');
+                }
                 else
+                {
                   window.localStorage['bluetoothdeviceP'] = angular.toJson(value);//存储生理设备mac(相当于绑定设备)
+                  $scope.bindBleP = value.name;
+                  window.plugins.toast.showShortBottom('绑定腕表');
+                }
               }
             })
         } else {
@@ -1679,16 +1696,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
                                 $scope.catalog.Physical[3].value = $scope.testdata2[10];//收缩压
                                 $scope.catalog.Physical[4].value = $scope.testdata2[11];//舒张压
                                 // console.log($scope.catalog);
+                                window.plugins.toast.showShortBottom('获取成功');
                               }
                       }
                     }
                   });
                   // console.log($scope.testdata);
                 },function(ed){
-
+                  window.plugins.toast.showShortBottom('获取失败');
                 });
             }, function(e){
-
+              window.plugins.toast.showShortBottom('获取失败');
             });
           }else{
             var bluetoothdevice = angular.fromJson(window.localStorage['bluetoothdeviceP']);
@@ -1697,22 +1715,21 @@ angular.module('controllers', ['ionic','ngResource','services'])
               {
                 console.log(s);
                 // console.log(s.id+" "+s.services[2]+" "+s.characteristics[6].characteristic);
-                ble.read(s.id, s.services[2], s.characteristics[6].characteristic,
+                ble.read(s.id, s.services[3], s.characteristics[11].characteristic,
                   function(buff){
-                    console.log(buff);
-                    console.log('buff');
+                    // console.log(buff);
+                    // console.log('buff');
                     var data = new Uint8Array(buff);
                     ///////////获取成功进行存储，此处数据格式尚待确定
+                    $rootScope.$apply(function(){
+                      $scope.catalog.Physical[0].value = data[7]+data[8]/100;//体温
+                      $scope.catalog.Physical[1].value = data[4];//脉率
+                      $scope.catalog.Physical[3].value = data[5];//收缩压
+                      $scope.catalog.Physical[4].value = data[6];//舒张压
+                    })
 
-                    $scope.catalog.Physical[6].value = $scope.testdata2[6];//心率
-                    $scope.catalog.Physical[5].value = $scope.testdata2[7];//血氧值
-                    $scope.catalog.Physical[1].value = $scope.testdata2[8];//脉率
-                    $scope.catalog.Physical[2].value = $scope.testdata2[9];//呼吸率
-                    $scope.catalog.Physical[3].value = $scope.testdata2[10];//收缩压
-                    $scope.catalog.Physical[4].value = $scope.testdata2[11];//舒张压
-
-
-                    console.log(data);
+                    window.plugins.toast.showShortBottom('获取成功');
+                    console.log($scope.catalog.Physical);
                     ///断开连接
                     ble.disconnect(s.id,
                       function(dcsuccess){
@@ -1724,6 +1741,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
                   },function(e){
                     console.log(e);
                      ///断开连接
+                    window.plugins.toast.showShortBottom('获取失败');
                     ble.disconnect(s.id,
                       function(dcsuccess){
                         console.log(dcsuccess)
@@ -1736,6 +1754,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               {
                 console.log(e);
                  ///断开连接
+                    window.plugins.toast.showShortBottom('获取失败');
                     ble.disconnect(s.id,
                       function(dcsuccess){
                         console.log(dcsuccess)

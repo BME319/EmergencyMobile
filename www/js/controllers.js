@@ -1262,7 +1262,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     var Userid = window.localStorage['USERID'];
     var patientID = window.localStorage['PatientID'];
     //获取病人基本信息
-    // $scope.testdata={"PatientID":patientID, "VisitNo":visitNo, "PatientName":""}
+    $scope.showpatientinfo={"PatientID":patientID, "VisitNo":visitNo, "PatientName":""}
     // var promise_PatientInfo = PatientInfo.GetPsPatientInfo(Storage.get("PatientID")); 
     // promise_PatientInfo.then(function(data)
     // { 
@@ -1651,7 +1651,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       })
     }
     $scope.receivevdata = function(){//从生理设备获取数据
-      $scope.testdata = [];
+      $scope.pdata = [];
       if(ionic.Platform.platform()!='win32')
       {
         if($scope.Pbluttoothdevice==0)
@@ -1664,12 +1664,12 @@ angular.module('controllers', ['ionic','ngResource','services'])
                   var bytes = new Uint8Array(sd);
                   // console.log(sd);
                   $rootScope.$apply(function(){
-                    if($scope.testdata.length<55)
+                    if($scope.pdata.length<55)
                     {
                       // $scope.testdata.concat(bytes);
                       angular.forEach(bytes,function(value,key){
                         // console.log(value);
-                        $scope.testdata.push(value);
+                        $scope.pdata.push(value);
                         // console.log($scope.testdata);
                       })
                     }
@@ -1678,23 +1678,23 @@ angular.module('controllers', ['ionic','ngResource','services'])
                       bluetoothSerial.unsubscribeRawData(function(s){/*console.log(s)*/},function(e){/*console.log(e)*/});
                       bluetoothSerial.disconnect(function(s){/*console.log(s);*/},function(e){/*console.log(e);*/});
                       for(var i=0;i<55;i++){
-                        if($scope.testdata[i] == 170 && (i+26)<55)
-                          if($scope.testdata[i+1]==170)
-                            if($scope.testdata[i+2]==1)
-                              if($scope.testdata[i+3]==49)
+                        if($scope.pdata[i] == 170 && (i+26)<55)
+                          if($scope.pdata[i+1]==170)
+                            if($scope.pdata[i+2]==1)
+                              if($scope.pdata[i+3]==49)
                               {
-                                $scope.testdata2= [];
+                                $scope.pdata= [];
                                 for(var ii=0;ii<26;ii++)
                                 {
-                                   $scope.testdata2.push($scope.testdata[i+ii]);
+                                   $scope.pdata.push($scope.pdata[i+ii]);
                                 }
                                 // console.log($scope.testdata2);
-                                $scope.catalog.Physical[6].value = $scope.testdata2[6];//心率
-                                $scope.catalog.Physical[5].value = $scope.testdata2[7];//血氧值
-                                $scope.catalog.Physical[1].value = $scope.testdata2[8];//脉率
-                                $scope.catalog.Physical[2].value = $scope.testdata2[9];//呼吸率
-                                $scope.catalog.Physical[3].value = $scope.testdata2[10];//收缩压
-                                $scope.catalog.Physical[4].value = $scope.testdata2[11];//舒张压
+                                $scope.catalog.Physical[6].value = $scope.pdata[6];//心率
+                                $scope.catalog.Physical[5].value = $scope.pdata[7];//血氧值
+                                $scope.catalog.Physical[1].value = $scope.pdata[8];//脉率
+                                $scope.catalog.Physical[2].value = $scope.pdata[9];//呼吸率
+                                $scope.catalog.Physical[3].value = $scope.pdata[10];//收缩压
+                                $scope.catalog.Physical[4].value = $scope.pdata[11];//舒张压
                                 // console.log($scope.catalog);
                                 window.plugins.toast.showShortBottom('获取成功');
                               }

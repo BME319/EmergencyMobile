@@ -532,7 +532,7 @@ return{
 // 弹出分流框
 .factory('Popup', ['$state', '$ionicPopup', '$ionicLoading', 'MstDivision', 'PatientVisitInfo', 'Common', '$q', 'Storage', '$http', 'Data', function($state, $ionicPopup, $ionicLoading, MstDivision, PatientVisitInfo, Common, $q, Storage, $http, Data ){
   return{
-    triagePopup: function(scope){
+    triagePopup: function(category, scope){
       // 读入分诊去向字典表
       var promise = MstDivision.GetDivisions();
       promise.then(function(data){
@@ -546,10 +546,12 @@ return{
       };
       // 初始化  分流PID、VID、状态、时间、地点  
       scope.TriageData = {
-        "PatientID": Storage.get("PatientID"),
-        "VisitNo": Storage.get("VisitNo"),
+        "PatientID": "",
+        "VisitNo": "",
+        // "PatientID": Storage.get("PatientID"),
+        // "VisitNo": Storage.get("VisitNo"),
         "Status": "4",
-        "TriageDateTime": new Date(Common.DateTimeNow().fullTime),
+        "TriageDateTime": new Date(Common.DateTimeNow().fullTime), //new Date把字符串生成时间格式在view中显示
         "TriageToDept":"Dept05",
         "UserID":Common.postInformation().UserID, 
         "TerminalName":Common.postInformation().TerminalName, 
@@ -558,45 +560,77 @@ return{
       // console.log(scope.TriageData);
       // scope.TriageData.TriageToDept = "Dept05";  // 预置一个分诊地点
       // scope.TriageData.TriageDateTime = new Date(Common.DateTimeNow().fullTime);
+
+      // onTap
+      var onTap = function(){
+        // 插入病人分诊信息
+        // 考虑时序的问题，必须要在按键的时候才给变量赋值
+        if (category=="alone") {
+          var temp_TriageData = [{
+            "PatientID": Storage.get("PatientID"),
+            "VisitNo": Storage.get("VisitNo"),
+            "Status": scope.TriageData.Status,
+            "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime, // 重新将时间格式转回字符串格式插入数据库
+            "TriageToDept": scope.TriageData.TriageToDept,
+            "UserID": scope.TriageData.UserID, 
+            "TerminalName": scope.TriageData.TerminalName, 
+            "TerminalIP": scope.TriageData.TerminalIP
+          }];
+          console.log(temp_TriageData);          
+        } else if(category=="group"){
+          var i = 0;
+          var temp_TriageData = [];
+          angular.forEach(scope.patientlist_triage, function(data){
+            temp_TriageData[i] = {
+              "PatientID": data.PatientID,
+              "VisitNo": data.VisitNo,
+              "Status": scope.TriageData.Status,
+              "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime, // 重新将时间格式转回字符串格式插入数据库
+              "TriageToDept": scope.TriageData.TriageToDept,
+              "UserID": scope.TriageData.UserID, 
+              "TerminalName": scope.TriageData.TerminalName, 
+              "TerminalIP": scope.TriageData.TerminalIP
+            };
+            i++;
+          });
+          console.log(temp_TriageData);  
+        };
+
+        var promise = PatientVisitInfo.UpdateTriage(temp_TriageData);
+        promise.then(function(data){
+          if(data.result=="数据插入成功"){
+            $ionicLoading.show({
+              template: '分诊成功',
+              duration:1000
+            });
+            if (category=="alone") {
+              $state.go('ambulance.list');
+            } else {
+              scope.GetPatientsbyStatus(3);
+              scope.show.showDelete = false;
+            };
+            
+          }
+        }, function(err){
+          // 无错误处理
+            $ionicLoading.show({
+              template: '分诊失败',
+              duration:1000
+            });
+        });        
+      };
+
       // 弹出框
       var Popup_triage = $ionicPopup.show({
         templateUrl : 'templates/ambulance/triage.html',
         scope : scope,
         title : '分诊' ,
         buttons : [
-          { text:'确定',
-            type:'button-assertive',
+          { text: '确定',
+            type: 'button-assertive',
             onTap: function(){
-              // 插入病人分诊信息
-              // 考虑时序的问题，必须要在按键的时候才给变量赋值
-              var temp_TriageData = [{
-                "PatientID": scope.TriageData.PatientID,
-                "VisitNo": scope.TriageData.VisitNo,
-                "Status": scope.TriageData.Status,
-                "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime,
-                "TriageToDept": scope.TriageData.TriageToDept,
-                "UserID": scope.TriageData.UserID, 
-                "TerminalName": scope.TriageData.TerminalName, 
-                "TerminalIP": scope.TriageData.TerminalIP
-              }];
-              // console.log(temp_TriageData);
-              var promise = PatientVisitInfo.UpdateTriage(temp_TriageData);
-              promise.then(function(data){
-                if(data.result=="数据插入成功"){
-                  $ionicLoading.show({
-                    template: '分诊成功',
-                    duration:1000
-                  });
-                  $state.go('ambulance.list');
-                }
-              }, function(err){
-                // 无错误处理
-                  $ionicLoading.show({
-                    template: '分诊失败',
-                    duration:1000
-                  });
-              });
-            }
+              onTap();
+            },
           },
           { text:'取消' ,
             type:'button-positive'

@@ -324,20 +324,36 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
 // --------急救人员-列表、新建、后送 [赵艳霞]----------------
 //病人列表(已接收、已后送、已送达)
-.controller('AmbulanceListCtrl',['$state','$scope','$ionicLoading','UserInfo','Storage','PatientVisitInfo', '$state','Common', '$ionicPopup', '$stateParams', function($state,$scope,$ionicLoading,UserInfo,Storage, PatientVisitInfo, $state, Common, $ionicPopup, $stateParams){
+.controller('AmbulanceListCtrl',['$state','$scope','$ionicLoading','UserInfo','Storage','PatientVisitInfo', '$state','Common', '$ionicPopup', '$stateParams', 'Popup', function($state,$scope,$ionicLoading,UserInfo,Storage, PatientVisitInfo, $state, Common, $ionicPopup, $stateParams, Popup){
   $scope.$on('$ionicView.enter', function() {
     $scope.refreshList();
   });
   // 批量处理
-  $scope.data = {
-      showDelete: false
+  $scope.isshown = function(){
+    if ((Storage.get('RoleCode')=='DivideLeader')&&($scope.curtab=="tab3")) {
+      return true;
     };
+  };
+  $scope.show = {showDelete:false};
   $scope.select = function(item) {
     item.itemClass = !item.itemClass;
   };
+  $scope.triagegroup = function(){
+    var i=0;
+    $scope.patientlist_triage = [];
+    // 将选中的病人放到一个数组里
+    angular.forEach($scope.PatientList, function(data){
+      if(data.itemClass==true){
+        $scope.patientlist_triage[i] = {"PatientID":data.PatientID, "VisitNo":data.VisitNo};
+        i++;
+      };
+    });
+    console.log($scope.patientlist_triage);
+    Popup.triagePopup("group", $scope);
+  };
 
   //根据状态获取不同列表，并控制显示
-  var GetPatientsbyStatus = function(Status)
+  $scope.GetPatientsbyStatus = function(Status)
   {
       var promise = PatientVisitInfo.GetPatientsbyStatus(Status); 
       promise.then(function(data)
@@ -348,7 +364,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
          $scope.PatientList = data;
          $scope.$broadcast('scroll.refreshComplete'); 
         },function(err) {   
-      });      
+      }); 
+      // console.log($scope.PatientList);     
   }
 
   //不同角色，列表跳转不同
@@ -374,7 +391,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
      if( (Storage.get('RoleCode')!='EmergencyPersonnel')  && ($scope.curtab=="tab2") ) {
         //送达
         var ArriveDateTime = Common.DateTimeNow().fullTime;
-        console.log(ArriveDateTime);
+        // console.log(ArriveDateTime);
 
         var Popup_Arrive = $ionicPopup.show({
           template : '伤员 '+item.PatientID+' 于 '+ArriveDateTime+' 送达 '+Storage.get('MY_LOCATION'),
@@ -388,7 +405,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               var promise = PatientVisitInfo.UpdateArrive(item.PatientID, item.VisitNo, "3", ArriveDateTime, Storage.get('MY_LOCATION_CODE'));
               promise.then(function(data){
                 if(data.result=="数据插入成功"){
-                  GetPatientsbyStatus(2);
+                  $scope.GetPatientsbyStatus(2);
                   $ionicLoading.show({
                     template: '送达成功',
                     duration:1000
@@ -407,6 +424,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
      }
   };
+
   //tab选中的控制
   //默认显示 初始化与角色权限相关
   if(Storage.get('RoleCode')=='EmergencyPersonnel'){    
@@ -417,7 +435,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
        $scope.tab1_color={color:'blue'};   
        $scope.tab2_color="";  
        $scope.tab3_color="";  
-       GetPatientsbyStatus(1);
+       $scope.GetPatientsbyStatus(1);
        $scope.newPatientIcon=true;  
    }
    else if(Storage.get('RoleCode')=='DividePersonnel'){
@@ -428,7 +446,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
        $scope.tab1_color="";   
        $scope.tab2_color={color:'blue'};  
        $scope.tab3_color="";  
-       GetPatientsbyStatus(2);
+       $scope.GetPatientsbyStatus(2);
        $scope.newPatientIcon=false; 
    }
    else{
@@ -439,7 +457,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
        $scope.tab1_color="";   
        $scope.tab2_color="";  
        $scope.tab3_color={color:'blue'};  
-       GetPatientsbyStatus(3);
+       $scope.GetPatientsbyStatus(3);
        $scope.newPatientIcon=false; 
    }
 
@@ -447,9 +465,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
  $scope.sel_tab = function(vtab) {  
    if($scope.curtab!=vtab) 
    {
-    if(vtab=="tab1")  GetPatientsbyStatus(1);
-    else if(vtab=="tab2")  GetPatientsbyStatus(2);
-    else  GetPatientsbyStatus(3);
+    if(vtab=="tab1")  $scope.GetPatientsbyStatus(1);
+    else if(vtab=="tab2")  $scope.GetPatientsbyStatus(2);
+    else  $scope.GetPatientsbyStatus(3);
    }
 
    if(vtab=="tab1"){ 
@@ -459,7 +477,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.curtab="tab1";  
           $scope.tab1_color={color:'blue'};  
           $scope.tab2_color="";  
-          $scope.tab3_color="";                   
+          $scope.tab3_color=""; 
+          $scope.show.showDelete=false;                  
    }
    else if (vtab=="tab2"){  
           $scope.tab1_checked=false;  
@@ -468,7 +487,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.curtab="tab2";  
           $scope.tab1_color="";  
           $scope.tab2_color={color:'blue'};  
-          $scope.tab3_color="";                 
+          $scope.tab3_color="";  
+          $scope.show.showDelete=false;               
    }
    else if (vtab=="tab3"){  
           $scope.tab1_checked=false;  
@@ -477,17 +497,18 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.curtab="tab3";  
           $scope.tab1_color="";  
           $scope.tab2_color="";  
-          $scope.tab3_color={color:'blue'};                  
+          $scope.tab3_color={color:'blue'}; 
+          $scope.show.showDelete=false;                 
    }  
      
   };
   
   //下拉刷新
-   $scope.refreshList = function() { 
-     if($scope.curtab=="tab1")  GetPatientsbyStatus(1);
-     else if($scope.curtab=="tab2")  GetPatientsbyStatus(2);
-     else  GetPatientsbyStatus(3);
-   };
+  $scope.refreshList = function() { 
+    if($scope.curtab=="tab1")  $scope.GetPatientsbyStatus(1);
+    else if($scope.curtab=="tab2")  $scope.GetPatientsbyStatus(2);
+    else  $scope.GetPatientsbyStatus(3);
+  };
 
 }])
 
@@ -1198,8 +1219,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
   });
 
   // 分诊按钮
-  $scope.triagePopup = function(){
-    Popup.triagePopup($scope);
+  $scope.triagealone = function(){
+    Popup.triagePopup("alone", $scope);
   };
  
 }])

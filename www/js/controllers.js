@@ -324,20 +324,36 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
 // --------急救人员-列表、新建、后送 [赵艳霞]----------------
 //病人列表(已接收、已后送、已送达)
-.controller('AmbulanceListCtrl',['$state','$scope','$ionicLoading','UserInfo','Storage','PatientVisitInfo', '$state','Common', '$ionicPopup', '$stateParams', function($state,$scope,$ionicLoading,UserInfo,Storage, PatientVisitInfo, $state, Common, $ionicPopup, $stateParams){
+.controller('AmbulanceListCtrl',['$state','$scope','$ionicLoading','UserInfo','Storage','PatientVisitInfo', '$state','Common', '$ionicPopup', '$stateParams', 'Popup', function($state,$scope,$ionicLoading,UserInfo,Storage, PatientVisitInfo, $state, Common, $ionicPopup, $stateParams, Popup){
   $scope.$on('$ionicView.enter', function() {
     $scope.refreshList();
   });
   // 批量处理
-  $scope.data = {
-      showDelete: false
+  $scope.isshown = function(){
+    if ((Storage.get('RoleCode')=='DivideLeader')&&($scope.curtab=="tab3")) {
+      return true;
     };
+  };
+  $scope.show = {showDelete:false};
   $scope.select = function(item) {
     item.itemClass = !item.itemClass;
   };
+  $scope.triagegroup = function(){
+    var i=0;
+    $scope.patientlist_triage = [];
+    // 将选中的病人放到一个数组里
+    angular.forEach($scope.PatientList, function(data){
+      if(data.itemClass==true){
+        $scope.patientlist_triage[i] = {"PatientID":data.PatientID, "VisitNo":data.VisitNo};
+        i++;
+      };
+    });
+    console.log($scope.patientlist_triage);
+    Popup.triagePopup("group", $scope);
+  };
 
   //根据状态获取不同列表，并控制显示
-  var GetPatientsbyStatus = function(Status)
+  $scope.GetPatientsbyStatus = function(Status)
   {
       var promise = PatientVisitInfo.GetPatientsbyStatus(Status); 
       promise.then(function(data)
@@ -348,7 +364,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
          $scope.PatientList = data;
          $scope.$broadcast('scroll.refreshComplete'); 
         },function(err) {   
-      });      
+      }); 
+      // console.log($scope.PatientList);     
   }
 
   //不同角色，列表跳转不同
@@ -374,7 +391,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
      if( (Storage.get('RoleCode')!='EmergencyPersonnel')  && ($scope.curtab=="tab2") ) {
         //送达
         var ArriveDateTime = Common.DateTimeNow().fullTime;
-        console.log(ArriveDateTime);
+        // console.log(ArriveDateTime);
 
         var Popup_Arrive = $ionicPopup.show({
           template : '伤员 '+item.PatientID+' 于 '+ArriveDateTime+' 送达 '+Storage.get('MY_LOCATION'),
@@ -388,7 +405,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               var promise = PatientVisitInfo.UpdateArrive(item.PatientID, item.VisitNo, "3", ArriveDateTime, Storage.get('MY_LOCATION_CODE'));
               promise.then(function(data){
                 if(data.result=="数据插入成功"){
-                  GetPatientsbyStatus(2);
+                  $scope.GetPatientsbyStatus(2);
                   $ionicLoading.show({
                     template: '送达成功',
                     duration:1000
@@ -407,6 +424,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
      }
   };
+
   //tab选中的控制
   //默认显示 初始化与角色权限相关
   if(Storage.get('RoleCode')=='EmergencyPersonnel'){    
@@ -417,7 +435,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
        $scope.tab1_color={color:'blue'};   
        $scope.tab2_color="";  
        $scope.tab3_color="";  
-       GetPatientsbyStatus(1);
+       $scope.GetPatientsbyStatus(1);
        $scope.newPatientIcon=true;  
    }
    else if(Storage.get('RoleCode')=='DividePersonnel'){
@@ -428,7 +446,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
        $scope.tab1_color="";   
        $scope.tab2_color={color:'blue'};  
        $scope.tab3_color="";  
-       GetPatientsbyStatus(2);
+       $scope.GetPatientsbyStatus(2);
        $scope.newPatientIcon=false; 
    }
    else{
@@ -439,7 +457,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
        $scope.tab1_color="";   
        $scope.tab2_color="";  
        $scope.tab3_color={color:'blue'};  
-       GetPatientsbyStatus(3);
+       $scope.GetPatientsbyStatus(3);
        $scope.newPatientIcon=false; 
    }
 
@@ -447,9 +465,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
  $scope.sel_tab = function(vtab) {  
    if($scope.curtab!=vtab) 
    {
-    if(vtab=="tab1")  GetPatientsbyStatus(1);
-    else if(vtab=="tab2")  GetPatientsbyStatus(2);
-    else  GetPatientsbyStatus(3);
+    if(vtab=="tab1")  $scope.GetPatientsbyStatus(1);
+    else if(vtab=="tab2")  $scope.GetPatientsbyStatus(2);
+    else  $scope.GetPatientsbyStatus(3);
    }
 
    if(vtab=="tab1"){ 
@@ -459,7 +477,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.curtab="tab1";  
           $scope.tab1_color={color:'blue'};  
           $scope.tab2_color="";  
-          $scope.tab3_color="";                   
+          $scope.tab3_color=""; 
+          $scope.show.showDelete=false;                  
    }
    else if (vtab=="tab2"){  
           $scope.tab1_checked=false;  
@@ -468,7 +487,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.curtab="tab2";  
           $scope.tab1_color="";  
           $scope.tab2_color={color:'blue'};  
-          $scope.tab3_color="";                 
+          $scope.tab3_color="";  
+          $scope.show.showDelete=false;               
    }
    else if (vtab=="tab3"){  
           $scope.tab1_checked=false;  
@@ -477,17 +497,18 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.curtab="tab3";  
           $scope.tab1_color="";  
           $scope.tab2_color="";  
-          $scope.tab3_color={color:'blue'};                  
+          $scope.tab3_color={color:'blue'}; 
+          $scope.show.showDelete=false;                 
    }  
      
   };
   
   //下拉刷新
-   $scope.refreshList = function() { 
-     if($scope.curtab=="tab1")  GetPatientsbyStatus(1);
-     else if($scope.curtab=="tab2")  GetPatientsbyStatus(2);
-     else  GetPatientsbyStatus(3);
-   };
+  $scope.refreshList = function() { 
+    if($scope.curtab=="tab1")  $scope.GetPatientsbyStatus(1);
+    else if($scope.curtab=="tab2")  $scope.GetPatientsbyStatus(2);
+    else  $scope.GetPatientsbyStatus(3);
+  };
 
 }])
 
@@ -1198,8 +1219,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
   });
 
   // 分诊按钮
-  $scope.triagePopup = function(){
-    Popup.triagePopup($scope);
+  $scope.triagealone = function(){
+    Popup.triagePopup("alone", $scope);
   };
  
 }])
@@ -1262,7 +1283,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     var Userid = window.localStorage['USERID'];
     var patientID = window.localStorage['PatientID'];
     //获取病人基本信息
-    // $scope.testdata={"PatientID":patientID, "VisitNo":visitNo, "PatientName":""}
+    $scope.showpatientinfo={"PatientID":patientID, "VisitNo":visitNo, "PatientName":""}
     // var promise_PatientInfo = PatientInfo.GetPsPatientInfo(Storage.get("PatientID")); 
     // promise_PatientInfo.then(function(data)
     // { 
@@ -1272,8 +1293,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
     $scope.selectResult=[];//伤情记录/处置选择结果
     $scope.inputResult=[];//生理生化信息输入结果
-    $scope.bindble = '--';//生理ble绑定结果
 
+    var blem = angular.fromJson(window.localStorage['blemac']);
+    blem==undefined?$scope.bindble = '--':$scope.bindble = blem.name;//生化ble绑定结果blemac
+
+    var btd = angular.fromJson(window.localStorage['bluetoothdevice']);
+    btd==undefined?$scope.bindBle = '--':$scope.bindBle = btd.name;//生理手持ble绑定结果
+
+    var btdp = angular.fromJson(window.localStorage['bluetoothdeviceP']);
+    btdp==undefined?$scope.bindBleP = '--':$scope.bindBleP = btdp.name;//生理腕表ble绑定结果
+
+    console.log($scope.bindBleP);
     $scope.catalog = {};//获取目录
 
     Patients.GetVitalSignDictItems().then(
@@ -1615,9 +1645,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
               if(value.showconnecticon == true)
               {
                 if(i==0)
+                {
                   window.localStorage['bluetoothdevice'] = angular.toJson(value);//存储生理设备mac(相当于绑定设备)
+                  $scope.bindBle = value.name;
+                  window.plugins.toast.showShortBottom('绑定手持设备');
+                }
                 else
+                {
                   window.localStorage['bluetoothdeviceP'] = angular.toJson(value);//存储生理设备mac(相当于绑定设备)
+                  $scope.bindBleP = value.name;
+                  window.plugins.toast.showShortBottom('绑定腕表');
+                }
               }
             })
         } else {
@@ -1634,7 +1672,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       })
     }
     $scope.receivevdata = function(){//从生理设备获取数据
-      $scope.testdata = [];
+      $scope.pdata = [];
       if(ionic.Platform.platform()!='win32')
       {
         if($scope.Pbluttoothdevice==0)
@@ -1647,12 +1685,12 @@ angular.module('controllers', ['ionic','ngResource','services'])
                   var bytes = new Uint8Array(sd);
                   // console.log(sd);
                   $rootScope.$apply(function(){
-                    if($scope.testdata.length<55)
+                    if($scope.pdata.length<55)
                     {
                       // $scope.testdata.concat(bytes);
                       angular.forEach(bytes,function(value,key){
                         // console.log(value);
-                        $scope.testdata.push(value);
+                        $scope.pdata.push(value);
                         // console.log($scope.testdata);
                       })
                     }
@@ -1661,34 +1699,35 @@ angular.module('controllers', ['ionic','ngResource','services'])
                       bluetoothSerial.unsubscribeRawData(function(s){/*console.log(s)*/},function(e){/*console.log(e)*/});
                       bluetoothSerial.disconnect(function(s){/*console.log(s);*/},function(e){/*console.log(e);*/});
                       for(var i=0;i<55;i++){
-                        if($scope.testdata[i] == 170 && (i+26)<55)
-                          if($scope.testdata[i+1]==170)
-                            if($scope.testdata[i+2]==1)
-                              if($scope.testdata[i+3]==49)
+                        if($scope.pdata[i] == 170 && (i+26)<55)
+                          if($scope.pdata[i+1]==170)
+                            if($scope.pdata[i+2]==1)
+                              if($scope.pdata[i+3]==49)
                               {
-                                $scope.testdata2= [];
+                                $scope.pdata= [];
                                 for(var ii=0;ii<26;ii++)
                                 {
-                                   $scope.testdata2.push($scope.testdata[i+ii]);
+                                   $scope.pdata.push($scope.pdata[i+ii]);
                                 }
                                 // console.log($scope.testdata2);
-                                $scope.catalog.Physical[6].value = $scope.testdata2[6];//心率
-                                $scope.catalog.Physical[5].value = $scope.testdata2[7];//血氧值
-                                $scope.catalog.Physical[1].value = $scope.testdata2[8];//脉率
-                                $scope.catalog.Physical[2].value = $scope.testdata2[9];//呼吸率
-                                $scope.catalog.Physical[3].value = $scope.testdata2[10];//收缩压
-                                $scope.catalog.Physical[4].value = $scope.testdata2[11];//舒张压
+                                $scope.catalog.Physical[6].value = $scope.pdata[6];//心率
+                                $scope.catalog.Physical[5].value = $scope.pdata[7];//血氧值
+                                $scope.catalog.Physical[1].value = $scope.pdata[8];//脉率
+                                $scope.catalog.Physical[2].value = $scope.pdata[9];//呼吸率
+                                $scope.catalog.Physical[3].value = $scope.pdata[10];//收缩压
+                                $scope.catalog.Physical[4].value = $scope.pdata[11];//舒张压
                                 // console.log($scope.catalog);
+                                window.plugins.toast.showShortBottom('获取成功');
                               }
                       }
                     }
                   });
                   // console.log($scope.testdata);
                 },function(ed){
-
+                  window.plugins.toast.showShortBottom('获取失败');
                 });
             }, function(e){
-
+              window.plugins.toast.showShortBottom('获取失败');
             });
           }else{
             var bluetoothdevice = angular.fromJson(window.localStorage['bluetoothdeviceP']);
@@ -1697,22 +1736,21 @@ angular.module('controllers', ['ionic','ngResource','services'])
               {
                 console.log(s);
                 // console.log(s.id+" "+s.services[2]+" "+s.characteristics[6].characteristic);
-                ble.read(s.id, s.services[2], s.characteristics[6].characteristic,
+                ble.read(s.id, s.services[3], s.characteristics[11].characteristic,
                   function(buff){
-                    console.log(buff);
-                    console.log('buff');
+                    // console.log(buff);
+                    // console.log('buff');
                     var data = new Uint8Array(buff);
                     ///////////获取成功进行存储，此处数据格式尚待确定
+                    $rootScope.$apply(function(){
+                      $scope.catalog.Physical[0].value = data[7]+data[8]/100;//体温
+                      $scope.catalog.Physical[1].value = data[4];//脉率
+                      $scope.catalog.Physical[3].value = data[5];//收缩压
+                      $scope.catalog.Physical[4].value = data[6];//舒张压
+                    })
 
-                    $scope.catalog.Physical[6].value = $scope.testdata2[6];//心率
-                    $scope.catalog.Physical[5].value = $scope.testdata2[7];//血氧值
-                    $scope.catalog.Physical[1].value = $scope.testdata2[8];//脉率
-                    $scope.catalog.Physical[2].value = $scope.testdata2[9];//呼吸率
-                    $scope.catalog.Physical[3].value = $scope.testdata2[10];//收缩压
-                    $scope.catalog.Physical[4].value = $scope.testdata2[11];//舒张压
-
-
-                    console.log(data);
+                    window.plugins.toast.showShortBottom('获取成功');
+                    console.log($scope.catalog.Physical);
                     ///断开连接
                     ble.disconnect(s.id,
                       function(dcsuccess){
@@ -1724,6 +1762,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
                   },function(e){
                     console.log(e);
                      ///断开连接
+                    window.plugins.toast.showShortBottom('获取失败');
                     ble.disconnect(s.id,
                       function(dcsuccess){
                         console.log(dcsuccess)
@@ -1736,6 +1775,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               {
                 console.log(e);
                  ///断开连接
+                    window.plugins.toast.showShortBottom('获取失败');
                     ble.disconnect(s.id,
                       function(dcsuccess){
                         console.log(dcsuccess)

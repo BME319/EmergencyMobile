@@ -22,8 +22,8 @@
 			<a class="item item-thumbnail-left" href="#">
 				<img src="img/head_portrait.jpg">
 				<h2>
-					病人ID：{{testdata.PatientID}} &nbsp&nbsp&nbsp&nbsp</br>
-					就诊编号：{{testdata.VisitNo}}
+					病人ID：{{showpatientinfo.PatientID}} &nbsp&nbsp&nbsp&nbsp</br>
+					就诊编号：{{showpatientinfo.VisitNo}}
 				</h2>
 				<!-- <h2>姓名：{{testdata.PID}}</h2> -->
 			</a>
@@ -77,10 +77,10 @@
 							获取数据
 						</a>
 						<a class="item" style="padding-top: 4px;padding-bottom: 4px;" href="#" ng-click="showbluetoothConfirm(0)">
-							绑定手持设备<label><br/>bind</label>
+							绑定手持设备<label><br/>{{bindBle}}</label>
 						</a>
 						<a class="item" style="padding-top: 4px;padding-bottom: 4px;" href="#" ng-click="showbluetoothConfirm(1)">
-							绑定腕带<label><br/>bind</label>
+							绑定腕带<label><br/>{{bindBleP}}</label>
 						</a>
 					</ion-item>
 					<label class="item item-input" ng-repeat="item in itemdetail">

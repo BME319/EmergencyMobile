@@ -9,7 +9,7 @@
     </ion-nav-buttons>
 
 	<div class="bar bar-footer">
-		<button class="button button-block button-assertive" ng-click="triagePopup()" style="height: 41.6px; margin-bottom: 0px; margin-top: 0px;"><b><h4>分&nbsp;&nbsp;诊</h4></b></button>
+		<button class="button button-block button-assertive" ng-click="triagealone()" style="height: 41.6px; margin-bottom: 0px; margin-top: 0px;"><b><h4>分&nbsp;&nbsp;诊</h4></b></button>
 	</div>
 </ion-nav-bar>
 
@@ -43,7 +43,7 @@
 						<span><b>年龄：</b></span>{{PatientInfos.Age}}
 					</div>
 					<div class = "col">
-						<span><b>血型：</b></span>{{PatientInfos.BloodType}}
+						<span><b>血型：</b></span>{{PatientInfos.BloodType|BloodType}}
 					</div>
 				</div>
 				<!-- <div class = "row">
@@ -90,7 +90,8 @@
 			</ion-item>
 			<ion-item class = "item-accordion" ng-show = "true">
 				<div ng-repeat="EmergencyInfo in EmergencyInfos">
-					<p><b>{{EmergencyInfo.CategoryName}}：</b></p><p style="white-space:pre-wrap;"><span ng-repeat="item in EmergencyInfo.Item" >{{item.ItemValue}}；</span></p>
+					<p><b>{{EmergencyInfo.CategoryName}}：</b></p>
+					<p style="white-space:pre-wrap;"><span ng-repeat="item in EmergencyInfo.Item" >{{item.ItemValue}}；</span></p>
 				</div>
 			</ion-item>
 		</div>

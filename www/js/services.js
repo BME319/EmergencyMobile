@@ -2,7 +2,7 @@ angular.module('services', ['ionic','ngResource'])
 
 // 客户端配置
 .constant('CONFIG', {
-  baseUrl: 'http://10.12.43.32:8055/Api/v1/',
+  baseUrl: 'http://10.12.43.35:8001/Api/v1/',
   //revUserId: "",
   //TerminalName: "",
   //TerminalIP: "",
@@ -89,78 +89,78 @@ return{
 
   var Users = function(){
     return $resource(CONFIG.baseUrl + ':path/:route',{path:'UserInfo',},{
-      LogOn:{method:'POST', params:{route: 'LogOn',UserID:'@UserID',LoginPassword:'@LoginPassword'}, timeout: 10000},
-      UserRegister:{method:'POST', params:{route: 'UserRegister'}, timeout: 10000},
-      ChangePassword:{method:'POST',params:{route:'ChangePassword',UserID:'@UserID',OldPassword:'@OldPassword',NewPassword:'@NewPassword'},timeout: 10000},
-      UID:{method:'GET',params:{route:'UID',Type:'@Type',Name:'@Name'},timeout:10000},
-      ModifyUserInfo:{method:'POST',params:{route:'ModifyUserInfo',UserID:'@UserID',RoleCode:'@RoleCode',UserName:'@UserName',Occupation:"@Occupation",Position:'@Position',Affiliation:'@Affiliation'},timeout:10000},
-      SetUserInfo:{method:'POST',params:{route:'SetUserInfo'},timeout:10000},
-      GetModifyUserInfo:{method:'GET',params:{route:'GetModifyUserInfo',UserID:'@UserID'},timeout:10000},
+      LogOn:{method:'POST', params:{route: 'LogOn',UserID:'@UserID',LoginPassword:'@LoginPassword'}, timeout: 100000},
+      UserRegister:{method:'POST', params:{route: 'UserRegister'}, timeout: 100000},
+      ChangePassword:{method:'POST',params:{route:'ChangePassword',UserID:'@UserID',OldPassword:'@OldPassword',NewPassword:'@NewPassword'},timeout: 100000},
+      UID:{method:'GET',params:{route:'UID',Type:'@Type',Name:'@Name'},timeout:100000},
+      ModifyUserInfo:{method:'POST',params:{route:'ModifyUserInfo',UserID:'@UserID',RoleCode:'@RoleCode',UserName:'@UserName',Occupation:"@Occupation",Position:'@Position',Affiliation:'@Affiliation'},timeout:100000},
+      SetUserInfo:{method:'POST',params:{route:'SetUserInfo'},timeout:100000},
+      GetModifyUserInfo:{method:'GET',params:{route:'GetModifyUserInfo',UserID:'@UserID'},timeout:100000},
     });
   };
   var MstType = function(){
     return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstType',},{
-      GetMstType:{method:'GET',isArray:true, params:{route: 'GetMstType',Category:'@Category'}, timeout: 10000}
+      GetMstType:{method:'GET',isArray:true, params:{route: 'GetMstType',Category:'@Category'}, timeout: 100000}
     });
   }; 
   var MobileDevice = function(){
     return $resource(CONFIG.baseUrl + ':path/:route',{path:'MobileDevice',},{
-      SetMobileDevice:{method:'POST', params:{route: 'SetMobileDevice'}, timeout: 10000}
+      SetMobileDevice:{method:'POST', params:{route: 'SetMobileDevice'}, timeout: 100000}
     });
   };  
   var PatientInfo = function () {
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'PatientInfo'},
       {
-        SetPatientInfo: {method:'POST',params:{route: 'SetPatientInfo'}, timeout:10000},
-        GetNewPatientID: {method:'GET',params:{route: 'GetNewPatientID'}, timeout:10000},
-        GetPsPatientInfo: {method:'GET',params:{route: 'GetPsPatientInfo',strPatientID:'@strPatientID'}, timeout:10000},
-        CheckPatientID: {method:'POST',params:{route: 'CheckPatientID',PatientID:'@PatientID'}, timeout:10000},
+        SetPatientInfo: {method:'POST',params:{route: 'SetPatientInfo'}, timeout:100000},
+        GetNewPatientID: {method:'GET',params:{route: 'GetNewPatientID'}, timeout:100000},
+        GetPsPatientInfo: {method:'GET',params:{route: 'GetPsPatientInfo',strPatientID:'@strPatientID'}, timeout:100000},
+        CheckPatientID: {method:'POST',params:{route: 'CheckPatientID',PatientID:'@PatientID'}, timeout:100000},
       });
   };
   var PatientVisitInfo = function () {
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'PatientVisitInfo'},
       {
         GetPatientsbyStatus: {method:'GET',isArray: true,params:{route: 'GetPatientsbyStatus', strStatus:'@strStatus'}, timeout:100000},
-        GetPatientbyPID: {method:'GET',params:{route: 'GetPatientbyPID', strPatientID:'@strPatientID'}, timeout:10000},
-        GetNewVisitNo: {method:'GET',params:{route: 'GetNewVisitNo', patientID:'@patientID'}, timeout:10000},
-        UpdateInjury: {method:'POST',params:{route: 'UpdateInjury'}, timeout:10000},
-        UpdateEva: {method:'POST',params:{route: 'UpdateEva'}, timeout:10000},
-        GetPatientVisitInfo: {method:'GET',params:{route: 'GetPatientVisitInfo', strPatientID:'@strPatientID',strVisitNo:'@strVisitNo'}, timeout:10000},
-        SetPsPatientVisitInfo: {method:'POST',params:{route: 'SetPsPatientVisitInfo'}, timeout:10000},
-        UpdateTriage: {method:'POST', params:{route:'UpdateTriage'}, timeout:10000},
-        UpdateArrive: {method:'POST', params:{route:'UpdateArrive'}, timeout:10000},
+        GetPatientbyPID: {method:'GET',params:{route: 'GetPatientbyPID', strPatientID:'@strPatientID'}, timeout:100000},
+        GetNewVisitNo: {method:'GET',params:{route: 'GetNewVisitNo', patientID:'@patientID'}, timeout:100000},
+        UpdateInjury: {method:'POST',params:{route: 'UpdateInjury'}, timeout:100000},
+        UpdateEva: {method:'POST',params:{route: 'UpdateEva'}, timeout:100000},
+        GetPatientVisitInfo: {method:'GET',params:{route: 'GetPatientVisitInfo', strPatientID:'@strPatientID',strVisitNo:'@strVisitNo'}, timeout:100000},
+        SetPsPatientVisitInfo: {method:'POST',params:{route: 'SetPsPatientVisitInfo'}, timeout:100000},
+        UpdateTriage: {method:'POST', params:{route:'UpdateTriage'}, timeout:100000},
+        UpdateArrive: {method:'POST', params:{route:'UpdateArrive'}, timeout:100000},
       });
   };
   var VitalSignInfo = function(){
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'VitalSignInfo'}, {
-      GetVitalSignInfos: {method:'GET', params:{route:'GetVitalSignInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:10000},
-      POSTVitalSign:{method:'POST', params:{route: 'SetVitalSign',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 10000}
+      GetVitalSignInfos: {method:'GET', params:{route:'GetVitalSignInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:100000},
+      POSTVitalSign:{method:'POST', params:{route: 'SetVitalSign',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 100000}
     });
   };
   var MstVitalSignDict = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstVitalSignDict'},{
-          GETVitalSignDictItems:{method:'GET',isArray:true, params:{route: 'GetAllVitalSignDictItems'}, timeout: 10000}
+          GETVitalSignDictItems:{method:'GET',isArray:true, params:{route: 'GetAllVitalSignDictItems'}, timeout: 100000}
       });
   };
   var EmergencyInfo = function(){
     return $resource(CONFIG.baseUrl + ':path/:route', {path:'EmergencyInfo'}, {
-      GetEmergencyInfos: {method:'GET', params:{route:'GetEmergencyInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:10000},
-      POSTEmergency:{method:'POST', params:{route: 'SetEmergency',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 10000}
+      GetEmergencyInfos: {method:'GET', params:{route:'GetEmergencyInfos', PatientID:'@PatientID', VisitNo:'@VisitNo'}, isArray:true, timeout:100000},
+      POSTEmergency:{method:'POST', params:{route: 'SetEmergency',PatientID:'@PatientID',VisitNo:'@VisitNo'}, timeout: 100000}
     });
   };
   var MstEmergencyItemDict = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstEmergencyItemDict'},{
-          GETEmergencyDictItems:{method:'GET',isArray:true, params:{route: 'GetAllMstEmergencyItemDict'}, timeout: 10000}
+          GETEmergencyDictItems:{method:'GET',isArray:true, params:{route: 'GetAllMstEmergencyItemDict'}, timeout: 100000}
       });
   };
   var MstDivision = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstDivision'},{
-          GetDivisions:{method:'GET',isArray:true, params:{route: 'GetDivisions'}, timeout: 10000}
+          GetDivisions:{method:'GET',isArray:true, params:{route: 'GetDivisions'}, timeout: 100000}
       });
   };
   var MstEva = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstEva'},{
-          GetDataByEVATransportation:{method:'GET',isArray:true, params:{route: 'GetDataByEVATransportation'}, timeout: 10000}
+          GetDataByEVATransportation:{method:'GET',isArray:true, params:{route: 'GetDataByEVATransportation'}, timeout: 100000}
       });
   };
   serve.abort = function ($scope) {
@@ -532,7 +532,7 @@ return{
 // 弹出分流框
 .factory('Popup', ['$state', '$ionicPopup', '$ionicLoading', 'MstDivision', 'PatientVisitInfo', 'Common', '$q', 'Storage', '$http', 'Data', function($state, $ionicPopup, $ionicLoading, MstDivision, PatientVisitInfo, Common, $q, Storage, $http, Data ){
   return{
-    triagePopup: function(scope){
+    triagePopup: function(category, scope){
       // 读入分诊去向字典表
       var promise = MstDivision.GetDivisions();
       promise.then(function(data){
@@ -546,56 +546,91 @@ return{
       };
       // 初始化  分流PID、VID、状态、时间、地点  
       scope.TriageData = {
-        "PatientID": Storage.get("PatientID"),
-        "VisitNo": Storage.get("VisitNo"),
+        "PatientID": "",
+        "VisitNo": "",
+        // "PatientID": Storage.get("PatientID"),
+        // "VisitNo": Storage.get("VisitNo"),
         "Status": "4",
-        "TriageDateTime": new Date(Common.DateTimeNow().fullTime),
+        "TriageDateTime": new Date(Common.DateTimeNow().fullTime), //new Date把字符串生成时间格式在view中显示
         "TriageToDept":"Dept05",
         "UserID":Common.postInformation().UserID, 
         "TerminalName":Common.postInformation().TerminalName, 
         "TerminalIP":Common.postInformation().TerminalIP
       };
+      // console.log(scope.TriageData);
       // scope.TriageData.TriageToDept = "Dept05";  // 预置一个分诊地点
       // scope.TriageData.TriageDateTime = new Date(Common.DateTimeNow().fullTime);
+
+      // onTap
+      var onTap = function(){
+        // 插入病人分诊信息
+        // 考虑时序的问题，必须要在按键的时候才给变量赋值
+        if (category=="alone") {
+          var temp_TriageData = [{
+            "PatientID": Storage.get("PatientID"),
+            "VisitNo": Storage.get("VisitNo"),
+            "Status": scope.TriageData.Status,
+            "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime, // 重新将时间格式转回字符串格式插入数据库
+            "TriageToDept": scope.TriageData.TriageToDept,
+            "UserID": scope.TriageData.UserID, 
+            "TerminalName": scope.TriageData.TerminalName, 
+            "TerminalIP": scope.TriageData.TerminalIP
+          }];
+          console.log(temp_TriageData);          
+        } else if(category=="group"){
+          var i = 0;
+          var temp_TriageData = [];
+          angular.forEach(scope.patientlist_triage, function(data){
+            temp_TriageData[i] = {
+              "PatientID": data.PatientID,
+              "VisitNo": data.VisitNo,
+              "Status": scope.TriageData.Status,
+              "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime, // 重新将时间格式转回字符串格式插入数据库
+              "TriageToDept": scope.TriageData.TriageToDept,
+              "UserID": scope.TriageData.UserID, 
+              "TerminalName": scope.TriageData.TerminalName, 
+              "TerminalIP": scope.TriageData.TerminalIP
+            };
+            i++;
+          });
+          console.log(temp_TriageData);  
+        };
+
+        var promise = PatientVisitInfo.UpdateTriage(temp_TriageData);
+        promise.then(function(data){
+          if(data.result=="数据插入成功"){
+            $ionicLoading.show({
+              template: '分诊成功',
+              duration:1000
+            });
+            if (category=="alone") {
+              $state.go('ambulance.list');
+            } else {
+              scope.GetPatientsbyStatus(3);
+              scope.show.showDelete = false;
+            };
+            
+          }
+        }, function(err){
+          // 无错误处理
+            $ionicLoading.show({
+              template: '分诊失败',
+              duration:1000
+            });
+        });        
+      };
+
       // 弹出框
       var Popup_triage = $ionicPopup.show({
         templateUrl : 'templates/ambulance/triage.html',
         scope : scope,
         title : '分诊' ,
         buttons : [
-          { text:'确定',
-            type:'button-assertive',
+          { text: '确定',
+            type: 'button-assertive',
             onTap: function(){
-              // 插入病人分诊信息
-              // 考虑时序的问题，必须要在按键的时候才给变量赋值
-              var temp_TriageData = [{
-                "PatientID": scope.TriageData.PatientID,
-                "VisitNo": scope.TriageData.VisitNo,
-                "Status": scope.TriageData.Status,
-                "TriageDateTime": Common.DateTimeNow(scope.TriageData.TriageDateTime).fullTime,
-                "TriageToDept": "1|"+scope.TriageData.TriageToDept+"|0",
-                "UserID": scope.TriageData.UserID, 
-                "TerminalName": scope.TriageData.TerminalName, 
-                "TerminalIP": scope.TriageData.TerminalIP
-              }];
-              // console.log(temp_TriageData);
-              var promise = PatientVisitInfo.UpdateTriage(temp_TriageData);
-              promise.then(function(data){
-                if(data.result=="数据插入成功"){
-                  $ionicLoading.show({
-                    template: '分诊成功',
-                    duration:1000
-                  });
-                  $state.go('ambulance.list');
-                }
-              }, function(err){
-                // 无错误处理
-                  $ionicLoading.show({
-                    template: '分诊失败',
-                    duration:1000
-                  });
-              });
-            }
+              onTap();
+            },
           },
           { text:'取消' ,
             type:'button-positive'
@@ -834,8 +869,7 @@ return{
                           if(s=="1") $ionicLoading.show({template:'没有操作权限：该患者还未后送',noBackdrop:true,duration:2000});
                           else if(s!="4"){
                             if(s=="2"){
-                              var ArriveDateTime = Common.DateTimeNow().fullTime;
-                              PatientVisitInfo.UpdateArrive(temp[0],temp[1], "3",new Date(ArriveDateTime), Storage.get('MY_LOCATION_CODE'));
+                              PatientVisitInfo.UpdateArrive(temp[0],temp[1], "3",Common.DateTimeNow().fullTime, Storage.get('MY_LOCATION_CODE'));
                             }
                             Storage.set('PatientID',temp[0]);
                             Storage.set('VisitNo',temp[1]);
@@ -880,7 +914,7 @@ return{
         }, function () {
             console.log("Listening for any tag type.");
         }, function (reason) {
-            alert("Error adding NFC Listener " + reason);
+            //alert("Error adding NFC Listener " + reason);
         });
         
         nfc.addTagDiscoveredListener(function (nfcEvent) {
@@ -905,7 +939,7 @@ return{
         }, function () {
             console.log("Listening for any tag type.");
         }, function (reason) {
-            alert("Error adding NFC Listener " + reason);
+            //alert("Error adding NFC Listener " + reason);
         });
     }
 

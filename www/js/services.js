@@ -2,7 +2,7 @@ angular.module('services', ['ionic','ngResource'])
 
 // 客户端配置
 .constant('CONFIG', {
-  baseUrl: 'http://192.168.10.32:8055/Api/v1/',
+  baseUrl: 'http://10.12.43.35:8001/Api/v1/',
   //revUserId: "",
   //TerminalName: "",
   //TerminalIP: "",

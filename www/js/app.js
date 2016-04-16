@@ -62,7 +62,9 @@ angular.module('EmergencyMobile', ['ionic', 'services', 'controllers', 'ngCordov
     // $rootScope.eraseCard=false;
     $rootScope.NFCmodefy=false;
     Storage.set('UUID',ionic.Platform.device().uuid);
-    nfcService.start();  
+    if(ionic.Platform.platform()!='win32'){
+      nfcService.start();  
+    }
   });
 })
 

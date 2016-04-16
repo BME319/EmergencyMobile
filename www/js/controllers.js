@@ -789,10 +789,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
   //保存
   $scope.saveVisitInfo = function(Type) {
-    // if(Type && !$rootScope.isWritedToCard){
-    //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-    //   return;
-    // }
+    if(Type && !$rootScope.isWritedToCard){
+      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+      return;
+    }
     $ionicLoading.show();
     var sendData = {
                   "PatientID": Storage.get("PatientID"),
@@ -832,11 +832,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
                       }else{
                         //写入NFC卡
                         $rootScope.NFCmodefy=true;
-                        var type = "text/pg",
-                            id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
-                            payload = "",//暂时用不到
-                            // payload = nfc.stringToBytes("fdsf"),
-                            record = ndef.record(ndef.TNF_MIME_MEDIA, type, id, payload);
+                        var record = ndef.encodemifareMessage(Storage.get("PatientID"));
                         $rootScope.recordToWrite=record;
                         $ionicLoading.show({template:'信息写入,请将设备靠近NFC卡片'});              
                       }
@@ -1061,11 +1057,12 @@ angular.module('controllers', ['ionic','ngResource','services'])
   //写卡
   $scope.wirteToCard = function(){
     $rootScope.NFCmodefy=true;
-    var type = "text/pg",
-        id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
-        payload = "",//暂时用不到
-        // payload = nfc.stringToBytes("fdsf"),
-        record = ndef.record(ndef.TNF_MIME_MEDIA, type, id, payload);
+    // var type = "text/pg",
+    //     id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
+    //     payload = "",//暂时用不到
+    //     // payload = nfc.stringToBytes("fdsf"),
+    //     record = ndef.record(ndef.TNF_MIME_MEDIA, type, id, payload);
+    var record = ndef.encodemifareMessage(Storage.get("PatientID"));
     $rootScope.recordToWrite=record;
     $ionicLoading.show({template:'信息写入,请将设备靠近NFC卡片'});    
   }
@@ -1274,6 +1271,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     $scope.showPDA = true;
     $scope.ifphysiological = true;//初始化显示生理信息采集
     $scope.ifbiochemical=false;
+    $scope.showClassfyinfo=false;
     // $scope.itemdetail = $scope.testdata.physiological;
     //////////////////////////
 
@@ -1380,23 +1378,27 @@ angular.module('controllers', ['ionic','ngResource','services'])
       [
         'Physical',//检测信息
         'Biochemical'
+      ],
+      [
+        'ClassifyInfo',//分类信息
       ]
-      ];
+    ];
     $scope.items = {//左侧目录详细数据，filters.js文件中有过滤信息
       "Site":{Style:{}},
-        "Class":{Style:{}},
-        "Type":{Style:{}},
-        "Complications":{Style:{}},
-        "InjuryExtent":{Style:{}},
-        "Emergency":{Style:{}},
-        "Treatment":{Style:{}},
-        "WarWound":{Style:{}},
-        "CarePathway":{Style:{}},
-        "TreatmentOutLine":{Style:{}},
-        "AntiInfect":{Style:{}},
-        "AntiShock":{Style:{}},
-        "Physical":{Style:{'background-color':'#BEDBD7'}},
-        "Biochemical":{Style:{}}
+      "Class":{Style:{}},
+      "Type":{Style:{}},
+      "Complications":{Style:{}},
+      "InjuryExtent":{Style:{}},
+      "Emergency":{Style:{}},
+      "Treatment":{Style:{}},
+      "WarWound":{Style:{}},
+      "CarePathway":{Style:{}},
+      "TreatmentOutLine":{Style:{}},
+      "AntiInfect":{Style:{}},
+      "AntiShock":{Style:{}},
+      "Physical":{Style:{'background-color':'#BEDBD7'}},
+      "Biochemical":{Style:{}},
+      "ClassifyInfo":{Style:{}}
     };
     $scope.lastchooseitem = 'Physical';//记录上一次选中的左侧目录信息，如 physiological
       $scope.chooseitem = function(ci){
@@ -1410,6 +1412,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               $scope.showPDA = true;
               $scope.ifphysiological = true;
               $scope.ifbiochemical=false;
+              $scope.showClassfyinfo=false;
               $scope.itemdetail = $scope.catalog.Physical;//获取所选目录详细信息进行显示
               break;
             }
@@ -1418,12 +1421,23 @@ angular.module('controllers', ['ionic','ngResource','services'])
               $scope.showPDA = true;
               $scope.ifbiochemical = true;
               $scope.ifphysiological=false;
+              $scope.showClassfyinfo=false;
               $scope.itemdetail = $scope.catalog.Biochemical;
+              break;
+            }
+            case "ClassifyInfo":
+            {
+              $scope.showClassfyinfo=true;
+              $scope.showPDA = true;
+              $scope.ifbiochemical = false;
+              $scope.ifphysiological=false;
+              $scope.itemdetail = $scope.catalog.Info;
               break;
             }
             default://伤情记录和伤情处理部分都是checkbox
             {
               $scope.showPDA = false;
+              $scope.showClassfyinfo=false;
               $scope.itemdetail = $scope.catalog[ci];
               break;
             }
@@ -1444,6 +1458,107 @@ angular.module('controllers', ['ionic','ngResource','services'])
         // console.log($scope.itemdetail);
         $scope.catalog[$scope.lastchooseitem]=$scope.itemdetail;
 
+      }
+      $scope.Warwound = {
+        "ItemCategory":'Info',
+        "ItemCode":"004",
+        "ItemValue":'战伤',
+        "UserId":Userid,
+        "TerminalName":"sampleTerminalName",
+        "TerminalIP":"sampleTerminalIP"
+      }
+      $scope.Save = {
+              "ItemCategory":'Info',
+              "ItemCode":"005",
+              "ItemValue":"未处置",
+              "UserId":Userid,
+              "TerminalName":"sampleTerminalName",
+              "TerminalIP":"sampleTerminalIP"
+            }
+      $scope.ClassifyInfochange=function(index,data)
+      {
+        switch (index)
+        {
+          case 0:
+            $scope.Warwound = {
+              "ItemCategory":'Info',
+              "ItemCode":"004",
+              "ItemValue":data,
+              "UserId":Userid,
+              "TerminalName":"sampleTerminalName",
+              "TerminalIP":"sampleTerminalIP"
+            }
+            console.log(data)
+            break;
+          case 1:
+            $scope.Save = {
+              "ItemCategory":'Info',
+              "ItemCode":"005",
+              "ItemValue":data,
+              "UserId":Userid,
+              "TerminalName":"sampleTerminalName",
+              "TerminalIP":"sampleTerminalIP"
+            }
+            console.log(data)
+            break;
+          case 2:
+            if(data=="紧急处置")
+            {
+              if($scope.Injury1==undefined)
+                $scope.Injury1={
+                  "ItemCategory":'Info',
+                  "ItemCode":"006",
+                  "ItemValue":data,
+                  "UserId":Userid,
+                  "TerminalName":"sampleTerminalName",
+                  "TerminalIP":"sampleTerminalIP"
+                }
+              else $scope.Injury1=undefined
+            }else if(data == "放射污染")
+            {
+              if($scope.Injury2==undefined)
+              $scope.Injury2={
+                "ItemCategory":'Info',
+                "ItemCode":"007",
+                "ItemValue":data,
+                "UserId":Userid,
+                "TerminalName":"sampleTerminalName",
+                "TerminalIP":"sampleTerminalIP"
+              }
+              else $scope.Injury2=undefined
+            }else if(data=="隔离")
+            {
+              if($scope.Injury3==undefined)
+              $scope.Injury3={
+                "ItemCategory":'Info',
+                "ItemCode":"008",
+                "ItemValue":data,
+                "UserId":Userid,
+                "TerminalName":"sampleTerminalName",
+                "TerminalIP":"sampleTerminalIP"
+              }
+              else $scope.Injury3=undefined
+            }else if(data=="染毒")
+            {
+              if($scope.Injury4==undefined)
+              $scope.Injury4={
+                "ItemCategory":'Info',
+                "ItemCode":"009",
+                "ItemValue":data,
+                "UserId":Userid,
+                "TerminalName":"sampleTerminalName",
+                "TerminalIP":"sampleTerminalIP"
+              }
+              else $scope.Injury4=undefined
+            }
+            break;
+        }
+          console.log($scope.Warwound)
+          console.log($scope.Save)
+          console.log($scope.Injury1)
+          console.log($scope.Injury2)
+          console.log($scope.Injury3)
+          console.log($scope.Injury4)
       }
       $scope.OnFocus = function(i)//当输入框获得焦点是调用，i-所选输入框的索引
       {
@@ -1544,6 +1659,24 @@ angular.module('controllers', ['ionic','ngResource','services'])
         if($scope.emergencylevel!=undefined)
         {
           postEmergencydata.postdata.push($scope.emergencylevel);
+        }
+        postEmergencydata.postdata.push($scope.Warwound);
+        postEmergencydata.postdata.push($scope.Save);
+        if($scope.Injury1!=undefined)
+        {
+          postEmergencydata.postdata.push($scope.Injury1);
+        }
+        if($scope.Injury2!=undefined)
+        {
+          postEmergencydata.postdata.push($scope.Injury2);
+        }
+        if($scope.Injury3!=undefined)
+        {
+          postEmergencydata.postdata.push($scope.Injury3);
+        }
+        if($scope.Injury4!=undefined)
+        {
+          postEmergencydata.postdata.push($scope.Injury4);
         }
         console.log(postVitalSigndata);
         console.log(postEmergencydata);

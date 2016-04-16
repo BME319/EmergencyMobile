@@ -46,9 +46,19 @@
         <ion-item ng-repeat="ct in PatientList| filter:query" class="item-avatar item-icon-right" ng-click ="setCurrent(ct)" on-hold="onHold(ct)">
           <img src="img/head_portrait.jpg">
           <span class="item-note" ng-if="tab2_checked || tab3_checked">伤情：{{ct.InjuryExtent}}</span>
-          <h2>姓名：{{ct.PatientName}}</h2>
-          <p>ID号：{{ct.PatientID}}</p>
-          <p>就诊号：{{ct.VisitNo}}</p>
+          <div class="row" style="padding:0">
+            <div class="col">
+              <h2>姓名：{{ct.PatientName}}</h2>
+              <p>ID号：{{ct.PatientID}}</p>
+              <p>就诊号：{{ct.VisitNo}}</p>
+            </div>
+            <div class="col">
+              <br/>
+              <p ng-if="ct.bleData.heartRate">心率：{{ct.bleData.heartRate}}</p>
+              <p ng-if="ct.bleData.temperature">体温：{{ct.bleData.temperature}}</p>
+            </div>           
+          </div>
+          
           <i class="icon ion-chevron-right icon-accessory"></i>
           <ion-delete-button ng-class="{true:'ion-android-checkbox-outline',false:'ion-android-checkbox-outline-blank'}[ct.itemClass]" ng-click="select(ct)"></ion-delete-button>   
         </ion-item>   

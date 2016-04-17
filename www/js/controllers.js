@@ -1272,6 +1272,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     $scope.ifphysiological = true;//初始化显示生理信息采集
     $scope.ifbiochemical=false;
     $scope.showClassfyinfo=false;
+    $scope.ifAntiInfectShock=false;
     // $scope.itemdetail = $scope.testdata.physiological;
     //////////////////////////
 
@@ -1413,6 +1414,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               $scope.ifphysiological = true;
               $scope.ifbiochemical=false;
               $scope.showClassfyinfo=false;
+              $scope.ifAntiInfectShock=false;
               $scope.itemdetail = $scope.catalog.Physical;//获取所选目录详细信息进行显示
               break;
             }
@@ -1422,6 +1424,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               $scope.ifbiochemical = true;
               $scope.ifphysiological=false;
               $scope.showClassfyinfo=false;
+              $scope.ifAntiInfectShock=false;
               $scope.itemdetail = $scope.catalog.Biochemical;
               break;
             }
@@ -1431,13 +1434,35 @@ angular.module('controllers', ['ionic','ngResource','services'])
               $scope.showPDA = true;
               $scope.ifbiochemical = false;
               $scope.ifphysiological=false;
+              $scope.ifAntiInfectShock=false;
               $scope.itemdetail = $scope.catalog.Info;
+              break;
+            }
+            case "AntiShock":
+            {
+              $scope.ifAntiInfectShock=true;
+              $scope.showClassfyinfo=false;
+              $scope.showPDA = true;
+              $scope.ifbiochemical = false;
+              $scope.ifphysiological=false;
+              $scope.itemdetail = $scope.catalog.AntiShock;
+              break;
+            }
+            case "AntiInfect":
+            {
+              $scope.ifAntiInfectShock=true;
+              $scope.showClassfyinfo=false;
+              $scope.showPDA = true;
+              $scope.ifbiochemical = false;
+              $scope.ifphysiological=false;
+              $scope.itemdetail = $scope.catalog.AntiInfect;
               break;
             }
             default://伤情记录和伤情处理部分都是checkbox
             {
               $scope.showPDA = false;
               $scope.showClassfyinfo=false;
+              $scope.ifAntiInfectShock=false;
               $scope.itemdetail = $scope.catalog[ci];
               break;
             }

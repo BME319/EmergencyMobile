@@ -97,6 +97,12 @@
 					<ion-checkbox ng-model="f" ng-value="10" ng-change="ClassifyInfochange(2,'染毒')">染毒</ion-checkbox>
 				</ion-list>
 			</div>
+			<ion-list ng-if="ifAntiInfectShock">
+				<label class="item item-input item-stacked-label" ng-repeat="item in itemdetail">
+					<span class="input-label">{{item.ItemName}}</span>
+					<input type="text" placeholder="在此输入" ng-model="item.value" ng-focus="OnFocus($index)">
+				</label>
+			</ion-list>
 			<div ng-if="showPDA">
 				<ion-list ng-if="ifphysiological">
 					<a class="item" style="text-align:center;" href="#" ng-click="clickshowdeviceoption('Physical')">

@@ -155,7 +155,8 @@ return{
   };
   var MstDivision = function(){
       return $resource(CONFIG.baseUrl + ':path/:route',{path:'MstDivision'},{
-          GetDivisions:{method:'GET',isArray:true, params:{route: 'GetDivisions'}, timeout: 100000}
+          GetDivisions:{method:'GET',isArray:true, params:{route: 'GetDivisions'}, timeout: 100000},
+          GetDivisionName:{method:'GET', params:{route: 'GetDivisionName', Code:'@Code'}, timeout: 100000}
       });
   };
   var MstEva = function(){
@@ -502,6 +503,16 @@ return{
   self.GetDivisions = function(){
     var deferred = $q.defer();
     Data.MstDivision.GetDivisions({},
+      function(data, headers){
+        deferred.resolve(data);
+      },function(err){
+        deferred.reject(err);
+      });
+    return deferred.promise;
+  };
+   self.GetDivisionName = function(Code){
+    var deferred = $q.defer();
+    Data.MstDivision.GetDivisionName({Code:Code},
       function(data, headers){
         deferred.resolve(data);
       },function(err){
@@ -996,13 +1007,12 @@ return{
     { 
      scope.EvaDestinations = data;
      scope.EvaDestinations.selectedOption=data[0];
-     console.log(scope.EvaDestinations.selectedOption);
       },function(err) {   
     }); 
    
      //后送操作
      var visitNo = window.localStorage['VisitNo'];
-     scope.evacuationInfo={"EvaDateTime": new Date(Common.DateTimeNow().fullTime), "EvaBatchNo":"33", "EvaDestination":"",  "EvaTransportation":"",  "EvaPosition":"医院船"};
+     scope.evacuationInfo={"EvaDateTime": new Date(Common.DateTimeNow().fullTime), "EvaBatchNo":"33", "EvaDestination":"医院船",  "EvaTransportation":"",  "EvaPosition":""};
      var Evacuation= function(scope)
      {
         
@@ -1021,7 +1031,7 @@ return{
          }
         var promise =  PatientVisitInfo.UpdateEva(sendData); 
         promise.then(function(data){ 
-          //scope.evacuationInfo.EvaPosition="医院船";
+         console.log(scope.evacuationInfo);
           if((data.result=="数据插入成功")){
             $ionicLoading.show({
               template: "后送完成！",

@@ -443,12 +443,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
       if($scope.curtab=="tab1"){
         $state.go('visitInfo'); 
       }  
-      else {} //$state.go('viewEmergency'); 
+      else if($scope.curtab=="tab4" )
+      {$state.go('viewTriage'); } //$state.go('viewEmergency'); 
     }
     else {
       if($scope.curtab=="tab3"){
         $state.go('viewEmergency'); 
       }
+       if($scope.curtab=="tab4")
+        {
+          $state.go('viewTriage');
+        }
     }
   };
 
@@ -496,33 +501,39 @@ angular.module('controllers', ['ionic','ngResource','services'])
   if(Storage.get('RoleCode')=='EmergencyPersonnel'){    
       $scope.tab1_checked=true;  
        $scope.tab2_checked=false;  
-       $scope.tab3_checked=false;  
+       $scope.tab3_checked=false; 
+       $scope.tab4_checked=true;   
        $scope.curtab="tab1";  
        $scope.tab1_color={color:'blue'};   
        $scope.tab2_color="";  
-       $scope.tab3_color="";  
+       $scope.tab3_color=""; 
+       $scope.tab4_color=""; 
        $scope.GetPatientsbyStatus(1);
        $scope.newPatientIcon=true;  
    }
    else if(Storage.get('RoleCode')=='DividePersonnel'){
        $scope.tab1_checked=false;  
        $scope.tab2_checked=true;  
-       $scope.tab3_checked=false;  
+       $scope.tab3_checked=false; 
+       $scope.tab4_checked=true; 
        $scope.curtab="tab2";  
        $scope.tab1_color="";   
        $scope.tab2_color={color:'blue'};  
-       $scope.tab3_color="";  
+       $scope.tab3_color=""; 
+       $scope.tab4_color=""; 
        $scope.GetPatientsbyStatus(2);
        $scope.newPatientIcon=false; 
    }
    else{
        $scope.tab1_checked=false;  
        $scope.tab2_checked=false;  
-       $scope.tab3_checked=true;  
+       $scope.tab3_checked=true; 
+       $scope.tab4_checked=true;  
        $scope.curtab="tab3";  
        $scope.tab1_color="";   
        $scope.tab2_color="";  
-       $scope.tab3_color={color:'blue'};  
+       $scope.tab3_color={color:'blue'}; 
+       $scope.tab4_color=""; 
        $scope.GetPatientsbyStatus(3);
        $scope.newPatientIcon=false; 
    }
@@ -533,7 +544,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
    {
     if(vtab=="tab1")  $scope.GetPatientsbyStatus(1);
     else if(vtab=="tab2")  $scope.GetPatientsbyStatus(2);
-    else  $scope.GetPatientsbyStatus(3);
+    else if(vtab=="tab3")  $scope.GetPatientsbyStatus(3);
+    else   $scope.GetPatientsbyStatus(4);
    }
 
    if(vtab=="tab1"){ 
@@ -544,26 +556,44 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.tab1_color={color:'blue'};  
           $scope.tab2_color="";  
           $scope.tab3_color=""; 
+          $scope.tab4_color=""; 
           $scope.show.showDelete=false;                  
    }
    else if (vtab=="tab2"){  
           $scope.tab1_checked=false;  
           $scope.tab2_checked=true;  
           $scope.tab3_checked=false;  
+          $scope.tab4_checked=false; 
           $scope.curtab="tab2";  
           $scope.tab1_color="";  
           $scope.tab2_color={color:'blue'};  
-          $scope.tab3_color="";  
+          $scope.tab3_color="";
+          $scope.tab4_color="";  
           $scope.show.showDelete=false;               
    }
    else if (vtab=="tab3"){  
           $scope.tab1_checked=false;  
           $scope.tab2_checked=false;  
-          $scope.tab3_checked=true;  
+          $scope.tab3_checked=true; 
+          $scope.tab4_checked=false; 
           $scope.curtab="tab3";  
           $scope.tab1_color="";  
           $scope.tab2_color="";  
           $scope.tab3_color={color:'blue'}; 
+          $scope.tab2_color="";
+          $scope.show.showDelete=false;                 
+   }  
+
+   else if (vtab=="tab4"){  
+          $scope.tab1_checked=false;  
+          $scope.tab2_checked=false;  
+          $scope.tab3_checked=false;  
+          $scope.tab4_checked=true;
+          $scope.curtab="tab4";  
+          $scope.tab1_color="";  
+          $scope.tab2_color="";  
+          $scope.tab3_color=""; 
+          $scope.tab4_color={color:'blue'};
           $scope.show.showDelete=false;                 
    }  
      
@@ -573,7 +603,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
   $scope.refreshList = function() { 
     if($scope.curtab=="tab1")  $scope.GetPatientsbyStatus(1);
     else if($scope.curtab=="tab2")  $scope.GetPatientsbyStatus(2);
-    else  $scope.GetPatientsbyStatus(3);
+    else if($scope.curtab=="tab3")  $scope.GetPatientsbyStatus(3);
+    else  $scope.GetPatientsbyStatus(4);
   };
 
 }])
@@ -1290,7 +1321,58 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
 
 }])
+//查看患者分诊信息
+.controller('ViewTriageCtrl', ['$scope', '$ionicHistory', '$http','$ionicPopup' ,'$ionicLoading','Storage','MstType', 'PatientInfo', 'VitalSignInfo', 'EmergencyInfo','PatientVisitInfo', 'Common', 'MstDivision','Popup', function ($scope, $ionicHistory,$http,$ionicPopup, $ionicLoading, Storage, MstType, PatientInfo, VitalSignInfo, EmergencyInfo, PatientVisitInfo, Common, MstDivision, Popup) {
+  
+  $scope.goBack = function() {
+    $ionicHistory.goBack();
+  }; 
+   // 读入病人基本信息
+  var promise = PatientInfo.GetPsPatientInfo(Storage.get("PatientID"));
+  promise.then(function(data){
+    $scope.PatientInfos = data;
+        // console.log($scope.PatientInfos);
+  }, function(err){
+    // 无错误读入处理
+  });
 
+  // 读入病人生理体征参数信息
+  var promise = VitalSignInfo.GetVitalSignInfos(Storage.get("PatientID"), Storage.get("VisitNo"));
+  promise.then(function(data){
+    $scope.VitalSignInfos = data;
+    // console.log($scope.VitalSignInfos);
+  }, function(err){
+    // 无错误读入处理
+  });
+
+  // 读入病人伤情/处置信息
+  var promise = EmergencyInfo.GetEmergencyInfos(Storage.get("PatientID"), Storage.get("VisitNo"));
+  promise.then(function(data){
+    $scope.EmergencyInfos = data;
+    // console.log($scope.EmergencyInfos);
+  }, function(err){
+    // 无错误读入处理
+  });
+  //读入病人分诊科室
+    var promise = PatientVisitInfo.GetPatientVisitInfo(Storage.get("PatientID"), Storage.get("VisitNo")); 
+     promise.then(function(data)
+     { 
+       $scope.TriageInfo = data;
+       Storage.set('Code',data.TriageToDept);
+      },function(err) {   
+    }); 
+     var promise = MstDivision.GetDivisionName(Storage.get("Code")); 
+     promise.then(function(data)
+     {
+       $scope.DivisionName = "";
+       angular.forEach(data,function(value,key){
+        if(angular.isString(value))
+          $scope.DivisionName+=value;
+       })
+      },function(err) {   
+    }); 
+      
+}])
 
 // --------分流人员-列表、信息查看、分流 [张桠童]----------------
 //信息查看
@@ -1335,6 +1417,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
  
 }])
+
 // --------急救人员-伤情与处置 [马志彬]----------------
 //伤情、处置记录
 //生理参数采集

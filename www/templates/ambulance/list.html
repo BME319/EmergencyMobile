@@ -1,6 +1,7 @@
 
 <ion-view view-title="急救伤员列表">
 <ion-nav-buttons side="secondary">
+    <a class="button button-icon icon ion-android-sync" ng-click="bleRefresh()" ng-if="newPatientIcon"></a>
     <a class="button button-icon icon ion-android-person-add" href="#/newPatient" ng-if="newPatientIcon"></a>
     <button class="button button-icon icon ion-ios-people-outline" ng-click="show.showDelete = !show.showDelete;" ng-if="isshown()"></button>
     <!-- (!newPatientIcon)&&(curtab=="tab3") -->
@@ -18,6 +19,11 @@
         <a class="tab-item" ng-click="sel_tab('tab3')" >  
           <i class="icon ion-ios-star" ng-style="tab3_color"></i>  
           <span  ng-style="tab3_color">已送达</span>  
+        </a>  
+
+         <a class="tab-item" ng-click="sel_tab('tab4')" >  
+          <i class="icon ion-happy-outline" ng-style="tab4_color"></i>  
+          <span  ng-style="tab4_color">已分诊</span>  
         </a>  
       </div> 
 </ion-header-bar>
@@ -46,9 +52,19 @@
         <ion-item ng-repeat="ct in PatientList| filter:query" class="item-avatar item-icon-right" ng-click ="setCurrent(ct)" on-hold="onHold(ct)">
           <img src="img/head_portrait.jpg">
           <span class="item-note" ng-if="tab2_checked || tab3_checked">伤情：{{ct.InjuryExtent}}</span>
-          <h2>姓名：{{ct.PatientName}}</h2>
-          <p>ID号：{{ct.PatientID}}</p>
-          <p>就诊号：{{ct.VisitNo}}</p>
+          <div class="row" style="padding:0">
+            <div class="col">
+              <h2>姓名：{{ct.PatientName}}</h2>
+              <p>ID号：{{ct.PatientID}}</p>
+              <p>就诊号：{{ct.VisitNo}}</p>
+            </div>
+            <div class="col">
+              <br/>
+              <p ng-if="ct.bleData.heartRate">心率：{{ct.bleData.heartRate}}</p>
+              <p ng-if="ct.bleData.temperature">体温：{{ct.bleData.temperature}}</p>
+            </div>           
+          </div>
+          
           <i class="icon ion-chevron-right icon-accessory"></i>
           <ion-delete-button ng-class="{true:'ion-android-checkbox-outline',false:'ion-android-checkbox-outline-blank'}[ct.itemClass]" ng-click="select(ct)"></ion-delete-button>   
         </ion-item>   

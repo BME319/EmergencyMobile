@@ -139,6 +139,12 @@ angular.module('EmergencyMobile', ['ionic', 'services', 'controllers', 'ngCordov
       cache: false,
       controller:'ViewEmergencyCtrl'
     })
+    .state('viewTriage',{
+      url: '/viewTriage',
+      templateUrl: 'templates/ambulance/viewTriage.html',
+      cache: false,
+      controller:'ViewTriageCtrl'
+    })
     .state('injury',{
       url: '/injury',
       templateUrl: 'templates/ambulance/injury.html',

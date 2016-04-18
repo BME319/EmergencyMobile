@@ -32,17 +32,20 @@
   <div class="row">
     <div class="col">后送体位 </div>  
     <div class="col-50">
-        <select ng-options="EvaPosition.Description for EvaPosition in EvaPositions track by EvaPosition.Type" 
-      ng-model="EvaDestinations.selectedOption"></select>
-        </div>
+        <select ng-options="EvaPosition.Type as EvaPosition.Description  for EvaPosition in EvaPositions " ng-model="evacuationInfo.EvaPosition">
+          <option value="">请选择</option> 
+        </select>
+    </div>
     </div>
   </div> 
 
   <div class="row">
     <div class="col">后送地点 </div>  
     <div class="col-50" >
-      <select ng-options="EvaDestination.Description for EvaDestination in EvaDestinations track by EvaDestination.Type" 
-      ng-model="EvaDestinations.selectedOption"></select>
+      <select ng-options="EvaDestination.Type as EvaDestination.Description  for EvaDestination in EvaDestinations " ng-model="evacuationInfo.EvaDestination" ng-value="EvaDestination">
+        <option value="">请选择</option>
+      </select>
+      </div>
     </div>
   </div> 
   

@@ -324,9 +324,15 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
 // --------急救人员-列表、新建、后送 [赵艳霞]----------------
 //病人列表(已接收、已后送、已送达)
-.controller('AmbulanceListCtrl',['$state','$scope','$ionicLoading','UserInfo','Storage','PatientVisitInfo', '$state','Common', '$ionicPopup', '$stateParams', 'Popup', function($state,$scope,$ionicLoading,UserInfo,Storage, PatientVisitInfo, $state, Common, $ionicPopup, $stateParams, Popup){
+.controller('AmbulanceListCtrl',['$state','$scope','$ionicLoading','UserInfo','Storage','PatientVisitInfo', '$state','Common', '$ionicPopup', '$stateParams', 'Popup','bleService', function($state,$scope,$ionicLoading,UserInfo,Storage, PatientVisitInfo, $state, Common, $ionicPopup, $stateParams, Popup,bleService){
   $scope.$on('$ionicView.enter', function() {
     $scope.refreshList();
+    ble.isEnabled(function(){
+      $scope.bleRefresh(0);
+    }, function(){
+      // console.log("ble is not enabled");
+      ble.enable($scope.bleRefresh(0));
+    });
   });
   // 批量处理
   $scope.isshown = function(){
@@ -340,8 +346,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
   //从生理设备获取数据
   var receivevdata = function(i,bluetoothdevice){
+
     //$scope.testdata = [];
-    if(ionic.Platform.platform()!='win32' && bluetoothdevice!=undefined && bluetoothdevice!="")
+    if(ionic.Platform.platform()!='win32' && bluetoothdevice!=undefined && bluetoothdevice.length>17 && bluetoothdevice[17]=="|")
     {
       //var bluetoothdevice = angular.fromJson(window.localStorage['bluetoothdeviceP']);
       ble.connect(bluetoothdevice.substr(0,17),
@@ -387,7 +394,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
         {
           console.log(e);
            ///断开连接
-              ble.disconnect(s.id,
+              ble.disconnect(e.id,
                 function(dcsuccess){
                   console.log(dcsuccess)
                 },
@@ -398,9 +405,12 @@ angular.module('controllers', ['ionic','ngResource','services'])
       console.log(bluetoothdevice);
     }
   }
-  $scope.bleRefresh = function(){
-    $ionicLoading.show({template: '开始搜索附近设备', duration:1500 });
+  $scope.bleRefresh = function(type){
+    if(type)
+      $ionicLoading.show({template: '开始搜索附近设备', duration:1000 ,noBackdrop:true});
     for(var i in $scope.PatientList){
+      if(i=="$promise")
+        break;
       receivevdata(i,$scope.PatientList[i].TerminalIP);
     }
   }   
@@ -429,6 +439,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
          }
          $scope.PatientList = data;
          $scope.$broadcast('scroll.refreshComplete'); 
+         if(Status==1){
+          receivevdata(i,data.TerminalIP);
+         }
         },function(err) {   
       }); 
       // console.log($scope.PatientList);     
@@ -813,7 +826,16 @@ angular.module('controllers', ['ionic','ngResource','services'])
              }); 
       }); //promise end
    }
-  $scope.showbluetoothConfirm = function() {//弹出生理设备选择提示框
+  $scope.showbluetoothConfirm = function(){
+    ble.isEnabled(function(){
+      $scope.showbluetoothConfirmPop();
+    }, function(){
+      // console.log("ble is not enabled");
+      ble.enable($scope.showbluetoothConfirmPop());
+    });    
+  }
+  $scope.showbluetoothConfirmPop = function() {//弹出生理设备选择提示框
+
     $scope.bluetoothscanlist = [
       
     ];

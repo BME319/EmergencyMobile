@@ -96,6 +96,10 @@
 				</ion-list>
 			</div>
 			<ion-list ng-if="ifAntiInfectShock">
+				<ion-list ng-repeat="item in AntiShockselect">
+					<ion-checkbox ng-model="item.selectstatus" ng-checked="item.selectstatus" value=true ng-change="AntiShockselectchange()">{{item.ItemName}}</ion-checkbox>
+				</ion-list>
+				<div class="item item-divider item-positive"></div>
 				<label class="item item-input item-stacked-label" ng-repeat="item in itemdetail">
 					<span class="input-label">{{item.ItemName}}:</span>
 					<input type="text" placeholder="在此输入" ng-model="item.value" ng-focus="OnFocus($index)">

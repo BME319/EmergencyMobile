@@ -1552,6 +1552,16 @@ angular.module('controllers', ['ionic','ngResource','services'])
          for(var i=0;i<s.length;i++)
          {
            $scope.catalog[s[i].Category] = s[i].Item;
+            if(s[i].Category=="AntiShock")
+            {
+              $scope.AntiShockselect = [];
+              $scope.AntiShockselect.push($scope.catalog[s[i].Category][4]);
+              $scope.AntiShockselect.push($scope.catalog[s[i].Category][5]);
+              $scope.AntiShockselect[0]["selectstatus"]=false;
+              $scope.AntiShockselect[1]["selectstatus"]=false;
+              $scope.catalog[s[i].Category].splice(4,2);
+            }
+            console.log($scope.AntiShockselect);
          }
         EmergencyInfo.GetEmergencyInfos(patientID,visitNo).then(//获取已有信息
           function(s){
@@ -1562,7 +1572,13 @@ angular.module('controllers', ['ionic','ngResource','services'])
               {
                 if(s[i1].ItemCategory=="AntiInfect"||s[i1].ItemCategory=="AntiShock")
                 {
-                  $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1].value = s[i1].Item[i2].ItemValue;
+                  console.log(s[i1].Item[i2].ItemCode);
+                  if(s[i1].ItemCategory=="AntiShock"&&s[i1].Item[i2].ItemCode=="005")
+                    $scope.AntiShockselect[0]["selectstatus"]=true;
+                  else if(s[i1].ItemCategory=="AntiShock"&&s[i1].Item[i2].ItemCode=="006")
+                    $scope.AntiShockselect[1]["selectstatus"]=true;
+                  else
+                    $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1].value = s[i1].Item[i2].ItemValue;
                 }else{
                   if(s[i1].ItemCategory!="Info"&&s[i1].ItemCategory!="InjuryExtent")
                     $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1]["status"] = true;
@@ -1780,6 +1796,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
         $scope.catalog[$scope.lastchooseitem]=$scope.itemdetail;
 
       }
+      $scope.AntiShockselectchange = function(){
+        console.log($scope.AntiShockselect);
+      }
       $scope.Warwound = {
         "ItemCategory":'Info',
         "ItemCode":"004",
@@ -1990,6 +2009,28 @@ angular.module('controllers', ['ionic','ngResource','services'])
           }
         })
         // console.log($scope.emergencylevel);
+        if($scope.AntiShockselect[0].selectstatus==true)
+        {
+          var selectResult={};
+          selectResult["ItemCategory"] = "AntiShock";
+          selectResult["ItemCode"] = "005";
+          selectResult["ItemValue"] = "吸氧";
+          selectResult["UserId"] = Userid;
+          selectResult["TerminalName"] = "sampleTerminalName";
+          selectResult["TerminalIP"] = "sampleTerminalIP";
+          postEmergencydata.postdata.push(selectResult);
+        }
+        if($scope.AntiShockselect[1].selectstatus==true)
+        {
+          var selectResult={};
+          selectResult["ItemCategory"] = "AntiShock";
+          selectResult["ItemCode"] = "006";
+          selectResult["ItemValue"] = "抗休克裤";
+          selectResult["UserId"] = Userid;
+          selectResult["TerminalName"] = "sampleTerminalName";
+          selectResult["TerminalIP"] = "sampleTerminalIP";
+          postEmergencydata.postdata.push(selectResult);
+        }
         if($scope.emergencylevel!=undefined)
         {
           postEmergencydata.postdata.push($scope.emergencylevel);

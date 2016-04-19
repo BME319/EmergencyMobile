@@ -1530,7 +1530,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
       VitalSignInfo.GetVitalSignInfos(patientID,visitNo).then(//获取已有信息
         function(s){
-          // console.log(s);
+          console.log(s);
           for(var i=0;i<s.length;i++)
           {
             $scope.catalog[s[i].ItemCategory][s[i].ItemCode-1].value = s[i].ItemValue;
@@ -1555,14 +1555,94 @@ angular.module('controllers', ['ionic','ngResource','services'])
          }
         EmergencyInfo.GetEmergencyInfos(patientID,visitNo).then(//获取已有信息
           function(s){
-            // console.log(s);
+            console.log(s);
             for(var i1=0;i1<s.length;i1++)
             {
               for(var i2=0;i2<s[i1].Item.length;i2++)
               {
-                $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1].status = true;
-                if(s[i1].Item[i2].ItemName=="其他")
+                if(s[i1].ItemCategory=="AntiInfect"||s[i1].ItemCategory=="AntiShock")
+                {
                   $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1].value = s[i1].Item[i2].ItemValue;
+                }else{
+                  if(s[i1].ItemCategory!="Info"&&s[i1].ItemCategory!="InjuryExtent")
+                    $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1]["status"] = true;
+                  if(s[i1].Item[i2].ItemName=="其他")
+                    $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1].value = s[i1].Item[i2].ItemValue;
+                }
+                
+              }
+              if(s[i1].ItemCategory=="Info"){
+                // console.log(s[i1]);
+                angular.forEach(s[i1].Item,function(value,key){
+                  // console.log(value);
+                  switch(value.ItemName)
+                  {
+                    case "战伤非战伤":
+                      $scope.Warwound = {
+                        "ItemCategory":'Info',
+                        "ItemCode":"004",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                    case "自救互救卫救":
+                      $scope.Save = {
+                        "ItemCategory":'Info',
+                        "ItemCode":"005",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                    case "紧急处置":
+                      $scope.Injury1={
+                        "ItemCategory":'Info',
+                        "ItemCode":"006",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                    case "放射沾染":
+                      $scope.Injury2={
+                        "ItemCategory":'Info',
+                        "ItemCode":"006",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                    case "隔离":
+                      $scope.Injury3={
+                        "ItemCategory":'Info',
+                        "ItemCode":"006",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                    case "染毒":
+                      $scope.Injury4={
+                        "ItemCategory":'Info',
+                        "ItemCode":"006",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                  }
+                })
+              console.log($scope.Injury1);
+              console.log($scope.Injury2);
+              console.log($scope.Injury3);
+              console.log($scope.Injury4);
               }
             }
             angular.forEach($scope.catalog.InjuryExtent,function(value,key){
@@ -1819,6 +1899,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
         $scope.mytext2height = {'height':0+"px"};
         $scope.mytext2textareaheight = {"height":0+"px"};
         scoring();
+        console.log($scope.itemdetail);
       }
 
       $scope.loosecurse = function(){//通用输入框失去焦点时调用
@@ -1881,7 +1962,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               if(value[i].ItemName=='其他')selectResult["ItemValue"] = value[i].value;
               postEmergencydata.postdata.push(selectResult);
             }
-            if(value[i].value!=''&&value[i].value!=undefined&&value[i].ItemName!='其他')
+            if(value[i].value!=''&&value[i].value!=undefined&&value[i].ItemName!='其他'&&key!="AntiShock"&&key!="AntiInfect")
             {
               // console.log(key+value[i].ItemName);
               var inputResult={};
@@ -1893,6 +1974,18 @@ angular.module('controllers', ['ionic','ngResource','services'])
               inputResult["TerminalName"] = "sampleTerminalName";
               inputResult["TerminalIP"] = "sampleTerminalIP";
               postVitalSigndata.postdata.push(inputResult);
+            }
+            if((key=="AntiShock"||key=="AntiInfect")&&value[i].value!=''&&value[i].value!=undefined)
+            {
+              var inputResult={};
+              inputResult["ItemCategory"] = key;
+              inputResult["ItemCode"] = value[i].ItemCode;
+              inputResult["ItemValue"] = value[i].value;
+              inputResult["ItemUnit"] = value[i].ItemUnit;
+              inputResult["UserID"] = Userid;
+              inputResult["TerminalName"] = "sampleTerminalName";
+              inputResult["TerminalIP"] = "sampleTerminalIP";
+              postEmergencydata.postdata.push(inputResult);
             }
           }
         })

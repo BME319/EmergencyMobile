@@ -76,30 +76,28 @@
 				<textarea class="textarea1" ng-focus="OnFocus($index)" id="mytext1" ng-model="itemdetail.slice(-1)[0].value" ng-if="itemdetail.slice(-1)[0].status" type="text" rows="4" placeholder="请填写50字以内" ng-maxlength=50></textarea>
 			</ion-list>
 			<div ng-if="showClassfyinfo">
-				<div class="row">
-					<div class="col"><ion-radio name="aa" ng-model="Warwound.ItemValue" value="战伤" ng-change="ClassifyInfochange(0,'战伤')">战伤</ion-radio></div>
-					<div class="col"><ion-radio name="aa" ng-model="Warwound.ItemValue" value="非战伤" ng-change="ClassifyInfochange(0,'非战伤')">非战伤</ion-radio></div>
-				</div>
-				<br/>
-				<div class="row">
-					<div class="col"><ion-radio name="bb" ng-model="Save.ItemValue" value="自救" ng-change="ClassifyInfochange(1,'自救')">自救</ion-radio></div>
-					<div class="col"><ion-radio name="bb" ng-model="Save.ItemValue" value="互救" ng-change="ClassifyInfochange(1,'互救')">互救</ion-radio></div>
-				</div>
-				<div class="row">
-					<div class="col"><ion-radio name="bb" ng-model="Save.ItemValue" value="卫救" ng-change="ClassifyInfochange(1,'卫救')">卫救</ion-radio></div>
-					<div class="col"><ion-radio name="bb" ng-model="Save.ItemValue" value="未处置" ng-change="ClassifyInfochange(1,'未处置')">未处置</ion-radio></div>
-				</div>
-				<br/>
 				<ion-list>
-					<ion-checkbox ng-model="c" ng-value="7" ng-change="ClassifyInfochange(2,'紧急处置')">紧急处置</ion-checkbox>
-					<ion-checkbox ng-model="d" ng-value="8" ng-change="ClassifyInfochange(2,'放射污染')">放射污染</ion-checkbox>
-					<ion-checkbox ng-model="e" ng-value="9" ng-change="ClassifyInfochange(2,'隔离')">隔离</ion-checkbox>
-					<ion-checkbox ng-model="f" ng-value="10" ng-change="ClassifyInfochange(2,'染毒')">染毒</ion-checkbox>
+					<ion-radio name="aa" ng-model="Warwound.ItemValue" value="战伤" ng-change="ClassifyInfochange(0,'战伤')">战伤</ion-radio>
+					<ion-radio name="aa" ng-model="Warwound.ItemValue" value="非战伤" ng-change="ClassifyInfochange(0,'非战伤')">非战伤</ion-radio>
+				</ion-list>
+				<div class="item item-divider item-positive"></div>
+				<ion-list>
+					<ion-radio name="bb" ng-model="Save.ItemValue" value="自救" ng-change="ClassifyInfochange(1,'自救')">自救</ion-radio>
+					<ion-radio name="bb" ng-model="Save.ItemValue" value="互救" ng-change="ClassifyInfochange(1,'互救')">互救</ion-radio>
+					<ion-radio name="bb" ng-model="Save.ItemValue" value="卫救" ng-change="ClassifyInfochange(1,'卫救')">卫救</ion-radio>
+					<ion-radio name="bb" ng-model="Save.ItemValue" value="未处置" ng-change="ClassifyInfochange(1,'未处置')">未处置</ion-radio>
+				</ion-list>
+				<div class="item item-divider item-positive"></div>
+				<ion-list>
+					<ion-checkbox ng-model="Injury1.ItemValue" ng-checked="Injury1.ItemValue!=undefined" value="紧急处置" ng-change="ClassifyInfochange(2,'紧急处置')">紧急处置</ion-checkbox>
+					<ion-checkbox ng-model="Injury2.ItemValue" ng-checked="Injury2.ItemValue!=undefined" value="放射污染" ng-change="ClassifyInfochange(2,'放射污染')">放射污染</ion-checkbox>
+					<ion-checkbox ng-model="Injury3.ItemValue" ng-checked="Injury3.ItemValue!=undefined" value="隔离" ng-change="ClassifyInfochange(2,'隔离')">隔离</ion-checkbox>
+					<ion-checkbox ng-model="Injury4.ItemValue" ng-checked="Injury4.ItemValue!=undefined" value="染毒" ng-change="ClassifyInfochange(2,'染毒')">染毒</ion-checkbox>
 				</ion-list>
 			</div>
 			<ion-list ng-if="ifAntiInfectShock">
 				<label class="item item-input item-stacked-label" ng-repeat="item in itemdetail">
-					<span class="input-label">{{item.ItemName}}</span>
+					<span class="input-label">{{item.ItemName}}:</span>
 					<input type="text" placeholder="在此输入" ng-model="item.value" ng-focus="OnFocus($index)">
 				</label>
 			</ion-list>

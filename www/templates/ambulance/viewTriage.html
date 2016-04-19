@@ -69,7 +69,7 @@
 				</div>
 			</ion-item>
 			<ion-item  ng-show = "true">
-				<div class="row row-wrap" ng-repeat="EmergencyInfo in EmergencyInfos" style="background-color:#ACD6FF;">
+				<div class="item-text-wrap" ng-repeat="EmergencyInfo in EmergencyInfos" style="background-color:#ACD6FF;">
 					<span><b>{{EmergencyInfo.CategoryName}}：</b></span>
 					<p ><span ng-repeat="item in EmergencyInfo.Item" >{{item.ItemValue}}；</span></p>
 				</div>

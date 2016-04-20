@@ -78,7 +78,7 @@
 				<ion-checkbox ng-model="item.status" ng-repeat="item in itemdetail" ng-change="onselectchange(item)">
 					{{item.ItemName}}
 				</ion-checkbox>
-				<textarea class="textarea1" ng-focus="OnFocus($index)" id="mytext1" ng-model="itemdetail.slice(-1)[0].value" ng-if="itemdetail.slice(-1)[0].status" type="text" rows="4" placeholder="请填写50字以内" ng-maxlength=50></textarea>
+				<textarea class="textarea1" ng-focus="OnFocus($index)" id="mytext1" ng-model="itemdetail.slice(-1)[0].value" ng-if="itemdetail.slice(-1)[0].status&&itemdetail.slice(-1)[0].ItemName!='复温'" type="text" rows="4" placeholder="请填写50字以内" ng-maxlength=50></textarea>
 			</ion-list>
 			<div ng-if="showClassfyinfo">
 				<ion-list>

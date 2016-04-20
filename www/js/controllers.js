@@ -1498,7 +1498,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     $scope.mytext3textareaheight = {"height":0+"px","margin-top": -10+"px"};
     //////////////////////////
     $scope.dosage={
-      "药名1":"123",//剂量
+      "药名1":"",//剂量
       "药名2":"",//剂量
       "药名3":"",//剂量
       "药名4":"",//剂量

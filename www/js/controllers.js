@@ -953,10 +953,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
   //保存
   $scope.saveVisitInfo = function(Type) {
-    // if(Type && !$rootScope.isWritedToCard){
-    //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-    //   return;
-    // }
+    if(Type && !$rootScope.isWritedToCard){
+      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+      return;
+    }
     $ionicLoading.show();
     var sendData = {
                   "PatientID": Storage.get("PatientID"),
@@ -996,11 +996,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
                       }else{
                         //写入NFC卡
                         $rootScope.NFCmodefy=true;
-                        var type = "text/pg",
-                            id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
-                            payload = "",//暂时用不到
-                            // payload = nfc.stringToBytes("fdsf"),
-                            record = ndef.record(ndef.TNF_MIME_MEDIA, type, id, payload);
+                        var record = ndef.encodemifareMessage(Storage.get("PatientID"));
                         $rootScope.recordToWrite=record;
                         $ionicLoading.show({template:'信息写入,请将设备靠近NFC卡片'});              
                       }
@@ -1225,11 +1221,12 @@ angular.module('controllers', ['ionic','ngResource','services'])
   //写卡
   $scope.wirteToCard = function(){
     $rootScope.NFCmodefy=true;
-    var type = "text/pg",
-        id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
-        payload = "",//暂时用不到
-        // payload = nfc.stringToBytes("fdsf"),
-        record = ndef.record(ndef.TNF_MIME_MEDIA, type, id, payload);
+    // var type = "text/pg",
+    //     id = Storage.get("PatientID")+"|"+Storage.get("VisitNo"),
+    //     payload = "",//暂时用不到
+    //     // payload = nfc.stringToBytes("fdsf"),
+    //     record = ndef.record(ndef.TNF_MIME_MEDIA, type, id, payload);
+    var record = ndef.encodemifareMessage(Storage.get("PatientID"));
     $rootScope.recordToWrite=record;
     $ionicLoading.show({template:'信息写入,请将设备靠近NFC卡片'});    
   }
@@ -1490,9 +1487,27 @@ angular.module('controllers', ['ionic','ngResource','services'])
     $scope.showPDA = true;
     $scope.ifphysiological = true;//初始化显示生理信息采集
     $scope.ifbiochemical=false;
+    $scope.showClassfyinfo=false;
+    $scope.ifAntiShock=false;
+    $scope.ifAntiInfect=false;
     // $scope.itemdetail = $scope.testdata.physiological;
-    //////////////////////////
 
+    $scope.mytext2height = {'height':0+"px"};
+    $scope.mytext2textareaheight = {"height":0+"px","margin-top": -10+"px"};
+    $scope.mytext3height = {'height':0+"px"};
+    $scope.mytext3textareaheight = {"height":0+"px","margin-top": -10+"px"};
+    //////////////////////////
+    $scope.dosage={
+      "药名1":"123",//剂量
+      "药名2":"",//剂量
+      "药名3":"",//剂量
+      "药名4":"",//剂量
+      "输血血型":"",//剂量
+      "输液药物":"",//剂量
+      "血管活性药物名":"",//剂量
+      "止痛药名":"",//剂量
+      "时间":""//时间
+    }
     //获取病人信息
 
     var visitNo = window.localStorage['VisitNo'];
@@ -1531,7 +1546,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
       VitalSignInfo.GetVitalSignInfos(patientID,visitNo).then(//获取已有信息
         function(s){
-          // console.log(s);
+          console.log(s);
           for(var i=0;i<s.length;i++)
           {
             $scope.catalog[s[i].ItemCategory][s[i].ItemCode-1].value = s[i].ItemValue;
@@ -1553,17 +1568,158 @@ angular.module('controllers', ['ionic','ngResource','services'])
          for(var i=0;i<s.length;i++)
          {
            $scope.catalog[s[i].Category] = s[i].Item;
+            if(s[i].Category=="AntiShock")
+            {
+              $scope.AntiShockselect = [];
+              $scope.AntiShockselect.push($scope.catalog[s[i].Category][4]);
+              $scope.AntiShockselect.push($scope.catalog[s[i].Category][5]);
+              $scope.AntiShockselect[0]["selectstatus"]=false;
+              $scope.AntiShockselect[1]["selectstatus"]=false;
+              $scope.catalog[s[i].Category].splice(4,2);
+            }
+            console.log($scope.AntiShockselect);
          }
         EmergencyInfo.GetEmergencyInfos(patientID,visitNo).then(//获取已有信息
           function(s){
-            // console.log(s);
+            console.log(s);
             for(var i1=0;i1<s.length;i1++)
             {
               for(var i2=0;i2<s[i1].Item.length;i2++)
               {
-                $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1].status = true;
-                if(s[i1].Item[i2].ItemName=="其他")
-                  $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1].value = s[i1].Item[i2].ItemValue;
+                if(s[i1].ItemCategory=="AntiInfect"||s[i1].ItemCategory=="AntiShock")
+                {
+                  console.log(s[i1].Item[i2].ItemCode);
+                  if(s[i1].ItemCategory=="AntiShock"&&s[i1].Item[i2].ItemCode=="005")
+                    $scope.AntiShockselect[0]["selectstatus"]=true;
+                  else if(s[i1].ItemCategory=="AntiShock"&&s[i1].Item[i2].ItemCode=="006")
+                    $scope.AntiShockselect[1]["selectstatus"]=true;
+                  else
+                  {
+                    var ishave=s[i1].Item[i2].ItemValue.indexOf("||");
+                    var key=s[i1].ItemCategory;
+                    if(ishave!=-1)
+                    {
+                      $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1].value = s[i1].Item[i2].ItemValue.slice(0,ishave);
+                      (key=="AntiShock"&&s[i1].Item[i2].ItemCode=="001")?$scope.dosage["输血血型"]=s[i1].Item[i2].ItemValue.slice(ishave+2):$scope.dosage["输血血型"]=$scope.dosage["输血血型"];
+                      (key=="AntiShock"&&s[i1].Item[i2].ItemCode=="002")?$scope.dosage["输液药物"]=s[i1].Item[i2].ItemValue.slice(ishave+2):$scope.dosage["输液药物"]=$scope.dosage["输液药物"];
+                      (key=="AntiShock"&&s[i1].Item[i2].ItemCode=="003")?$scope.dosage["血管活性药物名"]=s[i1].Item[i2].ItemValue.slice(ishave+2):$scope.dosage["血管活性药物名"]=$scope.dosage["血管活性药物名"];
+                      // (key=="AntiShock"&&s[i1].Item[i2].ItemCode=="004")?$scope.dosage["止痛药名"]=s[i1].Item[i2].ItemValue.slice(ishave+2):$scope.dosage["止痛药名"]=$scope.dosage["止痛药名"];
+                      (key=="AntiInfect"&&s[i1].Item[i2].ItemCode=="003")?$scope.dosage["药名1"]=s[i1].Item[i2].ItemValue.slice(ishave+2):$scope.dosage["药名1"]=$scope.dosage["药名1"];
+                      (key=="AntiInfect"&&s[i1].Item[i2].ItemCode=="004")?$scope.dosage["药名2"]=s[i1].Item[i2].ItemValue.slice(ishave+2):$scope.dosage["药名2"]=$scope.dosage["药名2"];
+                      (key=="AntiInfect"&&s[i1].Item[i2].ItemCode=="005")?$scope.dosage["药名3"]=s[i1].Item[i2].ItemValue.slice(ishave+2):$scope.dosage["药名3"]=$scope.dosage["药名3"];
+                      (key=="AntiInfect"&&s[i1].Item[i2].ItemCode=="006")?$scope.dosage["药名4"]=s[i1].Item[i2].ItemValue.slice(ishave+2):$scope.dosage["药名4"]=$scope.dosage["药名4"];
+                      if(key=="AntiShock"&&s[i1].Item[i2].ItemCode=="004"){
+                        var dosagesubstr = s[i1].Item[i2].ItemValue.slice(ishave+2);
+                        var ishavetime = dosagesubstr.indexOf("||");
+                        if(ishavetime!=-1){
+                          $scope.dosage["止痛药名"]=dosagesubstr.slice(0,ishavetime);
+                          var time = dosagesubstr.slice(ishavetime+2);
+                          var year = time.slice(0,4);
+                          time = time.slice(5);
+                          var month = time.slice(0,time.indexOf("/"));
+                          time = time.slice(time.indexOf("/")+1);
+                          var day = time.slice(0,time.indexOf("/"));
+                          time = time.slice(time.indexOf("/")+1);
+                          var hour = time.slice(0,time.indexOf("/"));
+                          time = time.slice(time.indexOf("/")+1);
+                          var minute = time;
+                          var date = new Date();
+                          date.setFullYear(year);
+                          date.setMonth(month-1);
+                          date.setDate(day);
+                          date.setHours(hour);
+                          date.setMinutes(minute);
+                          date.setSeconds(0);
+                          date.setMilliseconds(0)
+                          $scope.dosage["时间"] = date;
+                        }else
+                        {
+                          $scope.dosage["止痛药名"]=dosagesubstr;
+                        }
+                      }
+                    }else
+                      $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1].value = s[i1].Item[i2].ItemValue;
+                  }
+                }else{
+                  if(s[i1].ItemCategory!="Info"&&s[i1].ItemCategory!="InjuryExtent")
+                    $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1]["status"] = true;
+                  if(s[i1].Item[i2].ItemName=="其他")
+                    $scope.catalog[s[i1].ItemCategory][s[i1].Item[i2].ItemCode-1].value = s[i1].Item[i2].ItemValue;
+                }
+                
+              }
+              if(s[i1].ItemCategory=="Info"){
+                // console.log(s[i1]);
+                angular.forEach(s[i1].Item,function(value,key){
+                  // console.log(value);
+                  switch(value.ItemName)
+                  {
+                    case "战伤非战伤":
+                      $scope.Warwound = {
+                        "ItemCategory":'Info',
+                        "ItemCode":"004",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                    case "自救互救卫救":
+                      $scope.Save = {
+                        "ItemCategory":'Info',
+                        "ItemCode":"005",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                    case "紧急处置":
+                      $scope.Injury1={
+                        "ItemCategory":'Info',
+                        "ItemCode":"006",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                    case "放射沾染":
+                      $scope.Injury2={
+                        "ItemCategory":'Info',
+                        "ItemCode":"006",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                    case "隔离":
+                      $scope.Injury3={
+                        "ItemCategory":'Info',
+                        "ItemCode":"006",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                    case "染毒":
+                      $scope.Injury4={
+                        "ItemCategory":'Info',
+                        "ItemCode":"006",
+                        "ItemValue":value.ItemValue,
+                        "UserId":Userid,
+                        "TerminalName":"sampleTerminalName",
+                        "TerminalIP":"sampleTerminalIP"
+                      }
+                      break;
+                  }
+                })
+              console.log($scope.Injury1);
+              console.log($scope.Injury2);
+              console.log($scope.Injury3);
+              console.log($scope.Injury4);
               }
             }
             angular.forEach($scope.catalog.InjuryExtent,function(value,key){
@@ -1596,23 +1752,27 @@ angular.module('controllers', ['ionic','ngResource','services'])
       [
         'Physical',//检测信息
         'Biochemical'
+      ],
+      [
+        'ClassifyInfo',//分类信息
       ]
-      ];
+    ];
     $scope.items = {//左侧目录详细数据，filters.js文件中有过滤信息
       "Site":{Style:{}},
-        "Class":{Style:{}},
-        "Type":{Style:{}},
-        "Complications":{Style:{}},
-        "InjuryExtent":{Style:{}},
-        "Emergency":{Style:{}},
-        "Treatment":{Style:{}},
-        "WarWound":{Style:{}},
-        "CarePathway":{Style:{}},
-        "TreatmentOutLine":{Style:{}},
-        "AntiInfect":{Style:{}},
-        "AntiShock":{Style:{}},
-        "Physical":{Style:{'background-color':'#BEDBD7'}},
-        "Biochemical":{Style:{}}
+      "Class":{Style:{}},
+      "Type":{Style:{}},
+      "Complications":{Style:{}},
+      "InjuryExtent":{Style:{}},
+      "Emergency":{Style:{}},
+      "Treatment":{Style:{}},
+      "WarWound":{Style:{}},
+      "CarePathway":{Style:{}},
+      "TreatmentOutLine":{Style:{}},
+      "AntiInfect":{Style:{}},
+      "AntiShock":{Style:{}},
+      "Physical":{Style:{'background-color':'#BEDBD7'}},
+      "Biochemical":{Style:{}},
+      "ClassifyInfo":{Style:{}}
     };
     $scope.lastchooseitem = 'Physical';//记录上一次选中的左侧目录信息，如 physiological
       $scope.chooseitem = function(ci){
@@ -1626,6 +1786,9 @@ angular.module('controllers', ['ionic','ngResource','services'])
               $scope.showPDA = true;
               $scope.ifphysiological = true;
               $scope.ifbiochemical=false;
+              $scope.showClassfyinfo=false;
+              $scope.ifAntiShock=false;
+              $scope.ifAntiInfect=false;
               $scope.itemdetail = $scope.catalog.Physical;//获取所选目录详细信息进行显示
               break;
             }
@@ -1634,12 +1797,51 @@ angular.module('controllers', ['ionic','ngResource','services'])
               $scope.showPDA = true;
               $scope.ifbiochemical = true;
               $scope.ifphysiological=false;
+              $scope.showClassfyinfo=false;
+              $scope.ifAntiShock=false;
+              $scope.ifAntiInfect=false;
               $scope.itemdetail = $scope.catalog.Biochemical;
+              break;
+            }
+            case "ClassifyInfo":
+            {
+              $scope.showClassfyinfo=true;
+              $scope.showPDA = true;
+              $scope.ifbiochemical = false;
+              $scope.ifphysiological=false;
+              $scope.ifAntiShock=false;
+              $scope.ifAntiInfect=false;
+              $scope.itemdetail = $scope.catalog.Info;
+              break;
+            }
+            case "AntiShock":
+            {
+              $scope.ifAntiShock=true;
+              $scope.ifAntiInfect=false;
+              $scope.showClassfyinfo=false;
+              $scope.showPDA = true;
+              $scope.ifbiochemical = false;
+              $scope.ifphysiological=false;
+              $scope.itemdetail = $scope.catalog.AntiShock;
+              break;
+            }
+            case "AntiInfect":
+            {
+              $scope.ifAntiInfect=true;
+              $scope.ifAntiShock=false;
+              $scope.showClassfyinfo=false;
+              $scope.showPDA = true;
+              $scope.ifbiochemical = false;
+              $scope.ifphysiological=false;
+              $scope.itemdetail = $scope.catalog.AntiInfect;
               break;
             }
             default://伤情记录和伤情处理部分都是checkbox
             {
               $scope.showPDA = false;
+              $scope.showClassfyinfo=false;
+              $scope.ifAntiShock=false;
+              $scope.ifAntiInfect=false;
               $scope.itemdetail = $scope.catalog[ci];
               break;
             }
@@ -1661,8 +1863,110 @@ angular.module('controllers', ['ionic','ngResource','services'])
         $scope.catalog[$scope.lastchooseitem]=$scope.itemdetail;
 
       }
+      $scope.Warwound = {
+        "ItemCategory":'Info',
+        "ItemCode":"004",
+        "ItemValue":'战伤',
+        "UserId":Userid,
+        "TerminalName":"sampleTerminalName",
+        "TerminalIP":"sampleTerminalIP"
+      }
+      $scope.Save = {
+              "ItemCategory":'Info',
+              "ItemCode":"005",
+              "ItemValue":"未处置",
+              "UserId":Userid,
+              "TerminalName":"sampleTerminalName",
+              "TerminalIP":"sampleTerminalIP"
+            }
+      $scope.ClassifyInfochange=function(index,data)
+      {
+        switch (index)
+        {
+          case 0:
+            $scope.Warwound = {
+              "ItemCategory":'Info',
+              "ItemCode":"004",
+              "ItemValue":data,
+              "UserId":Userid,
+              "TerminalName":"sampleTerminalName",
+              "TerminalIP":"sampleTerminalIP"
+            }
+            console.log(data)
+            break;
+          case 1:
+            $scope.Save = {
+              "ItemCategory":'Info',
+              "ItemCode":"005",
+              "ItemValue":data,
+              "UserId":Userid,
+              "TerminalName":"sampleTerminalName",
+              "TerminalIP":"sampleTerminalIP"
+            }
+            console.log(data)
+            break;
+          case 2:
+            if(data=="紧急处置")
+            {
+              if($scope.Injury1==undefined)
+                $scope.Injury1={
+                  "ItemCategory":'Info',
+                  "ItemCode":"006",
+                  "ItemValue":data,
+                  "UserId":Userid,
+                  "TerminalName":"sampleTerminalName",
+                  "TerminalIP":"sampleTerminalIP"
+                }
+              else $scope.Injury1=undefined
+            }else if(data == "放射污染")
+            {
+              if($scope.Injury2==undefined)
+              $scope.Injury2={
+                "ItemCategory":'Info',
+                "ItemCode":"007",
+                "ItemValue":data,
+                "UserId":Userid,
+                "TerminalName":"sampleTerminalName",
+                "TerminalIP":"sampleTerminalIP"
+              }
+              else $scope.Injury2=undefined
+            }else if(data=="隔离")
+            {
+              if($scope.Injury3==undefined)
+              $scope.Injury3={
+                "ItemCategory":'Info',
+                "ItemCode":"008",
+                "ItemValue":data,
+                "UserId":Userid,
+                "TerminalName":"sampleTerminalName",
+                "TerminalIP":"sampleTerminalIP"
+              }
+              else $scope.Injury3=undefined
+            }else if(data=="染毒")
+            {
+              if($scope.Injury4==undefined)
+              $scope.Injury4={
+                "ItemCategory":'Info',
+                "ItemCode":"009",
+                "ItemValue":data,
+                "UserId":Userid,
+                "TerminalName":"sampleTerminalName",
+                "TerminalIP":"sampleTerminalIP"
+              }
+              else $scope.Injury4=undefined
+            }
+            break;
+        }
+          console.log($scope.Warwound)
+          console.log($scope.Save)
+          console.log($scope.Injury1)
+          console.log($scope.Injury2)
+          console.log($scope.Injury3)
+          console.log($scope.Injury4)
+      }
       $scope.OnFocus = function(i)//当输入框获得焦点是调用，i-所选输入框的索引
       {
+        console.log(123);
         document.getElementById('mytext2').focus();//使通用输入框获得焦点
         $scope.inputindex = i;//存储输入框索引
         // console.log(i);
@@ -1672,18 +1976,46 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.textarea2value = $scope.itemdetail.slice(-1)[0].value;
         var keyboardHeight = window.localStorage['keyboardHeight'];//获取键盘高度
         $scope.mytext2height = {'height':scrollHeight - keyboardHeight-43+"px"};//设置通用输入框高度
-        $scope.mytext2textareaheight = {"height":scrollHeight - keyboardHeight - 57+"px"};
+        $scope.mytext2textareaheight = {"height":scrollHeight - keyboardHeight - 57+"px","padding-top": 30+"px"};
       }
+      $scope.OndosageFocus = function(item)//当输入框获得焦点是调用，i-所选输入框的索引
+      {
+        // console.log(itemname);
+        if(item.value==""||item.value==undefined)
+        {
+          // document.getElementById('mytext3').blur();
+          alert("kong");
+        }else{
+          $scope.changedosage = item.ItemName;
+          // console.log($scope.changedosage);
+          // console.log($scope.dosage[itemname]);
+          $scope.textarea3value = $scope.dosage[item.ItemName];//通用输入框获得所选输入框的初始值
 
+          var keyboardHeight = window.localStorage['keyboardHeight'];//获取键盘高度
+          $scope.mytext3height = {'height':scrollHeight - keyboardHeight-43+"px"};//设置通用输入框高度
+          $scope.mytext3textareaheight = {"height":scrollHeight - keyboardHeight - 57+"px","padding-top": 30+"px"};
+
+          document.getElementById('mytext3').focus();//使通用输入框获得焦点
+        }
+      }
+      $scope.dosagechange = function(item){
+        console.log(item);
+        console.log($scope.dosage);
+      }
       $scope.doneotherinfo = function(){//完成通用输入框时调用
         $scope.mytext2height = {'height':0+"px"};
-        $scope.mytext2textareaheight = {"height":0+"px"};
+        $scope.mytext2textareaheight = {"height":0+"px","margin-top": -10+"px"};
+        $scope.mytext3height = {'height':0+"px"};
+        $scope.mytext3textareaheight = {"height":0+"px","margin-top": -10+"px"};
         scoring();
+        console.log($scope.itemdetail);
       }
-
+      $scope.mytext3loosecurse = function(){//通用输入框失去焦点时调用
+        console.log('loosecurse3');
+        $scope.dosage[$scope.changedosage] = $scope.textarea3value;//将通用输入框的值赋给所选输入框
+      }
       $scope.loosecurse = function(){//通用输入框失去焦点时调用
-        // console.log('loosecurse');
-        // console.log($scope.lastchooseitem);
+        console.log('loosecurse');
         if($scope.inputindex!=undefined)//undefined表示通用输入框操作的是生理，生化参数输入界面
         {
           $scope.itemdetail[$scope.inputindex].value = $scope.textarea2value;//将通用输入框的值赋给所选输入框
@@ -1741,7 +2073,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               if(value[i].ItemName=='其他')selectResult["ItemValue"] = value[i].value;
               postEmergencydata.postdata.push(selectResult);
             }
-            if(value[i].value!=''&&value[i].value!=undefined&&value[i].ItemName!='其他')
+            if(value[i].value!=''&&value[i].value!=undefined&&value[i].ItemName!='其他'&&key!="AntiShock"&&key!="AntiInfect")
             {
               // console.log(key+value[i].ItemName);
               var inputResult={};
@@ -1754,15 +2086,83 @@ angular.module('controllers', ['ionic','ngResource','services'])
               inputResult["TerminalIP"] = "sampleTerminalIP";
               postVitalSigndata.postdata.push(inputResult);
             }
+            if((key=="AntiShock"||key=="AntiInfect")&&value[i].value!=''&&value[i].value!=undefined)
+            {
+              var inputResult={};
+              inputResult["ItemCategory"] = key;
+              inputResult["ItemCode"] = value[i].ItemCode;
+              inputResult["ItemValue"] = value[i].value;
+              inputResult["ItemUnit"] = value[i].ItemUnit;
+              inputResult["UserID"] = Userid;
+              inputResult["TerminalName"] = "sampleTerminalName";
+              inputResult["TerminalIP"] = "sampleTerminalIP";
+              (key=="AntiShock"&&value[i].ItemCode=="001")?inputResult["ItemValue"]=inputResult["ItemValue"]+"||"+$scope.dosage["输血血型"]:inputResult["ItemValue"]=inputResult["ItemValue"];
+              (key=="AntiShock"&&value[i].ItemCode=="002")?inputResult["ItemValue"]=inputResult["ItemValue"]+"||"+$scope.dosage["输液药物"]:inputResult["ItemValue"]=inputResult["ItemValue"];
+              (key=="AntiShock"&&value[i].ItemCode=="003")?inputResult["ItemValue"]=inputResult["ItemValue"]+"||"+$scope.dosage["血管活性药物名"]:inputResult["ItemValue"]=inputResult["ItemValue"];
+              (key=="AntiShock"&&value[i].ItemCode=="004")?(
+                $scope.dosage["时间"]!=""?inputResult["ItemValue"]=inputResult["ItemValue"]+"||"+$scope.dosage["止痛药名"]+"||"+
+                  $scope.dosage["时间"].getFullYear()+"/"+
+                  ($scope.dosage["时间"].getMonth()+1)+"/"+
+                  $scope.dosage["时间"].getDate()+"/"+
+                  $scope.dosage["时间"].getHours()+"/"+
+                  $scope.dosage["时间"].getMinutes():inputResult["ItemValue"]=inputResult["ItemValue"]+"||"+$scope.dosage["止痛药名"]
+                ):inputResult["ItemValue"]=inputResult["ItemValue"];
+              (key=="AntiInfect"&&value[i].ItemCode=="003")?inputResult["ItemValue"]=inputResult["ItemValue"]+"||"+$scope.dosage["药名1"]:inputResult["ItemValue"]=inputResult["ItemValue"];
+              (key=="AntiInfect"&&value[i].ItemCode=="004")?inputResult["ItemValue"]=inputResult["ItemValue"]+"||"+$scope.dosage["药名2"]:inputResult["ItemValue"]=inputResult["ItemValue"];
+              (key=="AntiInfect"&&value[i].ItemCode=="005")?inputResult["ItemValue"]=inputResult["ItemValue"]+"||"+$scope.dosage["药名3"]:inputResult["ItemValue"]=inputResult["ItemValue"];
+              (key=="AntiInfect"&&value[i].ItemCode=="006")?inputResult["ItemValue"]=inputResult["ItemValue"]+"||"+$scope.dosage["药名4"]:inputResult["ItemValue"]=inputResult["ItemValue"];
+              postEmergencydata.postdata.push(inputResult);
+            }
           }
         })
         // console.log($scope.emergencylevel);
+        if($scope.AntiShockselect[0].selectstatus==true)
+        {
+          var selectResult={};
+          selectResult["ItemCategory"] = "AntiShock";
+          selectResult["ItemCode"] = "005";
+          selectResult["ItemValue"] = "吸氧";
+          selectResult["UserId"] = Userid;
+          selectResult["TerminalName"] = "sampleTerminalName";
+          selectResult["TerminalIP"] = "sampleTerminalIP";
+          postEmergencydata.postdata.push(selectResult);
+        }
+        if($scope.AntiShockselect[1].selectstatus==true)
+        {
+          var selectResult={};
+          selectResult["ItemCategory"] = "AntiShock";
+          selectResult["ItemCode"] = "006";
+          selectResult["ItemValue"] = "抗休克裤";
+          selectResult["UserId"] = Userid;
+          selectResult["TerminalName"] = "sampleTerminalName";
+          selectResult["TerminalIP"] = "sampleTerminalIP";
+          postEmergencydata.postdata.push(selectResult);
+        }
         if($scope.emergencylevel!=undefined)
         {
           postEmergencydata.postdata.push($scope.emergencylevel);
         }
+        postEmergencydata.postdata.push($scope.Warwound);
+        postEmergencydata.postdata.push($scope.Save);
+        if($scope.Injury1!=undefined)
+        {
+          postEmergencydata.postdata.push($scope.Injury1);
+        }
+        if($scope.Injury2!=undefined)
+        {
+          postEmergencydata.postdata.push($scope.Injury2);
+        }
+        if($scope.Injury3!=undefined)
+        {
+          postEmergencydata.postdata.push($scope.Injury3);
+        }
+        if($scope.Injury4!=undefined)
+        {
+          postEmergencydata.postdata.push($scope.Injury4);
+        }
         console.log(postVitalSigndata);
         console.log(postEmergencydata);
+        // console.log($scope.dosage["时间"].getDay());
         if(postVitalSigndata.postdata.length>0)
         {
           Patients.PostVitalSign(postVitalSigndata).then(

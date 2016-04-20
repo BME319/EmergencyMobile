@@ -47,7 +47,7 @@ angular.module('filters', [])
       switch(input)
       {
         case 'Site':return '受伤部位';break;
-        case 'Type':return '受伤类型';break;
+        case 'Type':return '受伤类别';break;
         case 'Complications':return '并发症';break;
         case 'InjuryExtent':return 'InjuryExtent';break;
         case 'Emergency':return '紧急手术';break;
@@ -57,10 +57,13 @@ angular.module('filters', [])
         case 'Treatment':return '处置概要';break;
         case 'AntiInfect':return '抗感染';break;
         case 'AntiShock':return '抗休克';break;
-        case 'Class':return '受伤类别';break;
+        case 'Class':return '受伤类型';break;
 
         case "Physical":return '生理信息';break;
         case "Biochemical":return '生化信息';break;
+
+        case 'ClassifyInfo':return '分类信息';break;
+
         default:return input;break;
       }
     };

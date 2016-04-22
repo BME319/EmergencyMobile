@@ -25,15 +25,28 @@
           </div>
         </div>
 
-        <div class="row">
+       <!--  <div class="row">
           <div class="col">
             <span class="input-label">患者姓名</span> 
           </div>  
           <div class=" col-67" >
             <input type="text" ng-model="BasicInfo.PatientName" style="width:100%;background:#f4f4f4;height:34px;" >
           </div>
+        </div> -->
+         <div class="row">
+          <div class="col">
+            <span class="input-label" ng-show=namecheck=='required' style="color:red">*必填</span>患者姓名：&nbsp;
+          </div>  
+          <div class=" col-67" >
+            <input type="text" ng-model="BasicInfo.PatientName" style="width:100%;background:#f4f4f4;height:34px;" >
+          </div>
         </div>
-
+        <!-- <div class="list" style="margin-top:10px">
+        <label class="item item-input" >
+             <span ng-show=namecheck=='required' style="color:red">*必填</span>患者姓名：&nbsp;
+              <input type="text" ng-model="BasicInfo.PatientName" style="width:100%;background:#f4f4f4;height:34px;" >
+        </label>
+      </div> -->
           <div class="row">
           <div class="col" style="width:100%">
             <span class="input-label">性别</span> 
@@ -54,10 +67,19 @@
           </div>
         </div>
         </form> -->
-        <div class="row">
+     <!--    <div class="row">
           <div class="col">
-            <!-- <span class="input-label" ng-show=birthcheck=='required' style="color:red">*必填</span>出生日期&nbsp; -->
+          
             出生日期
+          </div>  
+          <div class=" col-67" >
+            <input type="date" ng-model="BasicInfo.DOB" style="width:100%;background:#f4f4f4;height:34px;" >
+          </div>
+        </div> -->
+
+          <div class="row">
+          <div class="col">
+            <span class="input-label" ng-show=birthcheck=='required' style="color:red">*必填</span>出生日期&nbsp;
           </div>  
           <div class=" col-67" >
             <input type="date" ng-model="BasicInfo.DOB" style="width:100%;background:#f4f4f4;height:34px;" >
@@ -89,7 +111,7 @@
             <span class="input-label">部别</span> 
           </div>  
           <div class="col col-67">
-            <select ng-model="BasicInfo.Troop" ng-options="Troop.Type as Troop.Description for Troop in Troops" style="width:100%">
+            <select ng-model="BasicInfo.TroopType" ng-options="Troop.Type as Troop.Description for Troop in Troops" style="width:100%">
             </select>
           </div>
         </div>
@@ -100,7 +122,7 @@
             <span class="input-label">职位</span> 
           </div>  
           <div class="col col-67">
-            <select ng-model="BasicInfo.JOB" ng-options="JOB.Type as JOB.Description for JOB in JOBs" style="width:100%">
+           <select ng-model="BasicInfo.Job" ng-options="Job.Type as Job.Description for Job in JOBs" style="width:100%">
             </select>
           </div>
         </div>

@@ -452,6 +452,16 @@ angular.module('controllers', ['ionic','ngResource','services'])
     Storage.set("PatientID", item.PatientID);  
     Storage.set("VisitNo", item.VisitNo);
     Storage.set("PatientName", item.PatientName);
+
+    var bleP = {id:"",name:""};
+    var indexof = item.TerminalIP.indexOf('|');
+    if(indexof!=-1)
+    {
+      bleP.id=item.TerminalIP.slice(0,indexof);
+      bleP.name=item.TerminalIP.slice(indexof+1);
+    }
+    window.localStorage['bluetoothdeviceP'] = angular.toJson(bleP);
+
     if(Storage.get('RoleCode')=='EmergencyPersonnel')  {
       if($scope.curtab=="tab1"){
         $state.go('visitInfo'); 
@@ -1527,7 +1537,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     $scope.mytext3textareaheight = {"height":0+"px","margin-top": -10+"px"};
     //////////////////////////
     $scope.dosage={
-      "药名1":"123",//剂量
+      "药名1":"",//剂量
       "药名2":"",//剂量
       "药名3":"",//剂量
       "药名4":"",//剂量
@@ -1561,9 +1571,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
     btd==undefined?$scope.bindBle = '--':$scope.bindBle = btd.name;//生理手持ble绑定结果
 
     var btdp = angular.fromJson(window.localStorage['bluetoothdeviceP']);
-    btdp==undefined?$scope.bindBleP = '--':$scope.bindBleP = btdp.name;//生理腕表ble绑定结果
+    btdp.id==""?$scope.bindBleP = '--':$scope.bindBleP = btdp.name;//生理腕表ble绑定结果
 
     console.log($scope.bindBleP);
+    PatientInfo.GetPsPatientInfo(Storage.get("PatientID")).then(//获取病人基本信息，用于绑定生理设备后保存mac
+      function(data)
+      { 
+        $scope.PatientInfo_pre = data;
+        console.log(data);
+      },function(err) {
+      //   
+    });
     $scope.catalog = {};//获取目录
 
     Patients.GetVitalSignDictItems().then(
@@ -1986,12 +2004,12 @@ angular.module('controllers', ['ionic','ngResource','services'])
             }
             break;
         }
-          console.log($scope.Warwound)
-          console.log($scope.Save)
-          console.log($scope.Injury1)
-          console.log($scope.Injury2)
-          console.log($scope.Injury3)
-          console.log($scope.Injury4)
+          // console.log($scope.Warwound)
+          // console.log($scope.Save)
+          // console.log($scope.Injury1)
+          // console.log($scope.Injury2)
+          // console.log($scope.Injury3)
+          // console.log($scope.Injury4)
       }
       $scope.OnFocus = function(i)//当输入框获得焦点是调用，i-所选输入框的索引
       {
@@ -2010,11 +2028,11 @@ angular.module('controllers', ['ionic','ngResource','services'])
       $scope.OndosageFocus = function(item)//当输入框获得焦点是调用，i-所选输入框的索引
       {
         // console.log(itemname);
-        if(item.value==""||item.value==undefined)
-        {
-          // document.getElementById('mytext3').blur();
-          alert("kong");
-        }else{
+        // if(item.value==""||item.value==undefined)
+        // {
+        //   // document.getElementById('mytext3').blur();
+        //   alert("kong");
+        // }else{
           $scope.changedosage = item.ItemName;
           // console.log($scope.changedosage);
           // console.log($scope.dosage[itemname]);
@@ -2025,7 +2043,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.mytext3textareaheight = {"height":scrollHeight - keyboardHeight - 57+"px","padding-top": 30+"px"};
 
           document.getElementById('mytext3').focus();//使通用输入框获得焦点
-        }
+        // }
       }
       $scope.dosagechange = function(item){
         console.log(item);
@@ -2297,9 +2315,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
                 }
                 else
                 {
-                  window.localStorage['bluetoothdeviceP'] = angular.toJson(value);//存储生理设备mac(相当于绑定设备)
-                  $scope.bindBleP = value.name;
-                  window.plugins.toast.showShortBottom('绑定腕表');
+                  $scope.PatientInfo_pre.TerminalIP=value.id+"|"+value.name;
+                  PatientVisitInfo.SetPsPatientVisitInfo($scope.PatientInfo_pre).then(
+                    function(s){
+                      $rootScope.$apply(function(){
+                        window.localStorage['bluetoothdeviceP'] = angular.toJson(value);//存储生理设备mac(相当于绑定设备)
+                        $scope.bindBleP = value.name;
+                        window.plugins.toast.showShortBottom('绑定腕表');
+                      })
+                    },function(e){
+                      console.log("绑定失败")
+                    })
                 }
               }
             })
@@ -2434,6 +2460,13 @@ angular.module('controllers', ['ionic','ngResource','services'])
       }
     }
     $scope.scoring = 0;
+    $scope.showscoredetail = function()
+      {
+        if(ionic.Platform.platform()!='win32')
+          window.plugins.toast.showShortTop("战伤计分:"+$scope.scoring);
+        else 
+          console.log("战伤计分:"+$scope.scoring);
+      }
     var scoring = function()
     {
       var breathscoring = 0;
@@ -2473,61 +2506,55 @@ angular.module('controllers', ['ionic','ngResource','services'])
       // console.log(breathscoring);
       // console.log(bp_hscoring);
       // console.log(mindscoring);
-      $scope.showscoredetail = function()
-      {
-        if(ionic.Platform.platform()!='win32')
-          window.plugins.toast.showShortTop("战伤计分:"+$scope.scoring);
-        else 
-          console.log("战伤计分:"+$scope.scoring);
-      }
+      
       $scope.scoring = breathscoring+bp_hscoring+mindscoring;
       if($scope.scoring>=6&&$scope.scoring<=9)
         {
-          $scope.scoring+="分 重伤";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":3,
-            "ItemValue":'重伤',
+            "ItemValue":'重伤||'+$scope.scoring,
             "UserId":Userid,
             "TerminalName":"sampleTerminalName",
             "TerminalIP":"sampleTerminalIP"
           }
+          $scope.scoring+="分 重伤";
         }
       else if($scope.scoring>=10&&$scope.scoring<=11)
        { 
-        $scope.scoring+="分 中度伤";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":2,
-            "ItemValue":'中度伤',
+            "ItemValue":'中度伤||'+$scope.scoring,
             "UserId":Userid,
             "TerminalName":"sampleTerminalName",
             "TerminalIP":"sampleTerminalIP"
           }
+          $scope.scoring+="分 中度伤";
       }
       else if($scope.scoring==12)
         {
-          $scope.scoring+="分 轻伤";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":1,
-            "ItemValue":'轻伤',
+            "ItemValue":'轻伤||'+$scope.scoring,
             "UserId":Userid,
             "TerminalName":"sampleTerminalName",
             "TerminalIP":"sampleTerminalIP"
           }
+          $scope.scoring+="分 轻伤";
         }
       else if($scope.scoring<=5)
         {
-          $scope.scoring+="分 危重伤";
           $scope.emergencylevel = {
             "ItemCategory":'InjuryExtent',
             "ItemCode":4,
-            "ItemValue":'危重伤',
+            "ItemValue":'危重伤||'+$scope.scoring,
             "UserId":Userid,
             "TerminalName":"sampleTerminalName",
             "TerminalIP":"sampleTerminalIP"
           }
+          $scope.scoring+="分 危重伤";
         }
     }
     $scope.showdescribe = function() {

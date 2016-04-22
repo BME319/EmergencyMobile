@@ -74,8 +74,9 @@ return{
       dt.second=date.getSeconds().toString();
       dt.second.length==1?dt.second='0'+dt.second:dt.second=dt.second;
       dt.fullTime=dt.year+'-'+dt.month+'-'+dt.day+' '+dt.hour+':'+dt.minute+':'+dt.second;
+      dt.date=dt.year+'/'+dt.month+'/'+dt.day;
       return dt;
-    }
+    }, 
   }
 }])
 

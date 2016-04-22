@@ -633,7 +633,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 }])
 
 //新建PID
-.controller('NewPatientCtrl', ['$scope', '$ionicHistory' ,'PatientInfo','MstType','$ionicLoading','$ionicPopup','Storage','$state','bleService','$rootScope', function ($scope, $ionicHistory,PatientInfo,MstType,$ionicLoading,$ionicPopup,Storage,$state,bleService,$rootScope) {
+.controller('NewPatientCtrl', ['$scope', '$ionicHistory' ,'PatientInfo','MstType','$ionicLoading','$ionicPopup','Storage','$state','bleService','$rootScope','Common', function ($scope, $ionicHistory,PatientInfo,MstType,$ionicLoading,$ionicPopup,Storage,$state,bleService,$rootScope,Common) {
 
   $scope.blename="";
   $scope.goBack = function() {
@@ -670,7 +670,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     });      
         
     //获取部别
-     var promise_Troop = MstType.GetMstType('Troop');
+     var promise_Troop = MstType.GetMstType('TroopType');
      promise_Troop.then(function(data)
      { 
        $scope.Troops = data;
@@ -678,7 +678,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     });      
      
      //获取职位
-     var promise_JOB = MstType.GetMstType('JOB');
+     var promise_JOB = MstType.GetMstType('Job');
      promise_JOB.then(function(data)
      { 
        $scope.JOBs = data;
@@ -701,11 +701,14 @@ angular.module('controllers', ['ionic','ngResource','services'])
   $scope.SaveNewPatientID = function() {
     if($scope.NewPatientID.PatientID==""){
       $ionicLoading.show({
-        template: "病人ID不能为空",
+        template: "病人ID或姓名不能为空",
         noBackdrop: true,
         duration: 1000,
       });
-    }
+      
+      
+      }
+    
     else{
       var promise_CheckPatientID = PatientInfo.CheckPatientID( $scope.NewPatientID.PatientID);
       promise_CheckPatientID.then(function(data)
@@ -713,9 +716,20 @@ angular.module('controllers', ['ionic','ngResource','services'])
            
           if(data.result=="病人Id不存在"){
              //showConfirm();
-             if($scope.BasicInfo.DOB) $scope.birthcheck='';
-             setPatientInfo();
+             if($scope.BasicInfo.PatientName)
+             {
+              $scope.namecheck='';
+             if($scope.BasicInfo.DOB) 
+              {
+                $scope.birthcheck='';
+                setPatientInfo();
+              }
+             else $scope.birthcheck='required';
+             
+          }else{
+            $scope.namecheck='required';
           }
+        }
           else{
             $ionicLoading.show({
               template: "该病人ID已存在，请重新输入",
@@ -803,12 +817,12 @@ angular.module('controllers', ['ionic','ngResource','services'])
           "PatientName": $scope.BasicInfo.PatientName,
           "Gender":  $scope.BasicInfo.Gender,
           "Age": jsGetAge($scope.BasicInfo.DOB),
-          "DOB": $scope.BasicInfo.DOB,
+          "DOB": Common.DateTimeNow($scope.BasicInfo.DOB).date,
           "BloodType": $scope.BasicInfo.BloodType,
           "Allergy": $scope.BasicInfo.Allergy,
           "ImageID": $scope.BasicInfo.ImageID,
-          "TroopType": $scope.BasicInfo.Troop,
-          "Job": $scope.BasicInfo.JOB,
+          "TroopType": $scope.BasicInfo.TroopType,
+          "Job": $scope.BasicInfo.Job,
           "Rank": $scope.BasicInfo.Rank,
           'UserID':'',
           'TerminalName':"",
@@ -827,6 +841,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               });
               $state.go('newVisit');
             }//if end 
+          
           },function(err) {  
              $ionicLoading.show({
                template:"保存PatientID失败" , //err.data.result
@@ -906,10 +921,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
 
   $scope.goInjury = function() {
-    // if(!$rootScope.isWritedToCard){
-    //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-    //   return;
-    // } 
+    if(!$rootScope.isWritedToCard){
+      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+      return;
+    } 
     if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')){
        Storage.set("New", 1);
        $state.go('injury');
@@ -1027,10 +1042,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
      
   //后送选择框         
     $scope.showreservePop = function() {
-      // if(!$rootScope.isWritedToCard){
-      //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-      //   return;
-      // }
+      if(!$rootScope.isWritedToCard){
+        $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+        return;
+      }
      var myPopup = Evacation.getPopup($scope);
      myPopup.then(function(res) {
      console.log('haha',res);
@@ -1040,7 +1055,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 }])
 
 //查看或编辑病人基本信息
-.controller('PatientInfoCtrl', ['$scope', '$ionicHistory' ,'PatientInfo','MstType','$ionicLoading','$ionicPopup','Storage','$state', function ($scope, $ionicHistory,PatientInfo,MstType,$ionicLoading,$ionicPopup,Storage,$state) {
+.controller('PatientInfoCtrl', ['$scope', '$ionicHistory' ,'PatientInfo','MstType','$ionicLoading','$ionicPopup','Storage','$state','Common', function ($scope, $ionicHistory,PatientInfo,MstType,$ionicLoading,$ionicPopup,Storage,$state,Common) {
 
   $scope.goBack = function() {
     $ionicHistory.goBack();
@@ -1066,7 +1081,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     });      
         
     //获取部别
-     var promise_Troop = MstType.GetMstType('Troop');
+     var promise_Troop = MstType.GetMstType('TroopType');
      promise_Troop.then(function(data)
      { 
        $scope.Troops = data;
@@ -1074,7 +1089,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     });      
      
      //获取职位
-     var promise_JOB = MstType.GetMstType('JOB');
+     var promise_JOB = MstType.GetMstType('Job');
      promise_JOB.then(function(data)
      { 
        $scope.JOBs = data;
@@ -1152,6 +1167,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
   promise_PatientInfo.then(function(data)
   { 
      $scope.BasicInfo = data;
+     console.log($scope.BasicInfo);
+     $scope.BasicInfo.DOB =new Date($scope.BasicInfo.DOB);
     },function(err) {   
   });
 
@@ -1166,31 +1183,36 @@ angular.module('controllers', ['ionic','ngResource','services'])
             {text: '确认',
              type: 'button-assertive',
            　onTap: function(e) {
-               $scope.BasicInfo.DOB =new Date($scope.BasicInfo.DOB);
+               //$scope.BasicInfo.DOB =Common.DateTime($scope.BasicInfo.DOB).fullTime;
                sendData = {
                 "PatientID": Storage.get("PatientID"),
                 "PatientName": $scope.BasicInfo.PatientName,
                 "Gender":  $scope.BasicInfo.Gender,
                 "Age": jsGetAge($scope.BasicInfo.DOB),
-                "DOB": $scope.BasicInfo.DOB,
+                "DOB": Common.DateTimeNow($scope.BasicInfo.DOB).date,
                 "BloodType": $scope.BasicInfo.BloodType,
                 "Allergy": $scope.BasicInfo.Allergy,
                 "ImageID": $scope.BasicInfo.ImageID,
-                "TroopType": $scope.BasicInfo.Troop,
-                "Job": $scope.BasicInfo.JOB,
+                "TroopType": $scope.BasicInfo.TroopType,
+                "Job": $scope.BasicInfo.Job,
                 "Rank": $scope.BasicInfo.Rank,
                 'UserID':$scope.BasicInfo.UserID,
                 'TerminalName':"",
                 "TerminalIP": ""
               }
-             
-            var promise =  PatientInfo.SetPatientInfo(sendData);
-            promise.then(function(data){
+            if($scope.BasicInfo.PatientName)
+             {
+              $scope.namecheck='';
+             if($scope.BasicInfo.DOB) 
+              {
+                $scope.birthcheck='';
+                 var promise =  PatientInfo.SetPatientInfo(sendData);
+                 promise.then(function(data){
                   //$scope.BasicInfo.DOB =new Date($scope.BasicInfo.DOB);
                   if(data.result=="数据插入成功"){
                    
                     Storage.set("PatientName", $scope.BasicInfo.PatientName);
-                    
+                    console.log($scope.BasicInfo);
                     $ionicLoading.show({
                        template: "患者基本信息修改成功",
                        noBackdrop: true,
@@ -1206,6 +1228,13 @@ angular.module('controllers', ['ionic','ngResource','services'])
                      hideOnStateChange: true
                    }); 
             }); //promise end
+              }
+             else $scope.birthcheck='required';
+             
+          }else{
+            $scope.namecheck='required';
+          } 
+         
           } //onTap end
         },{
             text: '取消',

@@ -983,11 +983,15 @@ angular.module('controllers', ['ionic','ngResource','services'])
       return;
     }
     $ionicLoading.show();
+    var deviceid = "";
+    if(ionic.Platform.platform()!='win32')
+      deviceid=Storage.get('UUID')
+    else deviceid="undefined";
     var sendData = {
                   "PatientID": Storage.get("PatientID"),
                   "VisitNo":  $scope.NewVisitNo.VisitNo,
                   "Status": "1",
-                  "DeviceID": "",  //暂时留空
+                  "DeviceID": deviceid,  //暂时留空
                   "InjuryArea": $scope.visitInfo.InjuryArea, 
                   "InjuryAreaGPS": "",
                   "InjuryDateTime":Common.DateTimeNow($scope.visitInfo.InjuryDateTime).fullTime, //"9999-12-31 23:59:59"
@@ -1324,12 +1328,16 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
   
   //保存
+  var deviceid = "";
+  if(ionic.Platform.platform()!='win32')
+    deviceid=Storage.get('UUID')
+  else deviceid="undefined";
    var saveVisitInfo = function() {
     var sendData = {
                   "PatientID": Storage.get("PatientID"),
                   "VisitNo":  $scope.visitInfo.VisitNo,
                   "Status": "1",
-                  "DeviceID": "",  //暂时留空
+                  "DeviceID": deviceid,  //暂时留空
                   "InjuryArea": $scope.visitInfo.InjuryArea, 
                   "InjuryAreaGPS": "",
                   "InjuryDateTime": Common.DateTimeNow($scope.visitInfo.InjuryDateTime).fullTime, //"9999-12-31 23:59:59"

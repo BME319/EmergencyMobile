@@ -327,12 +327,15 @@ angular.module('controllers', ['ionic','ngResource','services'])
 .controller('AmbulanceListCtrl',['$state','$scope','$ionicLoading','UserInfo','Storage','PatientVisitInfo', '$state','Common', '$ionicPopup', '$stateParams', 'Popup','bleService', function($state,$scope,$ionicLoading,UserInfo,Storage, PatientVisitInfo, $state, Common, $ionicPopup, $stateParams, Popup,bleService){
   $scope.$on('$ionicView.enter', function() {
     $scope.refreshList();
-    ble.isEnabled(function(){
-      $scope.bleRefresh(0);
-    }, function(){
-      // console.log("ble is not enabled");
-      ble.enable($scope.bleRefresh(0));
-    });
+    if(ionic.Platform.platform()!="win32")
+    {
+      ble.isEnabled(function(){
+        $scope.bleRefresh(0);
+      }, function(){
+        // console.log("ble is not enabled");
+        ble.enable($scope.bleRefresh(0));
+      });
+    }
   });
   // 批量处理
   $scope.isshown = function(){
@@ -921,10 +924,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
 
   $scope.goInjury = function() {
-    if(!$rootScope.isWritedToCard){
-      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-      return;
-    } 
+    // if(!$rootScope.isWritedToCard){
+    //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+    //   return;
+    // } 
     if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')){
        Storage.set("New", 1);
        $state.go('injury');
@@ -978,10 +981,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
   //保存
   $scope.saveVisitInfo = function(Type) {
-    if(Type && !$rootScope.isWritedToCard){
-      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-      return;
-    }
+    // if(Type && !$rootScope.isWritedToCard){
+    //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+    //   return;
+    // }
     $ionicLoading.show();
     var deviceid = "";
     if(ionic.Platform.platform()!='win32')
@@ -1046,10 +1049,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
      
   //后送选择框         
     $scope.showreservePop = function() {
-      if(!$rootScope.isWritedToCard){
-        $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-        return;
-      }
+      // if(!$rootScope.isWritedToCard){
+      //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+      //   return;
+      // }
      var myPopup = Evacation.getPopup($scope);
      myPopup.then(function(res) {
      console.log('haha',res);
@@ -2671,6 +2674,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       ble_write($scope.step);
     }, function(connectFailure){
       // console.log(connectFailure);
+      window.plugins.toast.showShortBottom('生化设备连接失败');
     });
   }
   $scope.receivecurrentdata = function(){
@@ -2707,7 +2711,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
                   ble_write($scope.step)
                 },2000);
               }
-                    });
+            });
           }else
           { }
         }else{
@@ -2722,6 +2726,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
               $scope.datafromdevice = c;
               if($scope.datafromdevice.length == 34)
               {
+                $scope.catalog.Biochemical[0].value = (($scope.datafromdevice[12]<<8)|$scope.datafromdevice[13])/10;//钾离子
+                $scope.catalog.Biochemical[1].value = (($scope.datafromdevice[14]<<8)|$scope.datafromdevice[15]);//钠离子
+                $scope.catalog.Biochemical[2].value = (($scope.datafromdevice[16]<<8)|$scope.datafromdevice[17])/10;//钙离子
+                $scope.catalog.Biochemical[3].value = (($scope.datafromdevice[18]<<8)|$scope.datafromdevice[19])/10;//pH
+                $scope.catalog.Biochemical[4].value = (($scope.datafromdevice[20]<<8)|$scope.datafromdevice[21])/10;//碳酸氢根离子
+                $scope.catalog.Biochemical[5].value = (($scope.datafromdevice[22]<<8)|$scope.datafromdevice[23]);//氯离子
+                $scope.catalog.Biochemical[6].value = (($scope.datafromdevice[24]<<8)|$scope.datafromdevice[25]);//二氧化碳分压
+                $scope.catalog.Biochemical[7].value = (($scope.datafromdevice[26]<<8)|$scope.datafromdevice[27])/10;//葡萄糖
+                $scope.catalog.Biochemical[8].value = (($scope.datafromdevice[28]<<8)|$scope.datafromdevice[29])/10;//乳酸
+                $scope.catalog.Biochemical[9].value = (($scope.datafromdevice[30]<<8)|$scope.datafromdevice[31])/10;//血红蛋白
+                window.plugins.toast.showShortBottom('生化数据获取成功');
                 setTimeout(function(){
                   $scope.step++;
                   ble_write($scope.step);
@@ -2734,15 +2749,16 @@ angular.module('controllers', ['ionic','ngResource','services'])
             }else{
               //此处应该取消监听
             }
-                  });
+          });
         }
       },function(err){
         // console.log('readerr');
+        window.plugins.toast.showShortBottom('生化数据获取失败');
         // console.log(err);
         $rootScope.$apply(function(){
           $scope.step = 0;
           ble_write(0);
-                });
+        });
       });
   }
   var ble_write = function(step){
@@ -2799,15 +2815,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
 /////////////////////////ble-endv
 
-// var mytest = [];
-// var mytest2 = new Uint8Array(2);
-// mytest2[0]=1;
-// mytest2[1]=2;
-// // angular.forEach(mytest2,function(value,key){
-// //   console.log(value);
-// //   mytest.push(value);
-// // })
-// mytest.concat(mytest2);
-// console.log(mytest);
 }])
+
+// var mytest = new Uint8Array(2);
+// mytest[0]=1;
+// mytest[1]=1;
+// var dat = (mytest[0]<<8)|mytest[1];
+
+// // // angular.forEach(mytest2,function(value,key){
+// // //   console.log(value);
+// // //   mytest.push(value);
+// // // })
+// // mytest.concat(mytest2);
+// console.log(dat/10);
 ;

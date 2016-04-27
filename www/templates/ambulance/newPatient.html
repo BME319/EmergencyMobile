@@ -53,6 +53,7 @@
           </div>  
           <div class="col col-67">
             <select ng-model="BasicInfo.Gender" ng-options="Gender.Type as Gender.Description for Gender in Genders" style="width:100%">
+              <option value="BasicInfo.Gender">{{BasicInfo.Gender }} </option>
             </select>
           </div>
         </div>
@@ -92,7 +93,7 @@
           </div>  
           <div class="col col-67" style="width:100%">
             <select ng-model="BasicInfo.BloodType" ng-options="BloodType.Type as BloodType.Description for BloodType in BloodTypes" style="width:100%">
-              <!-- <option value="">-请选择-</option> -->
+              <option value="BasicInfo.BloodType">{{BasicInfo.BloodType}}</option>
             </select>
           </div>
         </div>

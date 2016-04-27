@@ -807,7 +807,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       }
 
     }
-   $scope.BasicInfo={}; //提交的容器初始化
+   $scope.BasicInfo={Gender:"1",BloodType:"1"}; //提交的容器初始化
    $scope.BasicInfo.bluetoothdevice="";
    //患者基本信息插入
    var setPatientInfo = function() {
@@ -841,7 +841,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
               });
               $state.go('newVisit');
             }//if end 
-          
+           console.log($scope.BasicInfo);
           },function(err) {  
              $ionicLoading.show({
                template:"保存PatientID失败" , //err.data.result
@@ -1286,6 +1286,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
      promise.then(function(data)
      { 
        $scope.visitInfo = data;
+       $scope.visitInfo.InjuryDateTime=$scope.visitInfo.InjuryDateTime;
+       $scope.visitInfo.InjuryDateTime =$scope.visitInfo.InjuryDateTime.substr(0,10)+' '+$scope.visitInfo.InjuryDateTime.substr(11,19);
+       $scope.visitInfo.VisitDateTime=$scope.visitInfo.VisitDateTime;
+       $scope.visitInfo.VisitDateTime =$scope.visitInfo.VisitDateTime.substr(0,10)+' '+$scope.visitInfo.VisitDateTime.substr(11,19);
        $scope.visitInfo.InjuryDateTime =new Date($scope.visitInfo.InjuryDateTime);
        $scope.visitInfo.VisitDateTime =new Date($scope.visitInfo.VisitDateTime);
       },function(err) {   

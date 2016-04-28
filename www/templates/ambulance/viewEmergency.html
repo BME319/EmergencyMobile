@@ -76,11 +76,17 @@
 				<i class = "icon ion-android-arrow-dropdown"></i>&nbsp;&nbsp;生理体征参数信息
 			</ion-item>
 			<ion-item  ng-show = "true">
-				<div class="row row-wrap">
+			<!-- 两列的显示 -->
+				<!-- <div class="row row-wrap">
 					<div class="col col-50" ng-repeat="VitalSignInfo in VitalSignInfos">
 						<span><b>{{VitalSignInfo.ItemName}}：</b></span>{{VitalSignInfo.ItemValue}}{{VitalSignInfo.ItemUnit}}
 					</div>
-				</div>
+				</div> -->
+				
+					<div ng-repeat="VitalSignInfo in VitalSignInfos">
+						<span><b>{{VitalSignInfo.ItemName}}：</b></span>{{VitalSignInfo.ItemValue}}{{VitalSignInfo.ItemUnit}}
+					</div>
+				
 			</ion-item>
 		</div>
 

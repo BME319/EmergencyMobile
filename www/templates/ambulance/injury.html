@@ -10,14 +10,19 @@
     </ion-nav-buttons>
 </ion-nav-bar>
     <div class="textarea2" ng-style="mytext2height">
-    	<textarea ng-style="mytext2textareaheight" id="mytext2" ng-model="textarea2value" ng-blur="loosecurse()" type="text" rows="1" placeholder="请填写50字以内" ng-maxlength=50></textarea>
+    	<textarea ng-style="mytext2textareaheight" id="mytext2" ng-model="textarea2value" ng-blur="loosecurse()" type="text" rows="1" ng-maxlength=50></textarea>
     	<div class="button-bar">
 		  <a class="button button-positive" ng-click="doneotherinfo()">完成</a>
 		</div>
     </div>
+	<div class="textarea2" ng-style="mytext3height">
+    	<textarea ng-style="mytext3textareaheight" id="mytext3" ng-model="textarea3value" ng-blur="mytext3loosecurse()" type="text" rows="1" ng-maxlength=50></textarea>
+    	<div class="button-bar">
+		  <a class="button button-positive" ng-click="doneotherinfo()">完成2</a>
+		</div>
+    </div>
 	
-	
-	<ion-nav-view id="basicinfo" class="basicinfo hide-on-keyboard-open">
+	<ion-nav-view id="basicinfo" class="basicinfo hide-on-keyboard-open  item-text-wrap">
 		<ion-content scroll="false">
 			<a class="item item-thumbnail-left" href="#">
 				<img src="img/head_portrait.jpg">
@@ -29,13 +34,21 @@
 			</a>
 		</ion-content>
 	</ion-nav-view>
-	<ion-nav-view id="firstdirs" class="firstdirs hide-on-keyboard-open">
+	<ion-nav-view id="firstdirs" class="firstdirs hide-on-keyboard-open item-text-wrap">
 		<ion-content scroll="true" scrollbar-y="false">
 			<ion-list>
 				<div class="itemdivider">
 			    	<h3>检测信息</h3>
 			  	</div>
 			  	<a class="item item-icon-right" href="#" ng-repeat="item in firstdirs[2]"
+				ng-click="chooseitem(item)"  ng-style="items[item].Style">
+    				<i class="icon ion-ios-arrow-right"></i>
+					{{item | itemname}}
+				</a>
+				<div class="itemdivider">
+			    	<h3>分类信息</h3>
+			  	</div>
+			  	<a class="item item-icon-right" href="#" ng-repeat="item in firstdirs[3]"
 				ng-click="chooseitem(item)"  ng-style="items[item].Style">
     				<i class="icon ion-ios-arrow-right"></i>
 					{{item | itemname}}
@@ -59,13 +72,130 @@
 			</ion-list>
 		</ion-content>
 	</ion-nav-view>
-	<ion-nav-view id="seconddirs" class="seconddirs hide-on-keyboard-open">
+	<ion-nav-view id="seconddirs" class="seconddirs hide-on-keyboard-open item-text-wrap">
 		<ion-content scroll="true" scrollbar-y="false" delegate-handle="myhand">
 			<ion-list ng-if="!showPDA">
 				<ion-checkbox ng-model="item.status" ng-repeat="item in itemdetail" ng-change="onselectchange(item)">
 					{{item.ItemName}}
 				</ion-checkbox>
-				<textarea class="textarea1" ng-focus="OnFocus($index)" id="mytext1" ng-model="itemdetail.slice(-1)[0].value" ng-if="itemdetail.slice(-1)[0].status" type="text" rows="4" placeholder="请填写50字以内" ng-maxlength=50></textarea>
+				<textarea class="textarea1" ng-focus="OnFocus($index)" id="mytext1" ng-model="itemdetail.slice(-1)[0].value" ng-if="itemdetail.slice(-1)[0].status&&itemdetail.slice(-1)[0].ItemName!='复温'" type="text" rows="4" placeholder="请填写50字以内" ng-maxlength=50></textarea>
+			</ion-list>
+			<div ng-if="showClassfyinfo">
+				<ion-list>
+					<ion-radio name="aa" ng-model="Warwound.ItemValue" value="战伤" ng-change="ClassifyInfochange(0,'战伤')">战伤</ion-radio>
+					<ion-radio name="aa" ng-model="Warwound.ItemValue" value="非战伤" ng-change="ClassifyInfochange(0,'非战伤')">非战伤</ion-radio>
+				</ion-list>
+				<div class="item item-divider item-positive"></div>
+				<ion-list>
+					<ion-radio name="bb" ng-model="Save.ItemValue" value="自救" ng-change="ClassifyInfochange(1,'自救')">自救</ion-radio>
+					<ion-radio name="bb" ng-model="Save.ItemValue" value="互救" ng-change="ClassifyInfochange(1,'互救')">互救</ion-radio>
+					<ion-radio name="bb" ng-model="Save.ItemValue" value="卫救" ng-change="ClassifyInfochange(1,'卫救')">卫救</ion-radio>
+					<ion-radio name="bb" ng-model="Save.ItemValue" value="未处置" ng-change="ClassifyInfochange(1,'未处置')">未处置</ion-radio>
+				</ion-list>
+				<div class="item item-divider item-positive"></div>
+				<ion-list>
+					<ion-checkbox ng-model="Injury1.ItemValue" ng-checked="Injury1.ItemValue!=undefined" value="紧急处置" ng-change="ClassifyInfochange(2,'紧急处置')">紧急处置</ion-checkbox>
+					<ion-checkbox ng-model="Injury2.ItemValue" ng-checked="Injury2.ItemValue!=undefined" value="放射污染" ng-change="ClassifyInfochange(2,'放射污染')">放射污染</ion-checkbox>
+					<ion-checkbox ng-model="Injury3.ItemValue" ng-checked="Injury3.ItemValue!=undefined" value="隔离" ng-change="ClassifyInfochange(2,'隔离')">隔离</ion-checkbox>
+					<ion-checkbox ng-model="Injury4.ItemValue" ng-checked="Injury4.ItemValue!=undefined" value="染毒" ng-change="ClassifyInfochange(2,'染毒')">染毒</ion-checkbox>
+				</ion-list>
+			</div>
+			<ion-list ng-if="ifAntiInfect">
+				<label class="item item-input item-stacked-label"><!--破伤风类毒素-->
+					<span class="input-label">{{itemdetail[0].ItemName}}:</span>
+					<input id="aa1" type="text" placeholder="请输入剂量" ng-model="itemdetail[0].value" ng-focus="OnFocus(0)">
+				</label>
+				<div class="item item-divider item-positive"></div><!--破伤风抗毒血清-->
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">{{itemdetail[1].ItemName}}:</span>
+					<input id="aa1" type="text" placeholder="请输入剂量" ng-model="itemdetail[1].value" ng-focus="OnFocus(1)">
+				</label>
+				<div class="item item-divider item-positive"></div><!--药名1-->
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">{{itemdetail[2].ItemName}}:</span>
+					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[2].value" ng-focus="OnFocus(2)">
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">剂量:</span>
+					<input id="aa2" type="text" placeholder="请输入剂量" ng-model="dosage[itemdetail[2].ItemName]" ng-focus="OndosageFocus(itemdetail[2])">
+				</label>
+				<div class="item item-divider item-positive"></div><!--药名2-->
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">{{itemdetail[3].ItemName}}:</span>
+					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[3].value" ng-focus="OnFocus(3)">
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">剂量:</span>
+					<input id="aa2" type="text" placeholder="请输入剂量" ng-model="dosage[itemdetail[3].ItemName]" ng-focus="OndosageFocus(itemdetail[3])">
+				</label>
+				<div class="item item-divider item-positive"></div><!--药名3-->
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">{{itemdetail[4].ItemName}}:</span>
+					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[4].value" ng-focus="OnFocus(4)">
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">剂量:</span>
+					<input id="aa2" type="text" placeholder="请输入剂量" ng-model="dosage[itemdetail[4].ItemName]" ng-focus="OndosageFocus(itemdetail[4])">
+				</label>
+				<div class="item item-divider item-positive"></div><!--药名4-->
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">{{itemdetail[5].ItemName}}:</span>
+					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[5].value" ng-focus="OnFocus(5)">
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">剂量:</span>
+					<input id="aa2" type="text" placeholder="请输入剂量" ng-model="dosage[itemdetail[5].ItemName]" ng-focus="OndosageFocus(itemdetail[5])">
+				</label>
+			</ion-list>
+			<ion-list ng-if="ifAntiShock">
+				<ion-list ng-repeat="item in AntiShockselect"><!--抗休克裤 吸氧-->
+					<ion-checkbox ng-model="item.selectstatus" ng-checked="item.selectstatus" value=true>{{item.ItemName}}</ion-checkbox>
+				</ion-list>
+				<div class="item item-divider item-positive"></div><!--输血血型-->
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">{{itemdetail[0].ItemName}}:</span>
+					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[0].value" ng-focus="OnFocus(0)">
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">剂量:</span>
+					<input id="aa2" type="text" placeholder="请输入剂量" ng-model="dosage[itemdetail[0].ItemName]" ng-focus="OndosageFocus(itemdetail[0])">
+				</label>
+				<div class="item item-divider item-positive"></div><!--输液药物-->
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">{{itemdetail[1].ItemName}}:</span>
+					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[1].value" ng-focus="OnFocus(1)">
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">剂量:</span>
+					<input id="aa2" type="text" placeholder="请输入剂量" ng-model="dosage[itemdetail[1].ItemName]" ng-focus="OndosageFocus(itemdetail[1])">
+				</label>
+				<div class="item item-divider item-positive"></div><!--血管活性药物名-->
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">{{itemdetail[2].ItemName}}:</span>
+					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[2].value" ng-focus="OnFocus(2)">
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">剂量:</span>
+					<input id="aa2" type="text" placeholder="请输入剂量" ng-model="dosage[itemdetail[2].ItemName]" ng-focus="OndosageFocus(itemdetail[2])">
+				</label>
+				<div class="item item-divider item-positive"></div><!--止痛药名-->
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">{{itemdetail[3].ItemName}}:</span>
+					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[3].value" ng-focus="OnFocus(3)">
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">剂量:</span>
+					<input id="aa2" type="text" placeholder="请输入剂量" ng-model="dosage[itemdetail[3].ItemName]" ng-focus="OndosageFocus(itemdetail[3])">
+				</label>
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">止痛时间:</span>
+					<input type="datetime-local" ng-model="dosage['时间']"> 
+				</label>
+				<div class="item item-divider item-positive"></div><!--其他-->
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">{{itemdetail[4].ItemName}}:</span>
+					<input id="aa1" type="text" placeholder="请输入其他" ng-model="itemdetail[4].value" ng-focus="OnFocus(4)">
+				</label>
 			</ion-list>
 			<div ng-if="showPDA">
 				<ion-list ng-if="ifphysiological">
@@ -175,6 +305,7 @@
 	}
 	.textarea2 textarea{
 		width:100%;
+		font-size: 30px;
 		/*height: 80px;*/
 	}
 	.textarea2 div{

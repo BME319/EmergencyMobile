@@ -1,10 +1,11 @@
 
 <ion-view view-title="急救伤员列表">
-<ion-nav-buttons side="secondary">
+<ion-nav-buttons side="primary">
     <a class="button button-icon icon ion-android-sync" ng-click="bleRefresh(1)" ng-if="newPatientIcon"></a>
+</ion-nav-buttons>
+<ion-nav-buttons side="secondary">
     <a class="button button-icon icon ion-android-person-add" href="#/newPatient" ng-if="newPatientIcon"></a>
     <button class="button button-icon icon ion-ios-people-outline" ng-click="show.showDelete = !show.showDelete;" ng-if="isshown()"></button>
-    <!-- (!newPatientIcon)&&(curtab=="tab3") -->
 </ion-nav-buttons>
 <ion-header-bar class="bar-calm">
     <div class="tabs tabs-icon-top tabs-top"  >  

@@ -2,7 +2,6 @@
   <ion-nav-bar class="bar-calm nav-title-slide-ios7">
     <ion-nav-back-button class="button-icon ion-android-arrow-back"></ion-nav-back-button>    
   </ion-nav-bar>
-  <!--<div  style="position: absolute;top: 43px;z-index:100;display: block;height: 2.5px;background-color: #ef473a;{{barwidth}}" ></div>-->
   <ion-content padding="true">
     <div class="list" style="margin-bottom:0" >
       <label class="item item-input">
@@ -26,22 +25,12 @@
         <span class="input-label" style="width:80px">职位</span>
         <input type="text" ng-model="profile.Position" placeholder="请填写您的职位">
       </label> 
- <!--      <a class="item">
-        <div>
-          <span>角色</span><span class="item-note">role{{role}}</span>
-        </div>
-      </a>  -->    
       <label class="item item-input">
         <span class="input-label" style="width:80px">单位</span>
         <input type="text" ng-model="profile.Affiliation" placeholder="请填写您的工作单位">
       </label> 
-<!--       <label class="item item-input">
-        <span class="input-label" style="width:80px">职位</span>
-        <input type="password" ng-model="register.position" placeholder="请填写您的职位">
-      </label>   --> 
-      <!-- <span style="color:#c55e19">{{logStatus}}</span><span style="color:white">00</span>                 -->
+      <button  class="button button-block button-assertive" ng-click="upload(profile)">保 存</button>          
     </div>        
-    <button  class="button button-block button-assertive" ng-click="upload(profile)">保 存</button>          
   </ion-content>
   </div>
 </ion-view>

@@ -1514,7 +1514,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
     firstdirs.height = (scrollHeight - 190);
     firstdirs.top = 143;
-    firstdirs.width = scrollWidth*2/5;
+    firstdirs.width = scrollWidth*7/20;
 
     seconddirs.height = firstdirs.height;
     seconddirs.top = firstdirs.top;
@@ -2248,28 +2248,6 @@ angular.module('controllers', ['ionic','ngResource','services'])
           });
         }
       }
-      // A confirm dialog
-    $scope.showConfirm = function() {
-      // console.log($scope.blescanlist);
-      var confirmPopup = $ionicPopup.confirm({
-        title: '选择设备',
-        scope:$scope,
-        template:'<ion-list><a class="item item-icon-right" href="#" ng-repeat="item in blescanlist"ng-click="selectbledevice($index)"><i class="icon ion-android-done" ng-if="item.showconnecticon"></i>{{item.name}}</a></ion-list>'
-      }).then(function(res) {
-        if(res) {
-          // console.log('You are sure');
-          for(var i=0;i<$scope.blescanlist.length;i++)
-          {
-            if($scope.blescanlist[i].showconnecticon == true)
-            {
-                $scope.ble_connect(i);
-            }
-          }
-        } else {
-          // console.log('You are not sure');
-        }
-      });
-    };
     $scope.selectbledevice = function(index){
       // console.log(index);
       // console.log($scope.blescanlist);
@@ -2607,26 +2585,54 @@ angular.module('controllers', ['ionic','ngResource','services'])
         }, function(err){
           // console.log(err);
     });
-    $scope.ble_connect = function(index){
-      var device_id = $scope.blescanlist[index].id;
-      // console.log(device_id);
-      ble.connect(device_id, function(connectSuccess){
 
-        window.localStorage['blemac'] = angular.toJson(connectSuccess);//angular.fromJson()
-        $rootScope.$apply(function(){
-          $scope.bindble = connectSuccess.name;
+      // A confirm dialog
+    $scope.showConfirm = function() {
+      // console.log($scope.blescanlist);
+      var confirmPopup = $ionicPopup.confirm({
+        title: '选择设备',
+        scope:$scope,
+        template:'<ion-list><a class="item item-icon-right" href="#" ng-repeat="item in blescanlist"ng-click="selectbledevice($index)"><i class="icon ion-android-done" ng-if="item.showconnecticon"></i>{{item.name}}</a></ion-list>'
+      }).then(function(res) {
+        if(res) {
+          // console.log('You are sure');
+          for(var i=0;i<$scope.blescanlist.length;i++)
+          {
+            if($scope.blescanlist[i].showconnecticon == true)
+            {
+                // $scope.ble_connect(i);
+                window.localStorage['blemac'] = angular.toJson($scope.blescanlist[i]);//angular.fromJson()
+                window.plugins.toast.showShortBottom('绑定生化设备');
+                $rootScope.$apply(function(){
+                  $scope.bindble = connectSuccess.name;
                 });
-                // console.log($scope.blescanlist);
-      }, function(connectFailure){
-        $rootScope.$apply(function(){
-          $scope.bindble = '绑定失败';
-          // console.log(index);
-          // console.log($scope.blescanlist[index].showconnecticon)
-          $scope.blescanlist[index].showconnecticon = false;
-                });
-                // console.log($scope.blescanlist);
+            }
+          }
+        } else {
+          // console.log('You are not sure');
+        }
       });
     };
+    // $scope.ble_connect = function(index){
+    //   var device_id = $scope.blescanlist[index].id;
+    //   console.log(device_id);
+    //   ble.connect(device_id, function(connectSuccess){
+
+    //     window.localStorage['blemac'] = angular.toJson(connectSuccess);//angular.fromJson()
+    //     $rootScope.$apply(function(){
+    //       $scope.bindble = connectSuccess.name;
+    //             });
+    //             // console.log($scope.blescanlist);
+    //   }, function(connectFailure){
+    //     $rootScope.$apply(function(){
+    //       $scope.bindble = '绑定失败';
+    //       // console.log(index);
+    //       // console.log($scope.blescanlist[index].showconnecticon)
+    //       $scope.blescanlist[index].showconnecticon = false;
+    //             });
+    //             // console.log($scope.blescanlist);
+    //   });
+    // };
     $scope.ble_disconnect = function(device_id){
       ble.disconnect(device_id, function(disconnectSuccess){
         // console.log(disconnectSuccess);
@@ -2672,13 +2678,15 @@ angular.module('controllers', ['ionic','ngResource','services'])
     // console.log('clickstarttimesync');
     var bledevice = angular.fromJson(window.localStorage['blemac']);
     ble.connect(bledevice.id, function(connectSuccess){
-      // console.log(connectSuccess);
+      window.localStorage['blemac'] = angular.toJson(connectSuccess);
+      console.log(connectSuccess);
       ble_startNotification();
       $scope.step = 0;
       ble_write($scope.step);
     }, function(connectFailure){
-      // console.log(connectFailure);
-      window.plugins.toast.showShortBottom('生化设备连接失败');
+      console.log(connectFailure);
+      window.plugins.toast.showShortBottom('生化设备失去连接');
+      ble.disconnect(bledevice.id, function(disconnectSuccess){}, function(disconnectfailure){});
     });
   }
   $scope.receivecurrentdata = function(){
@@ -2686,6 +2694,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     $scope.datafromdevice = new Uint8Array(0);
     var bledevice = angular.fromJson(window.localStorage['blemac']);
     ble.connect(bledevice.id, function(connectSuccess){
+      window.localStorage['blemac'] = angular.toJson(connectSuccess);
       // console.log(connectSuccess);
       ble_startNotification();
       $scope.step = 2;
@@ -2714,10 +2723,13 @@ angular.module('controllers', ['ionic','ngResource','services'])
                   $scope.step++;
                   ble_write($scope.step)
                 },2000);
+              }else if($scope.step==1){
+                window.plugins.toast.showShortBottom('时间同步成功');
+                ble.disconnect(bledevice.id, function(disconnectSuccess){}, function(disconnectfailure){});
               }
             });
           }else
-          { }
+          { ble.disconnect(bledevice.id, function(disconnectSuccess){}, function(disconnectfailure){});}
         }else{
           //此处判断接收的数据信息是否正确，正确则发送ble_write(3);mastercomputerrespond指令并取消监听完成获取数据
           $rootScope.$apply(function(){
@@ -2783,8 +2795,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
         case 1://发送时间数据
           ble.writeWithoutResponse(bledevice.id, bledevice.services[2], bledevice.characteristics[6].characteristic, bleService.timesyncdata(),
             function(){
-              // console.log('timesyncdatasuccess');
-              // console.log(new Uint8Array(bleService.timesyncdata()));
+              console.log('timesyncdatasuccess');
+              console.log(new Uint8Array(bleService.timesyncdata()));
             },
             function(err){
               // console.log(err);

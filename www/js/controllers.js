@@ -327,12 +327,15 @@ angular.module('controllers', ['ionic','ngResource','services'])
 .controller('AmbulanceListCtrl',['$state','$scope','$ionicLoading','UserInfo','Storage','PatientVisitInfo', '$state','Common', '$ionicPopup', '$stateParams', 'Popup','bleService', function($state,$scope,$ionicLoading,UserInfo,Storage, PatientVisitInfo, $state, Common, $ionicPopup, $stateParams, Popup,bleService){
   $scope.$on('$ionicView.enter', function() {
     $scope.refreshList();
-    ble.isEnabled(function(){
-      $scope.bleRefresh(0);
-    }, function(){
-      // console.log("ble is not enabled");
-      ble.enable($scope.bleRefresh(0));
-    });
+    if(ionic.Platform.platform()!="win32")
+    {
+      ble.isEnabled(function(){
+        $scope.bleRefresh(0);
+      }, function(){
+        // console.log("ble is not enabled");
+        ble.enable($scope.bleRefresh(0));
+      });
+    }
   });
   // 批量处理
   $scope.isshown = function(){
@@ -988,11 +991,15 @@ angular.module('controllers', ['ionic','ngResource','services'])
       return;
     }
     $ionicLoading.show();
+    var deviceid = "";
+    if(ionic.Platform.platform()!='win32')
+      deviceid=Storage.get('UUID')
+    else deviceid="undefined";
     var sendData = {
                   "PatientID": Storage.get("PatientID"),
                   "VisitNo":  $scope.NewVisitNo.VisitNo,
                   "Status": "1",
-                  "DeviceID": "",  //暂时留空
+                  "DeviceID": deviceid,  //暂时留空
                   "InjuryArea": $scope.visitInfo.InjuryArea, 
                   "InjuryAreaGPS": "",
                   "InjuryDateTime":Common.DateTimeNow($scope.visitInfo.InjuryDateTime).fullTime, //"9999-12-31 23:59:59"
@@ -1333,12 +1340,16 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
   
   //保存
+  var deviceid = "";
+  if(ionic.Platform.platform()!='win32')
+    deviceid=Storage.get('UUID')
+  else deviceid="undefined";
    var saveVisitInfo = function() {
     var sendData = {
                   "PatientID": Storage.get("PatientID"),
                   "VisitNo":  $scope.visitInfo.VisitNo,
                   "Status": "1",
-                  "DeviceID": "",  //暂时留空
+                  "DeviceID": deviceid,  //暂时留空
                   "InjuryArea": $scope.visitInfo.InjuryArea, 
                   "InjuryAreaGPS": "",
                   "InjuryDateTime": Common.DateTimeNow($scope.visitInfo.InjuryDateTime).fullTime, //"9999-12-31 23:59:59"
@@ -1508,7 +1519,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
     firstdirs.height = (scrollHeight - 190);
     firstdirs.top = 143;
-    firstdirs.width = scrollWidth*2/5;
+    firstdirs.width = scrollWidth*7/20;
 
     seconddirs.height = firstdirs.height;
     seconddirs.top = firstdirs.top;
@@ -1575,7 +1586,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
     var blem = angular.fromJson(window.localStorage['blemac']);
     blem==undefined?$scope.bindble = '--':$scope.bindble = blem.name;//生化ble绑定结果blemac
-
+    console.log(blem);
     var btd = angular.fromJson(window.localStorage['bluetoothdevice']);
     btd==undefined?$scope.bindBle = '--':$scope.bindBle = btd.name;//生理手持ble绑定结果
 
@@ -2242,28 +2253,6 @@ angular.module('controllers', ['ionic','ngResource','services'])
           });
         }
       }
-      // A confirm dialog
-    $scope.showConfirm = function() {
-      // console.log($scope.blescanlist);
-      var confirmPopup = $ionicPopup.confirm({
-        title: '选择设备',
-        scope:$scope,
-        template:'<ion-list><a class="item item-icon-right" href="#" ng-repeat="item in blescanlist"ng-click="selectbledevice($index)"><i class="icon ion-android-done" ng-if="item.showconnecticon"></i>{{item.name}}</a></ion-list>'
-      }).then(function(res) {
-        if(res) {
-          // console.log('You are sure');
-          for(var i=0;i<$scope.blescanlist.length;i++)
-          {
-            if($scope.blescanlist[i].showconnecticon == true)
-            {
-                $scope.ble_connect(i);
-            }
-          }
-        } else {
-          // console.log('You are not sure');
-        }
-      });
-    };
     $scope.selectbledevice = function(index){
       // console.log(index);
       // console.log($scope.blescanlist);
@@ -2601,33 +2590,61 @@ angular.module('controllers', ['ionic','ngResource','services'])
         }, function(err){
           // console.log(err);
     });
-    $scope.ble_connect = function(index){
-      var device_id = $scope.blescanlist[index].id;
-      // console.log(device_id);
-      ble.connect(device_id, function(connectSuccess){
 
-        window.localStorage['blemac'] = angular.toJson(connectSuccess);//angular.fromJson()
-        $rootScope.$apply(function(){
-          $scope.bindble = connectSuccess.name;
+      // A confirm dialog
+    $scope.showConfirm = function() {
+      // console.log($scope.blescanlist);
+      var confirmPopup = $ionicPopup.confirm({
+        title: '选择设备',
+        scope:$scope,
+        template:'<ion-list><a class="item item-icon-right" href="#" ng-repeat="item in blescanlist"ng-click="selectbledevice($index)"><i class="icon ion-android-done" ng-if="item.showconnecticon"></i>{{item.name}}</a></ion-list>'
+      }).then(function(res) {
+        if(res) {
+          // console.log('You are sure');
+          for(var i=0;i<$scope.blescanlist.length;i++)
+          {
+            if($scope.blescanlist[i].showconnecticon == true)
+            {
+                // $scope.ble_connect(i);
+                window.localStorage['blemac'] = angular.toJson($scope.blescanlist[i]);//angular.fromJson()
+                window.plugins.toast.showShortBottom('绑定生化设备');
+                $rootScope.$apply(function(){
+                  $scope.bindble = $scope.blescanlist[i].name;
                 });
-                // console.log($scope.blescanlist);
-      }, function(connectFailure){
-        $rootScope.$apply(function(){
-          $scope.bindble = '绑定失败';
-          // console.log(index);
-          // console.log($scope.blescanlist[index].showconnecticon)
-          $scope.blescanlist[index].showconnecticon = false;
-                });
-                // console.log($scope.blescanlist);
+            }
+          }
+        } else {
+          // console.log('You are not sure');
+        }
       });
     };
-    $scope.ble_disconnect = function(device_id){
-      ble.disconnect(device_id, function(disconnectSuccess){
-        // console.log(disconnectSuccess);
-      }, function(disconnectfailure){
-        // console.log(disconnectfailure);
-      });
-    }
+    // $scope.ble_connect = function(index){
+    //   var device_id = $scope.blescanlist[index].id;
+    //   console.log(device_id);
+    //   ble.connect(device_id, function(connectSuccess){
+
+    //     window.localStorage['blemac'] = angular.toJson(connectSuccess);//angular.fromJson()
+    //     $rootScope.$apply(function(){
+    //       $scope.bindble = connectSuccess.name;
+    //             });
+    //             // console.log($scope.blescanlist);
+    //   }, function(connectFailure){
+    //     $rootScope.$apply(function(){
+    //       $scope.bindble = '绑定失败';
+    //       // console.log(index);
+    //       // console.log($scope.blescanlist[index].showconnecticon)
+    //       $scope.blescanlist[index].showconnecticon = false;
+    //             });
+    //             // console.log($scope.blescanlist);
+    //   });
+    // };
+    // $scope.ble_disconnect = function(device_id){
+    //   ble.disconnect(device_id, function(disconnectSuccess){
+    //     // console.log(disconnectSuccess);
+    //   }, function(disconnectfailure){
+    //     // console.log(disconnectfailure);
+    //   });
+    // }
     $scope.ble_enable = function(){
       ble.enable(function(enablesuccess){
         // console.log('enablesuccess');
@@ -2666,12 +2683,15 @@ angular.module('controllers', ['ionic','ngResource','services'])
     // console.log('clickstarttimesync');
     var bledevice = angular.fromJson(window.localStorage['blemac']);
     ble.connect(bledevice.id, function(connectSuccess){
-      // console.log(connectSuccess);
+      window.localStorage['blemac'] = angular.toJson(connectSuccess);
+      console.log(connectSuccess);
       ble_startNotification();
       $scope.step = 0;
       ble_write($scope.step);
     }, function(connectFailure){
-      // console.log(connectFailure);
+      console.log(connectFailure);
+      window.plugins.toast.showShortBottom('生化设备失去连接');
+      ble.disconnect(bledevice.id, function(disconnectSuccess){}, function(disconnectfailure){});
     });
   }
   $scope.receivecurrentdata = function(){
@@ -2679,6 +2699,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
     $scope.datafromdevice = new Uint8Array(0);
     var bledevice = angular.fromJson(window.localStorage['blemac']);
     ble.connect(bledevice.id, function(connectSuccess){
+      window.localStorage['blemac'] = angular.toJson(connectSuccess);
       // console.log(connectSuccess);
       ble_startNotification();
       $scope.step = 2;
@@ -2707,10 +2728,13 @@ angular.module('controllers', ['ionic','ngResource','services'])
                   $scope.step++;
                   ble_write($scope.step)
                 },2000);
+              }else if($scope.step==1){
+                window.plugins.toast.showShortBottom('时间同步成功');
+                ble.disconnect(bledevice.id, function(disconnectSuccess){}, function(disconnectfailure){});
               }
-                    });
+            });
           }else
-          { }
+          { ble.disconnect(bledevice.id, function(disconnectSuccess){}, function(disconnectfailure){});}
         }else{
           //此处判断接收的数据信息是否正确，正确则发送ble_write(3);mastercomputerrespond指令并取消监听完成获取数据
           $rootScope.$apply(function(){
@@ -2723,6 +2747,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
               $scope.datafromdevice = c;
               if($scope.datafromdevice.length == 34)
               {
+                $scope.catalog.Biochemical[0].value = (($scope.datafromdevice[12]<<8)|$scope.datafromdevice[13])/10;//钾离子
+                $scope.catalog.Biochemical[1].value = (($scope.datafromdevice[14]<<8)|$scope.datafromdevice[15]);//钠离子
+                $scope.catalog.Biochemical[2].value = (($scope.datafromdevice[16]<<8)|$scope.datafromdevice[17])/10;//钙离子
+                $scope.catalog.Biochemical[3].value = (($scope.datafromdevice[18]<<8)|$scope.datafromdevice[19])/10;//pH
+                $scope.catalog.Biochemical[4].value = (($scope.datafromdevice[20]<<8)|$scope.datafromdevice[21])/10;//碳酸氢根离子
+                $scope.catalog.Biochemical[5].value = (($scope.datafromdevice[22]<<8)|$scope.datafromdevice[23]);//氯离子
+                $scope.catalog.Biochemical[6].value = (($scope.datafromdevice[24]<<8)|$scope.datafromdevice[25]);//二氧化碳分压
+                $scope.catalog.Biochemical[7].value = (($scope.datafromdevice[26]<<8)|$scope.datafromdevice[27])/10;//葡萄糖
+                $scope.catalog.Biochemical[8].value = (($scope.datafromdevice[28]<<8)|$scope.datafromdevice[29])/10;//乳酸
+                $scope.catalog.Biochemical[9].value = (($scope.datafromdevice[30]<<8)|$scope.datafromdevice[31])/10;//血红蛋白
+                window.plugins.toast.showShortBottom('生化数据获取成功');
                 setTimeout(function(){
                   $scope.step++;
                   ble_write($scope.step);
@@ -2735,15 +2770,16 @@ angular.module('controllers', ['ionic','ngResource','services'])
             }else{
               //此处应该取消监听
             }
-                  });
+          });
         }
       },function(err){
         // console.log('readerr');
+        window.plugins.toast.showShortBottom('生化数据获取失败');
         // console.log(err);
         $rootScope.$apply(function(){
           $scope.step = 0;
           ble_write(0);
-                });
+        });
       });
   }
   var ble_write = function(step){
@@ -2764,8 +2800,8 @@ angular.module('controllers', ['ionic','ngResource','services'])
         case 1://发送时间数据
           ble.writeWithoutResponse(bledevice.id, bledevice.services[2], bledevice.characteristics[6].characteristic, bleService.timesyncdata(),
             function(){
-              // console.log('timesyncdatasuccess');
-              // console.log(new Uint8Array(bleService.timesyncdata()));
+              console.log('timesyncdatasuccess');
+              console.log(new Uint8Array(bleService.timesyncdata()));
             },
             function(err){
               // console.log(err);
@@ -2800,15 +2836,17 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
 /////////////////////////ble-endv
 
-// var mytest = [];
-// var mytest2 = new Uint8Array(2);
-// mytest2[0]=1;
-// mytest2[1]=2;
-// // angular.forEach(mytest2,function(value,key){
-// //   console.log(value);
-// //   mytest.push(value);
-// // })
-// mytest.concat(mytest2);
-// console.log(mytest);
 }])
+
+// var mytest = new Uint8Array(2);
+// mytest[0]=1;
+// mytest[1]=1;
+// var dat = (mytest[0]<<8)|mytest[1];
+
+// // // angular.forEach(mytest2,function(value,key){
+// // //   console.log(value);
+// // //   mytest.push(value);
+// // // })
+// // mytest.concat(mytest2);
+// console.log(dat/10);
 ;

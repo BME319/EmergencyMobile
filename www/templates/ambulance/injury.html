@@ -215,7 +215,7 @@
 					</ion-item>
 					<label class="item item-input" ng-repeat="item in itemdetail">
 						<span class="input-label">{{item.ItemName}}<span ng-if=(item.ItemName!="神志")>({{item.ItemUnit}})</span>:</span>
-							<input type="text" ng-model="item.value" ng-focus="OnFocus($index)"></input>
+							<input type="text" ng-model="item.value" ng-focus="OnFocus($index)" style="width: 40%"></input>
 					</label>
 					<div class="item" style="font-size: 15px;" ng-click="showscoredetail()">
 						战伤计分:&nbsp{{scoring}}
@@ -381,5 +381,9 @@
 	    top: 15px;
 	    z-index: 3;
 	    margin-top: -21px;
+	}
+	.item-text-wrap .item{
+		white-space: normal;
+		overflow: hidden;
 	}
 </style>

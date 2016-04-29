@@ -344,6 +344,23 @@ angular.module('controllers', ['ionic','ngResource','services'])
   $scope.select = function(item) {
     item.itemClass = !item.itemClass;
   };
+  $scope.triagegroup = function(){
+    var i=0;
+    $scope.patientlist_triage = [];
+    // 将选中的病人放到一个数组里
+    angular.forEach($scope.PatientList, function(data){
+      if(data.itemClass==true){
+        $scope.patientlist_triage[i] = {"PatientID":data.PatientID, "VisitNo":data.VisitNo};
+        i++;
+      };
+    });
+    console.log($scope.patientlist_triage);
+    if ($scope.patientlist_triage.length==0) {
+      $ionicLoading.show({template:'请选择分诊对象',noBackdrop:true,duration:1500});
+    } else {
+      Popup.triagePopup("group", $scope);
+    }
+  };
   //从生理设备获取数据
   var receivevdata = function(i,bluetoothdevice){
 
@@ -414,19 +431,6 @@ angular.module('controllers', ['ionic','ngResource','services'])
       receivevdata(i,$scope.PatientList[i].TerminalIP);
     }
   }   
-  $scope.triagegroup = function(){
-    var i=0;
-    $scope.patientlist_triage = [];
-    // 将选中的病人放到一个数组里
-    angular.forEach($scope.PatientList, function(data){
-      if(data.itemClass==true){
-        $scope.patientlist_triage[i] = {"PatientID":data.PatientID, "VisitNo":data.VisitNo};
-        i++;
-      };
-    });
-    console.log($scope.patientlist_triage);
-    Popup.triagePopup("group", $scope);
-  };
 
   //根据状态获取不同列表，并控制显示
   $scope.GetPatientsbyStatus = function(Status)
@@ -525,7 +529,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
       $scope.tab1_checked=true;  
        $scope.tab2_checked=false;  
        $scope.tab3_checked=false; 
-       $scope.tab4_checked=true;   
+       $scope.tab4_checked=false;   
        $scope.curtab="tab1";  
        $scope.tab1_color={color:'blue'};   
        $scope.tab2_color="";  
@@ -538,7 +542,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
        $scope.tab1_checked=false;  
        $scope.tab2_checked=true;  
        $scope.tab3_checked=false; 
-       $scope.tab4_checked=true; 
+       $scope.tab4_checked=false; 
        $scope.curtab="tab2";  
        $scope.tab1_color="";   
        $scope.tab2_color={color:'blue'};  
@@ -551,7 +555,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
        $scope.tab1_checked=false;  
        $scope.tab2_checked=false;  
        $scope.tab3_checked=true; 
-       $scope.tab4_checked=true;  
+       $scope.tab4_checked=false;  
        $scope.curtab="tab3";  
        $scope.tab1_color="";   
        $scope.tab2_color="";  
@@ -575,6 +579,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.tab1_checked=true;  
           $scope.tab2_checked=false;  
           $scope.tab3_checked=false;  
+          $scope.tab4_checked=false;
           $scope.curtab="tab1";  
           $scope.tab1_color={color:'blue'};  
           $scope.tab2_color="";  
@@ -603,7 +608,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
           $scope.tab1_color="";  
           $scope.tab2_color="";  
           $scope.tab3_color={color:'blue'}; 
-          $scope.tab2_color="";
+          $scope.tab4_color="";
           $scope.show.showDelete=false;                 
    }  
 

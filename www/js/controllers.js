@@ -924,10 +924,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
   };
 
   $scope.goInjury = function() {
-    // if(!$rootScope.isWritedToCard){
-    //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-    //   return;
-    // } 
+    if(!$rootScope.isWritedToCard){
+      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+      return;
+    } 
     if( (Storage.get("VisitNo")!='') && (Storage.get("PatientID")!='')){
        Storage.set("New", 1);
        $state.go('injury');
@@ -981,10 +981,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
   //保存
   $scope.saveVisitInfo = function(Type) {
-    // if(Type && !$rootScope.isWritedToCard){
-    //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-    //   return;
-    // }
+    if(Type && !$rootScope.isWritedToCard){
+      $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+      return;
+    }
     $ionicLoading.show();
     var deviceid = "";
     if(ionic.Platform.platform()!='win32')
@@ -1049,10 +1049,10 @@ angular.module('controllers', ['ionic','ngResource','services'])
      
   //后送选择框         
     $scope.showreservePop = function() {
-      // if(!$rootScope.isWritedToCard){
-      //   $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
-      //   return;
-      // }
+      if(!$rootScope.isWritedToCard){
+        $ionicLoading.show({template: '请先将信息写入NFC卡片', noBackdrop: true, duration: 1000});
+        return;
+      }
      var myPopup = Evacation.getPopup($scope);
      myPopup.then(function(res) {
      console.log('haha',res);
@@ -1581,7 +1581,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
 
     var blem = angular.fromJson(window.localStorage['blemac']);
     blem==undefined?$scope.bindble = '--':$scope.bindble = blem.name;//生化ble绑定结果blemac
-
+    console.log(blem);
     var btd = angular.fromJson(window.localStorage['bluetoothdevice']);
     btd==undefined?$scope.bindBle = '--':$scope.bindBle = btd.name;//生理手持ble绑定结果
 
@@ -2604,7 +2604,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
                 window.localStorage['blemac'] = angular.toJson($scope.blescanlist[i]);//angular.fromJson()
                 window.plugins.toast.showShortBottom('绑定生化设备');
                 $rootScope.$apply(function(){
-                  $scope.bindble = connectSuccess.name;
+                  $scope.bindble = $scope.blescanlist[i].name;
                 });
             }
           }
@@ -2633,13 +2633,13 @@ angular.module('controllers', ['ionic','ngResource','services'])
     //             // console.log($scope.blescanlist);
     //   });
     // };
-    $scope.ble_disconnect = function(device_id){
-      ble.disconnect(device_id, function(disconnectSuccess){
-        // console.log(disconnectSuccess);
-      }, function(disconnectfailure){
-        // console.log(disconnectfailure);
-      });
-    }
+    // $scope.ble_disconnect = function(device_id){
+    //   ble.disconnect(device_id, function(disconnectSuccess){
+    //     // console.log(disconnectSuccess);
+    //   }, function(disconnectfailure){
+    //     // console.log(disconnectfailure);
+    //   });
+    // }
     $scope.ble_enable = function(){
       ble.enable(function(enablesuccess){
         // console.log('enablesuccess');

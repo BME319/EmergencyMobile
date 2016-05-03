@@ -677,14 +677,14 @@ return{
             timesyncdata:function(){
                 var Timesyncdata = new Uint8Array(10);
                 Timesyncdata[0] = 0x00;//起始标志
-                Timesyncdata[1] = 0xF1;//上位机编号
+                Timesyncdata[1] = 0x01;//上位机编号
                 Timesyncdata[2] = 0x00;//年（2xxx）
                 Timesyncdata[3] = 0x00;//月
                 Timesyncdata[4] = 0x00;//日
                 Timesyncdata[5] = 0x00;//时
                 Timesyncdata[6] = 0x00;//分
                 Timesyncdata[7] = 0x00;//秒
-                Timesyncdata[8] = 0x88;//校验和
+                Timesyncdata[8] = 0x00;//校验和
                 Timesyncdata[9] = 0x88;//结束码
                 var date = new Date();
                 Timesyncdata[2] = date.getFullYear()%1000;
@@ -693,7 +693,7 @@ return{
                 Timesyncdata[5] = date.getHours();
                 Timesyncdata[6] = date.getMinutes();
                 Timesyncdata[7] = date.getSeconds();
-                // Timesyncdata[8] = Timesyncdata[1]+Timesyncdata[0]+Timesyncdata[2]+Timesyncdata[3]+Timesyncdata[4]+Timesyncdata[5]+Timesyncdata[6]+Timesyncdata[7];
+                Timesyncdata[8] = Timesyncdata[2]+Timesyncdata[3]+Timesyncdata[4]+Timesyncdata[5]+Timesyncdata[6]+Timesyncdata[7];
 
                 return Timesyncdata.buffer;
             },

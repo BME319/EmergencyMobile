@@ -232,7 +232,7 @@ angular.module('controllers', ['ionic','ngResource','services'])
   }
 }])
 //设置-退出
-.controller('SettingCtrl',['$ionicLoading','$state','$scope','$ionicPopup','$timeout','$ionicHistory','$rootScope','Storage',function($ionicLoading,$state,$scope,$ionicPopup,$timeout,$ionicHistory,$rootScope,Storage){
+.controller('SettingCtrl',['$ionicLoading','$state','$scope','$ionicPopup','$timeout','$ionicHistory','$rootScope','Storage','UserInfo',function($ionicLoading,$state,$scope,$ionicPopup,$timeout,$ionicHistory,$rootScope,Storage,UserInfo){
   $scope.$on('$ionicView.enter', function() {
     $scope.myLocation=Storage.get('MY_LOCATION');
     // $scope.isListShown=false;
@@ -252,14 +252,19 @@ angular.module('controllers', ['ionic','ngResource','services'])
           onTap: function(e) {
             var USERID=Storage.get('USERID');
             var UUID=Storage.get('UUID');
-            Storage.clear();
-            Storage.set('USERID',USERID);
-            Storage.set('UUID',UUID);
-            $timeout(function(){
-              $ionicHistory.clearHistory();
-              $ionicHistory.clearCache();
-              $state.go('signIn');
-            },100);
+            UserInfo.SetMobileDevice({DeviceID:UUID,Location:Storage.get('MY_LOCATION_CODE'),UserId:USERID,DeviceFlag:0})
+            .then(function(data){
+              Storage.clear();
+              Storage.set('USERID',USERID);
+              Storage.set('UUID',UUID);
+              $timeout(function(){
+                $ionicHistory.clearHistory();
+                $ionicHistory.clearCache();
+                $state.go('signIn');
+              },100);
+            },function(err){
+              //
+            })
           }
         },{ text: '取消',
             type: 'button-calm',

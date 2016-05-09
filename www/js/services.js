@@ -2,7 +2,7 @@ angular.module('services', ['ionic','ngResource'])
 
 // 客户端配置
 .constant('CONFIG', {
-  baseUrl: 'http://10.12.43.35:8001/Api/v1/',
+  baseUrl: 'http://192.168.10.224:8001/Api/v1/',
   //revUserId: "",
   //TerminalName: "",
   //TerminalIP: "",
@@ -821,21 +821,34 @@ return{
             $ionicLoading.show({template:'NFC卡片写入成功',noBackdrop:true,duration:1000});
         }, 
         function (reason) {
-            $ionicLoading.hide();
-            $ionicPopup.show({
-              title: '<center>操作失败</center>',
-              template: '请重新写入信息至NFC卡片',
-              //subTitle: '2',
-              scope: $rootScope,
-              buttons: [
-                {
-                  text: '确定',
-                  type: 'button-assertive',
-                  onTap: function(e) {
-                  }
-                }
-              ]
-            });
+            var record = ndef.encodenfcvMessage(Storage.get("PatientID"));
+            console.log(record);
+            nfc.writeNfcVcard(
+              [record],
+              function(){
+                  $rootScope.recordToWrite='';
+                  $rootScope.NFCmodefy=false;
+                  $rootScope.isWritedToCard = true;
+                  $ionicLoading.hide();
+                  $ionicLoading.show({template:'NFC卡片写入成功',noBackdrop:true,duration:1000});
+              },
+              function(){
+                  $ionicLoading.hide();
+                  $ionicPopup.show({
+                    title: '<center>操作失败</center>',
+                    template: '请重新写入信息至NFC卡片',
+                    //subTitle: '2',
+                    scope: $rootScope,
+                    buttons: [
+                      {
+                        text: '确定',
+                        type: 'button-assertive',
+                        onTap: function(e) {
+                        }
+                      }
+                    ]
+                  });
+              })
             //navigator.notification.alert(reason, function() {}, "There was a problem");
             // console.log(reason);
         }
@@ -929,6 +942,93 @@ return{
                 function(e)
                 {
                     console.log(e)
+                    nfc.readNfcVcard(
+                      function(s)
+                          {
+                            console.log(s);
+                            console.log(ndef.decodenfcvMessage(s.nfcv));
+                            var pidfromnfc = ndef.decodenfcvMessage(s.nfcv);
+                            if(Storage.get('MY_LOCATION') == undefined){
+                              $ionicLoading.show({template:'请先登录，并提交位置',noBackdrop:true,duration:2000});
+                            }
+                            // else if($rootScope.eraseCard == true){
+                            //   nfc.erase(function(){
+                            //     $ionicLoading.hide();
+                            //     $ionicLoading.show({template:'NFC卡片擦除成功',noBackdrop:true,duration:2000});
+                            //     $rootScope.eraseCard=false;
+                            //   },function(){});
+                            // }
+                            else{
+                              $rootScope.$apply(function(){
+                                  //angular.copy(nfcEvent.tag, tag);
+                                  if(!$rootScope.NFCmodefy && pidfromnfc==''){
+                                    openPop();
+                                  }else if(!$rootScope.NFCmodefy){
+                                    var goToPatient = function(){
+                                      var visit=window.localStorage['VisitNo'];
+                                      PatientVisitInfo.GetPatientVisitInfo(pidfromnfc,visit)
+                                      .then(function(data){
+                                        var s=data.Status;
+                                        if(Storage.get('RoleCode') == 'EmergencyPersonnel'){
+                                          if(s=="1"){
+                                            Storage.set('PatientID',pidfromnfc);
+                                            Storage.set('VisitNo',visit);
+                                            $state.go('visitInfo');
+                                          }else{
+                                            $ionicLoading.show({template:'没有操作权限：该患者已后送',noBackdrop:true,duration:2000});
+                                          } 
+                                        }else{
+                                          if(s=="1") $ionicLoading.show({template:'没有操作权限：该患者还未后送',noBackdrop:true,duration:2000});
+                                          else if(s!="4"){
+                                            if(s=="2"){
+                                              PatientVisitInfo.UpdateArrive(pidfromnfc,visit, "3",Common.DateTimeNow().fullTime, Storage.get('MY_LOCATION_CODE'));
+                                            }
+                                            Storage.set('PatientID',pidfromnfc);
+                                            Storage.set('VisitNo',visit);
+                                            $state.go('viewEmergency');
+                                          }else{
+                                            $ionicLoading.show({template:'没有操作权限：该患者已分诊',noBackdrop:true,duration:2000});
+                                          } 
+                                        }
+                                      },function(err){
+
+                                      });
+                                    }                    
+                                    if($state.current.name == 'newVisit' || $state.current.name == 'newPatient'){
+                                      $ionicPopup.show({
+                                        title: '<center>从NFC扫描到新患者</center>',
+                                        template: '是否放弃当前新建操作，跳转到该患者信息页面？',
+                                        //subTitle: '2',
+                                        scope: $rootScope,
+                                        buttons: [
+                                          {
+                                            text: '确定',
+                                            type: 'button-assertive',
+                                            onTap: function(e) {
+                                                goToPatient();
+                                            }
+                                          },{ text: '取消',
+                                              type: 'button-calm',
+                                            onTap: function(e) {}
+                                          }
+                                        ]
+                                      });                       
+                                    }else{
+                                      goToPatient();
+                                    }
+                                  }
+                              });
+                              if($rootScope.NFCmodefy && $rootScope.recordToWrite!=undefined && $rootScope.recordToWrite!=''){
+                                //写信息
+                                writeTag();
+                              }              
+                            }
+                          },
+                          function(e)
+                          {
+                              console.log(e)
+                          }
+                      );
                 }
             );
         }, function () {

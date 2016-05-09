@@ -102,12 +102,12 @@
 			</div>
 			<ion-list ng-if="ifAntiInfect">
 				<label class="item item-input item-stacked-label"><!--破伤风类毒素-->
-					<span class="input-label">{{itemdetail[0].ItemName}}:</span>
+					<span class="input-label" style="width:100%;">{{itemdetail[0].ItemName}}:</span>
 					<input id="aa1" type="text" placeholder="请输入剂量" ng-model="itemdetail[0].value" ng-focus="OnFocus(0)">
 				</label>
 				<div class="item item-divider item-positive"></div><!--破伤风抗毒血清-->
 				<label class="item item-input item-stacked-label">
-					<span class="input-label">{{itemdetail[1].ItemName}}:</span>
+					<span class="input-label" style="width:100%;">{{itemdetail[1].ItemName}}:</span>
 					<input id="aa1" type="text" placeholder="请输入剂量" ng-model="itemdetail[1].value" ng-focus="OnFocus(1)">
 				</label>
 				<div class="item item-divider item-positive"></div><!--药名1-->
@@ -153,16 +153,16 @@
 				</ion-list>
 				<div class="item item-divider item-positive"></div><!--输血血型-->
 				<label class="item item-input item-stacked-label">
-					<span class="input-label">{{itemdetail[0].ItemName}}:</span>
+					<span class="input-label" style="width:100%;">{{itemdetail[0].ItemName}}:</span>
 					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[0].value" ng-focus="OnFocus(0)">
 				</label>
 				<label class="item item-input item-stacked-label">
-					<span class="input-label">剂量:</span>
+					<span class="input-label" >剂量:</span>
 					<input id="aa2" type="text" placeholder="请输入剂量" ng-model="dosage[itemdetail[0].ItemName]" ng-focus="OndosageFocus(itemdetail[0])">
 				</label>
 				<div class="item item-divider item-positive"></div><!--输液药物-->
 				<label class="item item-input item-stacked-label">
-					<span class="input-label">{{itemdetail[1].ItemName}}:</span>
+					<span class="input-label" style="width:100%;">{{itemdetail[1].ItemName}}:</span>
 					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[1].value" ng-focus="OnFocus(1)">
 				</label>
 				<label class="item item-input item-stacked-label">
@@ -171,7 +171,7 @@
 				</label>
 				<div class="item item-divider item-positive"></div><!--血管活性药物名-->
 				<label class="item item-input item-stacked-label">
-					<span class="input-label">{{itemdetail[2].ItemName}}:</span>
+					<span class="input-label" style="width:100%;">{{itemdetail[2].ItemName}}:</span>
 					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[2].value" ng-focus="OnFocus(2)">
 				</label>
 				<label class="item item-input item-stacked-label">
@@ -180,7 +180,7 @@
 				</label>
 				<div class="item item-divider item-positive"></div><!--止痛药名-->
 				<label class="item item-input item-stacked-label">
-					<span class="input-label">{{itemdetail[3].ItemName}}:</span>
+					<span class="input-label" style="width:100%;">{{itemdetail[3].ItemName}}:</span>
 					<input id="aa1" type="text" placeholder="请输入名称" ng-model="itemdetail[3].value" ng-focus="OnFocus(3)">
 				</label>
 				<label class="item item-input item-stacked-label">
@@ -188,12 +188,12 @@
 					<input id="aa2" type="text" placeholder="请输入剂量" ng-model="dosage[itemdetail[3].ItemName]" ng-focus="OndosageFocus(itemdetail[3])">
 				</label>
 				<label class="item item-input item-stacked-label">
-					<span class="input-label">止痛时间:</span>
+					<span class="input-label" style="width:100%;">止痛时间:</span>
 					<input type="datetime-local" ng-model="dosage['时间']"> 
 				</label>
 				<div class="item item-divider item-positive"></div><!--其他-->
 				<label class="item item-input item-stacked-label">
-					<span class="input-label">{{itemdetail[4].ItemName}}:</span>
+					<span class="input-label" style="width:100%;">{{itemdetail[4].ItemName}}:</span>
 					<input id="aa1" type="text" placeholder="请输入其他" ng-model="itemdetail[4].value" ng-focus="OnFocus(4)">
 				</label>
 			</ion-list>
@@ -203,8 +203,11 @@
 						读取设备
 					</a>
 					<ion-item style="text-align:center;" ng-if="showdeviceoption_p">
-						<a class="item" href="#" ng-click="receivevdata()">
-							获取数据
+						<a class="item" href="#" ng-click="receivevdata(0)">
+							获取手持数据
+						</a>
+						<a class="item" href="#" ng-click="receivevdata(1)">
+							获取腕带数据
 						</a>
 						<a class="item" style="padding-top: 4px;padding-bottom: 4px;" href="#" ng-click="showbluetoothConfirm(0)">
 							绑定手持设备<label><br/>{{bindBle}}</label>
@@ -259,13 +262,25 @@
 		</ion-content>
 	</ion-nav-view>
 	<ion-nav-view id="bottombutton" class="bottombutton hide-on-keyboard-open">
-		<ion-content scroll="false" scrollbar-y="false">
+		<ion-content scroll="false" scrollbar-y="false"  ng-if="fromstate==0">
 			<div class="button-bar">
 			  <a class="button button-assertive" ng-click="showreservePop()">后送</a>
 			  <a class="button button-positive" ng-click="saveall()">保存</a>
 			</div>
 		</ion-content>
+		<ion-content scroll="false" scrollbar-y="false" ng-if="fromstate==1">
+			<div class="button-bar">
+			  <a class="button button-positive" ng-click="saveall()">保存</a>
+			</div>
+		</ion-content>
 	</ion-nav-view>
+	<!-- <ion-nav-view id="bottombutton" class="bottombutton hide-on-keyboard-open" ng-if="false">
+		<ion-content scroll="false" scrollbar-y="false">
+			<div class="button-bar">
+			  <a class="button button-positive" ng-click="saveall()">保存1</a>
+			</div>
+		</ion-content>
+	</ion-nav-view> -->
 </ion-view>
 <style type="text/css">
 	html,body{height:100%}
